@@ -50,7 +50,7 @@ Official pages should be refreshed weekly in a production extension. Any changed
 
 Fixed-size chunks were rejected because one chunk could contain multiple Xids or lose table-row relationships. The selected strategy creates one identifier-centered record with separate meaning, evidence, and limitation fields.
 
-The application computes a 256-dimensional local feature-hash embedding over unigrams and adjacent bigrams. Vectors are persisted in a checked-in index and verified against the corpus fingerprint in CI. This credential-free baseline runs in both Node and the browser. BM25 provides exact keyword retrieval, especially for numeric Xids and long DCGM field names.
+The application computes a deterministic 256-dimensional feature-hash embedding over unigrams and adjacent bigrams. The public website stores reviewed document vectors in a versioned Pinecone namespace and queries it only from a server route. A checked-in index remains the credential-free offline regression and ablation baseline. BM25 provides exact keyword retrieval, especially for numeric Xids and long DCGM field names.
 
 ## Retrieval and reranking
 
@@ -71,7 +71,7 @@ The system refuses when:
 Representative design instructions included:
 
 1. Make exact Xids and DCGM names first-class retrieval metadata.
-2. Combine BM25 with a deterministic local embedding.
+2. Combine BM25 with a deterministic embedding served from a versioned Pinecone namespace.
 3. Expose retrieval ranks so results are inspectable.
 4. Keep official definitions distinct from internal runbooks.
 5. Generate only from retrieved structured fields.
@@ -108,14 +108,15 @@ Recorded result:
 | Refusal precision | 100.0% |
 | Refusal recall | 100.0% |
 | p95 local latency | 2.31 ms |
+| p95 Pinecone retrieval latency | 191.74 ms |
 
-The expanded test suite contains 26 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, model contracts, ablations, and observability configuration. These results validate the checked-in regression set only.
+The expanded test suite contains 29 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and metadata, model contracts, ablations, and observability configuration. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
 
 ## Observability integration
 
 The repository contains a Fluent Bit tail/parser configuration, resource enrichment, and an OpenTelemetry Collector OTLP receiver with resource normalization and debug output. It replays synthetic GPU logs through `http://127.0.0.1:4318/v1/logs`.
 
-This optional path shows how GPU telemetry can be normalized and transported. It intentionally ends at the Collector debug exporter. The browser analyzer consumes pasted text; it does not imply an unimplemented collector-to-RAG backend.
+This optional path shows how GPU telemetry can be normalized and transported. It intentionally ends at the Collector debug exporter. The browser sends pasted text to the same-origin analysis route, which uses Pinecone only for reviewed-document retrieval; it does not imply a direct collector-to-RAG connection.
 
 ## User interface
 

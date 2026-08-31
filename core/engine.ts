@@ -9,11 +9,17 @@ import type {
 import { cosine, documentText, embed, fnv1a, tokenize } from './vector.ts';
 
 const RRF_K = 60;
-const CORPUS_VERSION = '2026-08-29-review-2';
+export const CORPUS_VERSION = '2026-08-29-review-2';
 
 export { cosine, embed, tokenize } from './vector.ts';
 
 export type RetrievalStrategy = 'bm25' | 'vector' | 'hybrid' | 'hybrid-rerank';
+
+export interface AnalysisRetrievalOptions {
+  vectorIndexVersion: string;
+  retrievalBackend: SignalAnalysis['diagnostics']['retrievalBackend'];
+  startedAt?: number;
+}
 
 const semanticIntents: Array<{ id: string; pattern: RegExp }> = [
   { id: 'nvidia-xid-79', pattern: /fallen off (?:the )?bus|driver (?:can(?:not|'t)|cannot) access (?:the )?gpu|gpu .*disappeared.*host/i },
@@ -107,9 +113,6 @@ export function retrieveWithStrategy(
   limit = 5,
   strategy: RetrievalStrategy = 'hybrid-rerank',
 ): RetrievalResult[] {
-  const queryTokens = tokenize(query);
-  const signals = extractSignals(query);
-  const sparseScores = bm25(queryTokens, documents);
   const queryVector = embed(query);
   const usePrecomputed = documents === defaultCorpus;
   const denseScores = documents.map((document) => {
@@ -120,6 +123,19 @@ export function retrieveWithStrategy(
       : undefined;
     return Math.max(0, cosine(queryVector, stored ?? embed(documentText(document))));
   });
+  return rankWithDenseScores(query, documents, denseScores, limit, strategy);
+}
+
+function rankWithDenseScores(
+  query: string,
+  documents: CorpusDocument[],
+  denseScores: number[],
+  limit: number,
+  strategy: RetrievalStrategy,
+): RetrievalResult[] {
+  const queryTokens = tokenize(query);
+  const signals = extractSignals(query);
+  const sparseScores = bm25(queryTokens, documents);
   const sparseRanks = ranks(sparseScores);
   const denseRanks = ranks(denseScores);
 
@@ -152,6 +168,19 @@ export function retrieveWithStrategy(
     .slice(0, limit);
 }
 
+export function retrieveWithExternalDenseScores(
+  query: string,
+  denseScoreByDocumentId: ReadonlyMap<string, number>,
+  documents: CorpusDocument[] = defaultCorpus,
+  limit = 5,
+  strategy: RetrievalStrategy = 'hybrid-rerank',
+): RetrievalResult[] {
+  const denseScores = documents.map((document) =>
+    Math.max(0, denseScoreByDocumentId.get(document.id) ?? 0),
+  );
+  return rankWithDenseScores(query, documents, denseScores, limit, strategy);
+}
+
 export function retrieve(
   query: string,
   documents: CorpusDocument[] = defaultCorpus,
@@ -177,8 +206,22 @@ export function analyzeTelemetry(
   documents: CorpusDocument[] = defaultCorpus,
 ): SignalAnalysis {
   const started = nowMs();
-  const observed = extractSignals(query);
   const retrieval = retrieve(query, documents, 5);
+  return analyzeTelemetryFromRetrieval(query, retrieval, documents, {
+    vectorIndexVersion: precomputedVectorIndex.version,
+    retrievalBackend: 'local-vector-index',
+    startedAt: started,
+  });
+}
+
+export function analyzeTelemetryFromRetrieval(
+  query: string,
+  retrieval: RetrievalResult[],
+  documents: CorpusDocument[] = defaultCorpus,
+  options: AnalysisRetrievalOptions,
+): SignalAnalysis {
+  const started = options.startedAt ?? nowMs();
+  const observed = extractSignals(query);
   const unknown = unknownExactSignals(observed, documents);
   const hasExact = observed.xids.length + observed.metrics.length > 0;
   const top = retrieval[0];
@@ -197,13 +240,14 @@ export function analyzeTelemetry(
     matchedSemanticIntents,
     decisionReasons,
     corpusVersion: CORPUS_VERSION,
-    vectorIndexVersion: precomputedVectorIndex.version,
+    vectorIndexVersion: options.vectorIndexVersion,
+    retrievalBackend: options.retrievalBackend,
     generationMode: 'deterministic-template' as const,
   });
 
   if (refuse) {
     const reason = unknown.length
-      ? `The local corpus does not contain an authoritative entry for ${unknown.join(', ')}.`
+      ? `The reviewed corpus does not contain an authoritative entry for ${unknown.join(', ')}.`
       : 'The input does not contain enough supported GPU telemetry context for a grounded answer.';
     return {
       status: 'refused',

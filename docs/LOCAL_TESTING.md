@@ -6,13 +6,18 @@
 - Node.js 22.13 or newer
 - npm
 
+Required for the Pinecone-backed website and managed-index evaluation:
+
+- Pinecone serverless index using dense 256-dimensional cosine vectors
+- `PINECONE_API_KEY`, `PINECONE_INDEX_HOST`, `PINECONE_INDEX_NAME`, and `PINECONE_NAMESPACE`
+
 Optional integration tools:
 
 - Fluent Bit
 - OpenTelemetry Collector Contrib
 - Docker or Podman, if you prefer containers for the optional replay
 
-A GPU, Kubernetes cluster, model API key, and telemetry backend are not required.
+A GPU, Kubernetes cluster, model API key, and telemetry backend are not required. Pinecone is optional for the local CLI, unit tests, ablations, and offline evaluation.
 
 ## 1. Clone and install
 
@@ -37,8 +42,8 @@ npm test
 Expected summary:
 
 ```text
-tests 26
-pass 26
+tests 29
+pass 29
 fail 0
 ```
 
@@ -69,7 +74,25 @@ npm run index:check
 npm run freshness
 ```
 
-## 4. Type-check and build the website
+## 4. Configure and validate Pinecone
+
+Copy `.env.example` to `.env.local`, add the server-only values, and never commit the file. Promote the reviewed corpus and run the live evaluation:
+
+```bash
+npm run pinecone:sync
+npm run evaluate:pinecone
+```
+
+Expected conditions:
+
+- 17 records in the configured namespace;
+- Recall@5 `100.0%`;
+- MRR `0.931`;
+- citation validity `100.0%`;
+- refusal precision and recall `100.0%`; and
+- zero failures.
+
+## 5. Type-check and build the website
 
 ```bash
 npm run typecheck
@@ -79,7 +102,7 @@ npm run build
 
 All commands should exit with status zero.
 
-## 5. Start the interactive website
+## 6. Start the interactive website
 
 ```bash
 npm run dev
@@ -101,13 +124,14 @@ Also verify:
 - `Reset` restores the Xid 79 sample;
 - citation links open the named official source;
 - the retrieval trace shows top result plus sparse/vector rank;
+- diagnostics identify `pinecone` as the retrieval backend and the configured namespace;
 - the page remains usable at narrow/mobile width; and
 - keyboard focus is visible on buttons and links;
 - clicking **Run full pipeline** advances through all nine visual stages;
 - pause, reset, and direct stage selection work; and
 - the browser console contains no hydration error.
 
-## 6. Run a CLI analysis
+## 7. Run a CLI analysis
 
 ```bash
 npm run analyze -- "Xid 48 DCGM_FI_DEV_ECC_DBE_VOL_TOTAL=2 A100 R570"
@@ -145,7 +169,7 @@ See [`LLM_MODE.md`](LLM_MODE.md) for local provider configuration. Unknown ident
 
 See [`INGESTION_AND_FRESHNESS.md`](INGESTION_AND_FRESHNESS.md). A refresh creates a review candidate; it never changes the corpus automatically.
 
-## 7. Optional Fluent Bit and OpenTelemetry replay
+## 8. Optional Fluent Bit and OpenTelemetry replay
 
 Start an OpenTelemetry Collector with the checked-in configuration:
 
@@ -173,13 +197,14 @@ This replay validates collection shape only. It does not feed the website automa
 
 To demonstrate the full project flow, copy a record printed by Fluent Bit or the Collector into the website analyzer. A production extension can replace this manual boundary with an authenticated adapter that reads from a log backend or receives OTLP-derived events.
 
-## 8. Full release checklist
+## 9. Full release checklist
 
 ```bash
 npm test
 npm run index:check
 npm run freshness
 npm run evaluate
+npm run evaluate:pinecone
 npm run ablate
 npm run typecheck
 npm run lint
@@ -217,3 +242,7 @@ Confirm the collector is listening on `127.0.0.1:4318`, the HTTP receiver is ena
 ### An expected identifier refuses
 
 Check that `core/corpus.ts` contains the exact normalized identifier. Add a corpus record and an independent evaluation case together; never add only the expected label.
+
+### Pinecone retrieval is unavailable
+
+Confirm `.env.local` contains all four variables, the index is Ready, its dimension is 256, and the configured namespace contains 17 vectors. Run `npm run pinecone:sync` before starting the website.

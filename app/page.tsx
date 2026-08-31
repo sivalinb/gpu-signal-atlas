@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Activity,
   ArrowUpRight,
@@ -17,6 +17,7 @@ import {
   Gauge,
   GitBranch,
   Layers3,
+  LoaderCircle,
   Network,
   Pause,
   Play,
@@ -41,9 +42,27 @@ import {
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { corpus } from '@/core/corpus';
-import { analyzeTelemetry } from '@/core/engine';
 import { samples } from '@/core/samples';
 import type { SignalAnalysis } from '@/core/types';
+
+interface AnalysisErrorPayload {
+  error?: string;
+}
+
+async function requestSignalAnalysis(telemetry: string, signal?: AbortSignal): Promise<SignalAnalysis> {
+  const response = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ telemetry }),
+    cache: 'no-store',
+    signal,
+  });
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => ({}))) as AnalysisErrorPayload;
+    throw new Error(payload.error ?? 'Analysis is temporarily unavailable.');
+  }
+  return (await response.json()) as SignalAnalysis;
+}
 
 const evaluationMetrics = [
   ['Recall@5', '100%', '31 labeled cases'],
@@ -70,7 +89,7 @@ const flow = [
     icon: Braces,
     number: '02',
     title: 'Embed',
-    text: 'Read deterministic 256-dimensional vectors from a checked-in, integrity-verified index.',
+    text: 'Encode the query into the same deterministic 256-dimensional space used by Pinecone.',
   },
   {
     icon: Search,
@@ -127,11 +146,11 @@ const walkthroughSteps = [
     icon: Database,
     number: '04',
     short: 'Index',
-    title: 'Vectors are computed once and persisted',
-    technology: '256d feature hash · checked-in index · integrity gate',
-    explanation: 'The build writes one normalized vector per corpus record. CI compares the stored corpus hash and every vector so stale indexes cannot ship.',
+    title: 'Reviewed vectors are promoted to Pinecone',
+    technology: '256d feature hash · Pinecone serverless · versioned namespace',
+    explanation: 'The sync workflow upserts one normalized vector per reviewed corpus record. Stable IDs, review metadata, and a versioned namespace keep promotion and rollback auditable.',
     input: '17 reviewed records',
-    output: '17 × 256 precomputed vector matrix',
+    output: '17 vectors in corpus-2026-08-31',
   },
   {
     icon: Activity,
@@ -148,9 +167,9 @@ const walkthroughSteps = [
     number: '06',
     short: 'Retrieve',
     title: 'Sparse and vector retrieval run side by side',
-    technology: 'BM25 · precomputed cosine similarity · top-k',
-    explanation: 'BM25 protects exact machine identifiers while the vector path helps symptom language. Both preserve their independent rank for inspection.',
-    input: 'Parsed query + stored vector index',
+    technology: 'BM25 · Pinecone cosine search · top-k',
+    explanation: 'BM25 protects exact machine identifiers while Pinecone supplies managed semantic candidates. Both preserve their independent rank for inspection.',
+    input: 'Parsed query + Pinecone corpus namespace',
     output: 'Sparse rank S1 · vector rank V1',
   },
   {
@@ -367,10 +386,11 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
       <CardContent className="space-y-6 pt-5 text-slate-200">
         <SignalTokens analysis={analysis} />
 
-        <div className="grid gap-2 rounded-xl border border-primary/15 bg-primary/[0.035] p-3 font-mono text-[10px] text-slate-400 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-2 rounded-xl border border-primary/15 bg-primary/[0.035] p-3 font-mono text-[10px] text-slate-400 sm:grid-cols-2 lg:grid-cols-5">
           <span>trace {analysis.diagnostics.traceId.slice(0, 12)}…</span>
           <span suppressHydrationWarning>{analysis.diagnostics.durationMs.toFixed(2)} ms analysis</span>
-          <span>index {analysis.diagnostics.vectorIndexVersion}</span>
+          <span className="truncate" title={analysis.diagnostics.vectorIndexVersion}>index {analysis.diagnostics.vectorIndexVersion}</span>
+          <span>{analysis.diagnostics.retrievalBackend}</span>
           <span>{analysis.diagnostics.generationMode}</span>
         </div>
 
@@ -446,8 +466,33 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
 
 export default function Home() {
   const [input, setInput] = useState<string>(samples[0].text);
-  const [submitted, setSubmitted] = useState<string>(samples[0].text);
-  const analysis = useMemo(() => analyzeTelemetry(submitted), [submitted]);
+  const [analysis, setAnalysis] = useState<SignalAnalysis | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    requestSignalAnalysis(samples[0].text, controller.signal)
+      .then((result) => setAnalysis(result))
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        setAnalysisError(error instanceof Error ? error.message : 'Analysis is temporarily unavailable.');
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, []);
+
+  async function runAnalysis(telemetry: string): Promise<void> {
+    setLoading(true);
+    setAnalysisError(null);
+    try {
+      setAnalysis(await requestSignalAnalysis(telemetry));
+    } catch (error) {
+      setAnalysisError(error instanceof Error ? error.message : 'Analysis is temporarily unavailable.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
@@ -470,7 +515,7 @@ export default function Home() {
             <a className="transition hover:text-foreground" href="#evaluation">Evaluation</a>
           </nav>
           <Badge variant="outline" className="border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
-            <span className="size-1.5 rounded-full bg-emerald-300" /> Offline corpus
+            <span className="size-1.5 rounded-full bg-emerald-300" /> Pinecone-backed corpus
           </Badge>
         </div>
       </header>
@@ -493,7 +538,7 @@ export default function Home() {
             {[
               [corpus.length.toString(), 'chunks'],
               ['31', 'evals'],
-              ['0', 'API keys'],
+              ['0', 'browser keys'],
             ].map(([value, label]) => (
               <div key={label} className="rounded-xl border border-border/70 bg-card/70 px-3 py-4 text-center backdrop-blur">
                 <p className="font-mono text-xl text-primary">{value}</p>
@@ -507,7 +552,7 @@ export default function Home() {
           <Card className="h-fit border border-border/70 bg-card/80 shadow-2xl shadow-black/20 backdrop-blur">
             <CardHeader className="border-b border-border/60">
               <CardTitle className="flex items-center gap-2"><Activity className="size-4 text-primary" /> Inspect telemetry</CardTitle>
-              <CardDescription>Use a replay or paste your own event. Analysis stays in this browser.</CardDescription>
+              <CardDescription>Use a replay or paste your own event. Retrieval runs through a server-only Pinecone connection.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-4">
               <div className="flex flex-wrap gap-2" aria-label="Sample telemetry">
@@ -530,13 +575,13 @@ export default function Home() {
                 spellCheck={false}
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="font-mono text-[11px] leading-5 text-muted-foreground">BM25 + 256d local embedding + exact-ID boost</p>
+                <p className="font-mono text-[11px] leading-5 text-muted-foreground">BM25 + Pinecone 256d retrieval + exact-ID boost</p>
                 <div className="flex gap-2">
-                  <Button size="lg" variant="outline" onClick={() => { setInput(samples[0].text); setSubmitted(samples[0].text); }} aria-label="Reset sample">
+                  <Button size="lg" variant="outline" disabled={loading} onClick={() => { setInput(samples[0].text); void runAnalysis(samples[0].text); }} aria-label="Reset sample">
                     <RefreshCw className="size-4" /> Reset
                   </Button>
-                  <Button size="lg" className="bg-primary px-5 text-primary-foreground hover:bg-primary/90" onClick={() => setSubmitted(input)}>
-                    <Sparkles className="size-4" /> Analyze signal
+                  <Button size="lg" disabled={loading} className="bg-primary px-5 text-primary-foreground hover:bg-primary/90" onClick={() => void runAnalysis(input)}>
+                    {loading ? <LoaderCircle className="size-4 animate-spin" /> : <Sparkles className="size-4" />} {loading ? 'Retrieving evidence' : 'Analyze signal'}
                   </Button>
                 </div>
               </div>
@@ -544,7 +589,9 @@ export default function Home() {
               <div className="border-t border-border/60 pt-4">
                 <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Retrieval trace</p>
                 <div className="space-y-3">
-                  {analysis.retrieval.slice(0, 3).map((result, index) => (
+                  {loading && [0, 1, 2].map((item) => <div key={item} className="h-8 animate-pulse rounded-lg bg-muted/60" />)}
+                  {!loading && analysisError && <p className="text-sm leading-6 text-amber-200">{analysisError}</p>}
+                  {!loading && analysis?.retrieval.slice(0, 3).map((result, index) => (
                     <div key={result.document.id}>
                       <div className="mb-1 flex items-center justify-between gap-3 text-xs">
                         <span className="truncate text-muted-foreground"><span className="mr-2 font-mono text-primary">0{index + 1}</span>{result.document.title}</span>
@@ -560,7 +607,23 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <ResultPanel analysis={analysis} />
+          {loading ? (
+            <Card className="grid min-h-96 place-items-center border border-primary/15 bg-card/70">
+              <CardContent className="flex flex-col items-center gap-3 pt-6 text-center">
+                <LoaderCircle className="size-7 animate-spin text-primary" />
+                <p className="font-heading text-lg">Retrieving reviewed evidence</p>
+                <p className="max-w-sm text-sm leading-6 text-muted-foreground">The server is combining Pinecone vector candidates with exact-identifier BM25 ranking.</p>
+              </CardContent>
+            </Card>
+          ) : analysisError ? (
+            <Card className="grid min-h-96 place-items-center border border-amber-300/20 bg-amber-300/[0.035]">
+              <CardContent className="max-w-md pt-6 text-center">
+                <ShieldAlert className="mx-auto size-7 text-amber-300" />
+                <p className="mt-3 font-heading text-lg text-amber-100">Evidence retrieval unavailable</p>
+                <p className="mt-2 text-sm leading-6 text-amber-50/60">{analysisError} No diagnostic response was generated.</p>
+              </CardContent>
+            </Card>
+          ) : analysis ? <ResultPanel analysis={analysis} /> : null}
         </div>
       </section>
 
@@ -573,7 +636,7 @@ export default function Home() {
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">System flow</p>
               <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">A transparent RAG path, not an agent maze.</h2>
             </div>
-            <p className="max-w-xl text-sm leading-6 text-muted-foreground">Every transformation is inspectable. The default path uses a persisted local index and deterministic generation; an optional strict-schema LLM can replace only the final composer.</p>
+            <p className="max-w-xl text-sm leading-6 text-muted-foreground">Every transformation is inspectable. Production dense retrieval uses a versioned Pinecone namespace; BM25, reranking, evidence gating, and deterministic generation remain explicit application controls.</p>
           </div>
 
           <div className="grid gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/70 sm:grid-cols-2 lg:grid-cols-5">
@@ -593,7 +656,7 @@ export default function Home() {
             <Card className="border border-border/70 bg-card/70">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Network className="size-4 text-primary" /> Telemetry integration</CardTitle>
-                <CardDescription>Optional collection replay; the browser analyzer remains a separate, local input surface.</CardDescription>
+                <CardDescription>Optional collection replay; the analyzer sends only the submitted snapshot to a server-side evidence service.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-muted-foreground">
@@ -612,7 +675,7 @@ export default function Home() {
                 <CardTitle className="flex items-center gap-2"><GitBranch className="size-4 text-primary" /> Safety contract</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-                {['No production writes', 'No hidden evaluator labels', 'No uncited diagnosis', 'No credentials required'].map((item) => (
+                {['No production writes', 'No hidden evaluator labels', 'No uncited diagnosis', 'No browser-exposed secrets'].map((item) => (
                   <p key={item} className="flex items-center gap-2"><Check className="size-3.5 text-primary" />{item}</p>
                 ))}
               </CardContent>

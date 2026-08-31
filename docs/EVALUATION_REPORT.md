@@ -2,14 +2,14 @@
 
 ## Objective
 
-Measure whether GPU Signal Atlas retrieves the expected corpus evidence, keeps citations tied to retrieved documents, refuses unsupported inputs, and meets its local latency target.
+Measure whether GPU Signal Atlas retrieves the expected corpus evidence, keeps citations tied to retrieved documents, refuses unsupported inputs, and meets latency targets for both the offline baseline and Pinecone-backed production path.
 
 ## Evaluation boundary
 
 The results apply only to:
 
 - the checked-in curated corpus;
-- the checked-in deterministic embedding and ranking implementation;
+- the deterministic embedding and ranking implementation using either the checked-in index or Pinecone namespace;
 - the 31 independently defined query expectations; and
 - the local Node runtime used for the recorded run.
 
@@ -57,7 +57,7 @@ Fraction of labeled unanswerable cases that the system refused.
 
 ### Latency
 
-Wall-clock duration of local extraction, embedding, retrieval, reranking, and structured generation. It excludes browser rendering and network access because neither is part of the local engine.
+Wall-clock duration of extraction, embedding, retrieval, reranking, and structured generation. The local measurement excludes network access. The Pinecone measurement includes the managed-index network query and therefore represents the production retrieval path more closely.
 
 ## Recorded result
 
@@ -83,7 +83,28 @@ Latency p95: 2.31 ms
 Failures: 0
 ```
 
-Latency varies by machine. The acceptance threshold is five seconds, so the result has substantial margin.
+The managed-index command:
+
+```bash
+npm run evaluate:pinecone
+```
+
+Recorded Pinecone result:
+
+```text
+GPU Signal Atlas Pinecone evaluation
+Cases: 31
+Recall@5: 100.0%
+MRR: 0.931
+Citation validity: 100.0%
+Refusal precision: 100.0%
+Refusal recall: 100.0%
+Latency p50: 102.90 ms
+Latency p95: 191.74 ms
+Failures: 0
+```
+
+Latency varies by machine and network. Both paths remain well inside the five-second acceptance threshold.
 
 ## Ablation evidence
 
@@ -103,6 +124,8 @@ The recorded run shows 100% Recall@5 and 0.931 MRR for BM25 and hybrid-plus-rera
 - model/driver incompatibility adds a warning;
 - corpus IDs are unique, source URLs use HTTPS, and every record has review provenance;
 - result count is bounded; and
+- Pinecone requests preserve the namespace, stable IDs, 256-dimensional vectors, and reviewed metadata;
+- the Pinecone path reports its backend and namespace in diagnostics;
 - the complete evaluation set meets retrieval and refusal targets.
 
 ## Failure analysis

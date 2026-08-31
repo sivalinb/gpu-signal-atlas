@@ -47,7 +47,7 @@ The extractor identifies Xids, DCGM fields, GPU models, and driver branches befo
 
 ### 2. Sparse and vector retrieval are complementary
 
-BM25 preserves exact tokens and field names. The local embedding supports phrase and symptom overlap. Reciprocal-rank fusion combines both without pretending either score is a calibrated probability.
+BM25 preserves exact tokens and field names. Pinecone serves dense candidates from the deterministic embedding to support phrase and symptom overlap. Reciprocal-rank fusion combines both without pretending either score is a calibrated probability.
 
 ### 3. Official meaning outranks local interpretation
 
@@ -67,7 +67,7 @@ An unknown Xid or DCGM field causes a hard refusal. The response asks for a comp
 |---|---|
 | Accept raw GPU telemetry | Browser textarea and CLI argument |
 | Parse exact identifiers | Regex-based Xid, DCGM, GPU, and driver extraction |
-| Embed query and corpus | Deterministic 256-dimensional feature hashing |
+| Embed query and corpus | Deterministic 256-dimensional feature hashing with Pinecone storage |
 | Sparse retrieval | BM25 with document-frequency weighting |
 | Hybrid ranking | Reciprocal-rank fusion plus explicit boosts |
 | Generate grounded result | Structured signal-card template |
@@ -75,12 +75,12 @@ An unknown Xid or DCGM field causes a hard refusal. The response asks for a comp
 | Refuse unsupported requests | Unknown-identifier and domain-threshold checks |
 | Explain retrieval | Browser trace displays top rank and sparse/vector positions |
 | Evaluate quality | 31 independent labeled cases, including six same-domain hard negatives |
-| Run without secrets | No API key, model endpoint, GPU, or production backend required |
+| Protect credentials | Pinecone key is server-only; no client-side secret or model key |
 
 ## Non-functional requirements
 
 - Deterministic output for reproducible evaluation
-- Browser interaction under 100 ms for the demonstration corpus
+- Pinecone-backed p95 analysis under five seconds for the demonstration corpus
 - No production writes or operational side effects
 - Source and authority visible to the user
 - Responsive, keyboard-accessible website
@@ -106,12 +106,13 @@ An unknown Xid or DCGM field causes a hard refusal. The response asks for a comp
 | Refusal precision | ≥90% | 100.0% |
 | Refusal recall | ≥90% | 100.0% |
 | p95 local analysis latency | <5 seconds | 2.31 ms |
+| p95 Pinecone analysis latency | <5 seconds | 191.74 ms |
 | Unapproved production writes | 0 | 0 by design |
 
 ## Production extension path
 
 1. Replace the demonstration corpus with a version-pinned ingestion job and content manifest.
-2. Replace local feature hashing with an approved provider or self-hosted sentence embedding.
+2. Benchmark the deterministic feature hash against an approved provider or self-hosted sentence embedding behind the same Pinecone interface.
 3. Add a cross-encoder reranker while preserving exact-ID boosts.
 4. Place generation behind a strict JSON schema and citation validator.
 5. Add authenticated access and approved internal runbooks.

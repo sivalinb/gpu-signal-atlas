@@ -75,6 +75,7 @@ export interface SignalAnalysis {
     decisionReasons: string[];
     corpusVersion: string;
     vectorIndexVersion: string;
+    retrievalBackend: 'local-vector-index' | 'pinecone';
     generationMode: 'deterministic-template' | 'schema-constrained-llm';
   };
 }

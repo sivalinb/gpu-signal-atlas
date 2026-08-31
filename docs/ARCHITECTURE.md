@@ -6,19 +6,24 @@
 flowchart TB
     U[GPU platform engineer]
     W[GPU Signal Atlas website]
+    A[Server-only analysis API]
     C[Curated evidence corpus]
+    P[Pinecone versioned namespace]
     E[Evaluation suite]
     F[Fluent Bit replay]
     O[OpenTelemetry Collector]
 
     U -->|pastes telemetry| W
-    C -->|in-memory documents| W
-    E -->|regression expectations| W
+    W -->|same-origin POST| A
+    C -->|reviewed fields and BM25| A
+    P -->|dense candidates| A
+    A -->|grounded result or refusal| W
+    E -->|regression expectations| A
     F -. optional OTLP logs .-> O
     O -. normalized replay .-> U
 ```
 
-The evaluated application is self-contained in the browser and command line. The Fluent Bit and OpenTelemetry files demonstrate how the same log shape can enter a real observability pipeline; they are not required for retrieval tests.
+The deployed application keeps input and rendering in the browser but performs retrieval through a same-origin server route. That route is the only component allowed to use the Pinecone credential. The credential-free command-line path and checked-in vector index remain available for deterministic regression testing and ablations.
 
 ## Component architecture
 
@@ -33,7 +38,8 @@ flowchart LR
       X[Signal extractor]
       T[Tokenizer]
       V[256d feature-hash query embedding]
-      P[Persistent precomputed document index]
+      P[Pinecone versioned document namespace]
+      L[Checked-in offline index]
       M[BM25]
       R[Dense and sparse ranks]
       F[RRF + contextual boosts]
@@ -57,6 +63,7 @@ flowchart LR
     X --> T
     T --> V
     P --> R
+    L -. offline evaluation .-> R
     T --> M
     V --> R
     M --> R
@@ -112,7 +119,7 @@ This model is deliberately richer than a plain text chunk. Exact identifiers dri
 
 The tokenizer lowercases text, preserves underscores and telemetry punctuation, and removes one-character noise. A name such as `DCGM_FI_DEV_GPU_TEMP` remains one searchable token.
 
-### Local embedding
+### Dense encoding and vector storage
 
 The embedding stage creates a 256-dimensional deterministic feature-hash vector:
 
@@ -122,7 +129,7 @@ The embedding stage creates a 256-dimensional deterministic feature-hash vector:
 4. Apply logarithmic term-frequency weighting.
 5. L2-normalize the vector.
 
-The result is local, reproducible, and suitable for demonstrating vector retrieval without secrets. Document vectors are generated once into `core/generated/vector-index.ts`; CI verifies its dimensions, corpus fingerprint, record coverage, and numerical equivalence. Query vectors remain computed at analysis time. The method is best understood as a retrieval baseline rather than a semantic-model substitute.
+The representation is reproducible and suitable for controlled retrieval experiments. The production sync workflow upserts reviewed document vectors and metadata into the `corpus-2026-08-31` Pinecone namespace. Query vectors are computed by the server route and submitted to Pinecone for cosine search. The checked-in `core/generated/vector-index.ts` remains an offline baseline; CI verifies its dimensions, corpus fingerprint, record coverage, and numerical equivalence. Pinecone changes storage and serving, not the semantic quality of the embedding itself.
 
 ### BM25
 
@@ -190,7 +197,7 @@ The public and evaluated path uses the deterministic template. `core/llm.ts` add
 
 ## Ingestion and freshness boundary
 
-`ingestion/source-manifest.ts` is the source allow-list. `npm run ingest` fetches one selected source or cleans a local HTML capture and writes a candidate snapshot. It does not mutate the operational corpus. `npm run freshness` validates allow-list coverage, HTTPS, curated-content fingerprints, and seven-day official-source or 30-day internal-source review SLAs. An approved corpus change must rebuild the vector index and pass the full evaluation.
+`ingestion/source-manifest.ts` is the source allow-list. `npm run ingest` fetches one selected source or cleans a local HTML capture and writes a candidate snapshot. It does not mutate the operational corpus. `npm run freshness` validates allow-list coverage, HTTPS, curated-content fingerprints, and seven-day official-source or 30-day internal-source review SLAs. An approved corpus change must rebuild the offline baseline, upsert a new Pinecone namespace, pass both evaluations, and only then promote the namespace configuration.
 
 ## Compatibility behavior
 
@@ -210,8 +217,10 @@ The graphite and mint visual system references telemetry terminals, signal trace
 
 ## Security and privacy
 
-- Analysis runs locally in the browser for the deployed demonstration.
-- No input is persisted or transmitted to a model provider.
+- Analysis is sent only to the same-origin server route and is not persisted by the application.
+- The Pinecone API key is a server secret and is never bundled into browser JavaScript.
+- Submitted telemetry is used as a transient query vector; no raw telemetry record is upserted into the documentation index.
+- No input is transmitted to a model provider.
 - No secret is included in the repository.
 - External links are static authoritative documentation URLs.
 - Observability configuration outputs to localhost only.

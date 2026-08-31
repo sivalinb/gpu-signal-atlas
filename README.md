@@ -12,8 +12,9 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 
 - Structure-aware corpus entries for Xids, DCGM fields, GPU Operator, Fluent Bit, and OpenTelemetry
 - Exact extraction of Xid identifiers, DCGM metric names, GPU models, and driver branches
-- Deterministic 256-dimensional local feature-hash embeddings
-- Checked-in precomputed vector index with corpus-hash and vector-integrity verification
+- Deterministic 256-dimensional feature-hash embeddings
+- Pinecone serverless dense retrieval in a versioned corpus namespace
+- Checked-in precomputed index retained as the offline regression and ablation baseline
 - BM25 sparse retrieval
 - Reciprocal-rank fusion of dense and sparse ranks
 - Exact-identifier, GPU-model, and driver-context boosts
@@ -34,9 +35,9 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 ```mermaid
 flowchart LR
     A[GPU log or metric snapshot] --> B[Signal extractor]
-    B --> C[256d local embedding]
+    B --> C[256d query embedding]
     B --> D[BM25 tokens]
-    C --> E[Dense ranking]
+    C --> E[Pinecone dense ranking]
     D --> F[Sparse ranking]
     E --> G[Reciprocal-rank fusion]
     F --> G
@@ -61,10 +62,14 @@ npm install
 npm test
 npm run evaluate
 npm run ablate
+npm run pinecone:sync
+npm run evaluate:pinecone
 npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+The website and Pinecone evaluation require the four server-only variables shown in `.env.example`. The CLI, unit tests, local evaluation, and ablations remain credential-free.
 
 Analyze a sample from the command line:
 
@@ -89,6 +94,7 @@ The checked-in evaluation contains 31 independent cases across exact identifiers
 | Refusal precision | 100.0% | ≥90% |
 | Refusal recall | 100.0% | ≥90% |
 | Local p95 retrieval latency | 2.31 ms | <5 s |
+| Pinecone p95 end-to-end retrieval latency | 191.74 ms | <5 s |
 
 These results validate the checked-in deterministic corpus and queries. They are regression evidence, not generalized GPU-diagnostic accuracy. Full methodology is in [`docs/EVALUATION_REPORT.md`](docs/EVALUATION_REPORT.md).
 
@@ -100,6 +106,7 @@ components/ui/               shadcn interface primitives
 core/
   corpus.ts                  curated evidence chunks
   engine.ts                  extraction, embedding, BM25, fusion, reranking, generation
+  pinecone.ts                server-only query, upsert, metadata, and index validation
   generated/vector-index.ts persistent precomputed document vectors
   ingestion.ts               cleaning, fingerprint, source validation, freshness logic
   llm.ts                     optional strict-schema model adapter
@@ -110,6 +117,8 @@ evaluation/cases.ts          independent query expectations
 tests/engine.test.ts         unit, retrieval, safety, and regression tests
 scripts/analyze.ts           command-line analysis
 scripts/evaluate.ts          reproducible evaluation runner
+scripts/evaluate-pinecone.ts live managed-index evaluation runner
+scripts/sync-pinecone.ts     reviewed-corpus Pinecone promotion workflow
 scripts/ablate.ts            retrieval and chunking ablation report
 scripts/ingest-source.ts     allow-listed source snapshot workflow
 observability/               Fluent Bit and OTel Collector replay configs
@@ -120,7 +129,8 @@ docs/                        design, visual, evaluation, testing, and submission
 ## Honest boundaries
 
 - The included telemetry is synthetic and labeled as replay data.
-- The local embedding is deterministic and credential-free; it is not a claim of state-of-the-art semantic quality.
+- The feature-hash embedding is deterministic and reproducible; Pinecone manages storage and similarity search but does not make the representation state of the art.
+- The public website queries Pinecone only from a server route. No Pinecone credential is included in browser JavaScript.
 - Template generation is used so every sentence can be traced to retrieved corpus fields.
 - Official documents are paraphrased into compact curated records; source URLs remain the authority.
 - Every record exposes its review date, rolling/snapshot source status, source section, and deterministic curated-content fingerprint.

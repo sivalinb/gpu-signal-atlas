@@ -83,12 +83,12 @@ Problems:
 
 This design is the main reason exact query retrieval is stable in the small corpus.
 
-## Embedding choice
+## Embedding and managed vector storage
 
-The local build uses a deterministic 256-dimensional feature-hash embedding of unigrams and adjacent bigrams. Document vectors are precomputed, checked in, and verified against the corpus hash. It was selected because it:
+The project uses a deterministic 256-dimensional feature-hash embedding of unigrams and adjacent bigrams. Reviewed document vectors are synchronized into a versioned Pinecone namespace for the public website. The precomputed checked-in copy remains available for offline tests and ablations. This representation was selected because it:
 
-- works offline and without credentials;
-- runs in a browser and Node;
+- remains reproducible offline and without credentials;
+- runs in the server route and Node evaluation tools;
 - produces reproducible vectors for tests;
 - demonstrates a replaceable vector-retrieval stage; and
 - avoids implying that a paid model call was made.
@@ -134,7 +134,7 @@ These prompts summarize the design work used to create the project:
 
 1. Design a GPU observability RAG application that is clearly different from a multi-signal incident agent.
 2. Make numeric Xids and long DCGM field names first-class retrieval metadata.
-3. Combine exact keyword retrieval with a local vector baseline and expose both ranks.
+3. Combine exact keyword retrieval with Pinecone dense candidates and expose both ranks.
 4. Generate a signal card that separates documented meaning, evidence to collect, and limitations.
 5. Refuse unknown identifiers instead of retrieving a semantically adjacent GPU error.
 6. Label synthetic telemetry and internal runbooks honestly.
