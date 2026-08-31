@@ -3,7 +3,7 @@ export interface EvaluationCase {
   query: string;
   expectedIds: string[];
   shouldRefuse: boolean;
-  category: 'exact' | 'semantic' | 'multi-source' | 'unanswerable';
+  category: 'exact' | 'semantic' | 'multi-source' | 'unanswerable' | 'hard-negative';
 }
 
 export const evaluationCases: EvaluationCase[] = [
@@ -182,4 +182,12 @@ export const evaluationCases: EvaluationCase[] = [
     shouldRefuse: true,
     category: 'unanswerable',
   },
+  ...[
+    ['hard-k8s-image-pull', 'Kubernetes pod is Pending because the image pull secret is invalid.'],
+    ['hard-otel-timeout', 'OpenTelemetry trace exporter timeout for payment-service spans.'],
+    ['hard-prometheus-auth', 'Prometheus scrape returns 401 for CPU metrics.'],
+    ['hard-gpu-fan', 'GPU fan speed is 2000 RPM; what failed?'],
+    ['hard-gpu-idle', 'GPU utilization is 10 percent during idle.'],
+    ['hard-nic-pcie', 'PCIe correctable errors on a network interface card.'],
+  ].map(([id, query]) => ({ id, query, expectedIds: [], shouldRefuse: true, category: 'hard-negative' as const })),
 ];

@@ -37,6 +37,7 @@ test('grounded analysis includes only retriever-backed citations', () => {
   assert.notEqual(analysis.status, 'refused');
   assert.ok(analysis.citations.length >= 1);
   assert.ok(analysis.citations.every((citation) => retrieved.has(citation.id)));
+  assert.ok(analysis.citations.every((citation) => citation.provenance.reviewStatus === 'curated-demo-review'));
 });
 
 test('unknown Xid follows the refusal path with zero citations', () => {
@@ -53,6 +54,30 @@ test('irrelevant question follows the refusal path', () => {
   assert.equal(analyzeTelemetry('What is the weather forecast for tomorrow?').status, 'refused');
 });
 
+test('same-domain but unsupported telemetry follows the refusal path', () => {
+  const unsupported = [
+    'Kubernetes pod is Pending because the image pull secret is invalid.',
+    'OpenTelemetry trace exporter timeout for payment-service spans.',
+    'Prometheus scrape returns 401 for CPU metrics.',
+    'GPU fan speed is 2000 RPM; what failed?',
+    'GPU utilization is 10 percent during idle.',
+    'PCIe correctable errors on a network interface card.',
+  ];
+  for (const query of unsupported) {
+    const analysis = analyzeTelemetry(query);
+    assert.equal(analysis.status, 'refused', query);
+    assert.equal(analysis.citations.length, 0, query);
+  }
+});
+
+test('analysis emits transparent, non-probabilistic diagnostic metadata', () => {
+  const analysis = analyzeTelemetry('Xid 79 on H100');
+  assert.equal(analysis.evidenceStrength, 'strong');
+  assert.match(analysis.diagnostics.traceId, /^[a-f0-9]{32}$/);
+  assert.ok(analysis.diagnostics.durationMs >= 0);
+  assert.ok(analysis.diagnostics.decisionReasons.includes('supported exact identifier'));
+});
+
 test('unsupported model and driver produce compatibility notes', () => {
   const analysis = analyzeTelemetry('Xid 154 on V100 with driver R470');
   assert.equal(analysis.status, 'needs-investigation');
@@ -62,6 +87,8 @@ test('unsupported model and driver produce compatibility notes', () => {
 test('corpus IDs and URLs are valid and unique', () => {
   assert.equal(new Set(corpus.map((document) => document.id)).size, corpus.length);
   assert.ok(corpus.every((document) => document.sourceUrl.startsWith('https://')));
+  assert.ok(corpus.every((document) => document.provenance.curatedContentHash.startsWith('fnv1a:')));
+  assert.ok(corpus.every((document) => document.provenance.retrievedAt === '2026-08-29'));
 });
 
 test('retrieval result is bounded to five documents', () => {

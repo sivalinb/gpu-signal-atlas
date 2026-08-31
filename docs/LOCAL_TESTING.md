@@ -37,8 +37,8 @@ npm test
 Expected summary:
 
 ```text
-tests 13
-pass 13
+tests 17
+pass 17
 fail 0
 ```
 
@@ -60,6 +60,7 @@ Expected acceptance conditions:
 
 ```bash
 npm run typecheck
+npm run lint
 npm run build
 ```
 
@@ -115,7 +116,7 @@ Expected fields:
 ```json
 {
   "status": "refused",
-  "confidence": 0,
+  "evidenceStrength": "insufficient",
   "citations": []
 }
 ```
@@ -140,10 +141,13 @@ Expected behavior:
 - Parsed events appear on standard output.
 - The OpenTelemetry output sends logs to `http://127.0.0.1:4318/v1/logs`.
 - The collector debug exporter prints received log records.
+- Records carry `service.name`, `service.namespace`, `deployment.environment.name`, `event.domain`, and `telemetry.source` context.
 
 If Fluent Bit is started from a different directory, update the relative `Path` and `Parsers_File` values or run from the repository root.
 
 This replay validates collection shape only. It does not feed the website automatically and does not make any cluster changes.
+
+To demonstrate the full project flow, copy a record printed by Fluent Bit or the Collector into the website analyzer. A production extension can replace this manual boundary with an authenticated adapter that reads from a log backend or receives OTLP-derived events.
 
 ## 8. Full release checklist
 

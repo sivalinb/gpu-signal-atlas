@@ -1,5 +1,14 @@
 export type Authority = 'official' | 'internal';
 export type SignalType = 'xid' | 'metric' | 'pipeline' | 'runbook';
+export type EvidenceStrength = 'strong' | 'moderate' | 'insufficient';
+
+export interface SourceProvenance {
+  sourceVersion: string;
+  retrievedAt: string;
+  sourceSection: string;
+  curatedContentHash: string;
+  reviewStatus: 'curated-demo-review';
+}
 
 export interface CorpusDocument {
   id: string;
@@ -12,6 +21,7 @@ export interface CorpusDocument {
   gpuModels: string[];
   driverBranches: string[];
   updated: string;
+  provenance: SourceProvenance;
   content: string;
   documentedMeaning: string;
   nextEvidence: string[];
@@ -40,11 +50,12 @@ export interface Citation {
   url: string;
   authority: Authority;
   score: number;
+  provenance: SourceProvenance;
 }
 
 export interface SignalAnalysis {
   status: 'grounded' | 'needs-investigation' | 'refused';
-  confidence: number;
+  evidenceStrength: EvidenceStrength;
   observed: ExtractedSignals;
   headline: string;
   documentedMeaning: string;
@@ -54,4 +65,12 @@ export interface SignalAnalysis {
   compatibilityNotes: string[];
   citations: Citation[];
   retrieval: RetrievalResult[];
+  diagnostics: {
+    traceId: string;
+    durationMs: number;
+    evidenceMargin: number;
+    matchedSemanticIntents: string[];
+    decisionReasons: string[];
+    corpusVersion: string;
+  };
 }

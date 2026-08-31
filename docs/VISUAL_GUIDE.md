@@ -121,7 +121,7 @@ flowchart LR
     K --> F --> P --> O --> D
 ```
 
-This path demonstrates collection and normalization. The RAG evaluation remains independent so it can run on any laptop without Docker, Fluent Bit, a collector, or a GPU.
+This path demonstrates collection and normalization and intentionally ends at the Collector debug exporter. For the demo, copy a replayed record into the browser analyzer. A production adapter can later read from a log backend or OTLP-derived event stream. The RAG evaluation remains independent so it can run on any laptop without Docker, Fluent Bit, a collector, or a GPU.
 
 ## Source-code map
 

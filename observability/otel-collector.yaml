@@ -7,6 +7,14 @@ receivers:
         endpoint: 0.0.0.0:4318
 
 processors:
+  resource:
+    attributes:
+      - key: service.name
+        value: gpu-signal-replay
+        action: upsert
+      - key: service.namespace
+        value: gpu-observability
+        action: upsert
   batch: {}
 
 exporters:
@@ -17,5 +25,5 @@ service:
   pipelines:
     logs:
       receivers: [otlp]
-      processors: [batch]
+      processors: [resource, batch]
       exporters: [debug]

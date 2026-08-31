@@ -74,7 +74,7 @@ An unknown Xid or DCGM field causes a hard refusal. The response asks for a comp
 | Cite evidence | Direct official/internal source links |
 | Refuse unsupported requests | Unknown-identifier and domain-threshold checks |
 | Explain retrieval | Browser trace displays top rank and sparse/vector positions |
-| Evaluate quality | 25 independent labeled cases and automated metrics |
+| Evaluate quality | 31 independent labeled cases, including six same-domain hard negatives |
 | Run without secrets | No API key, model endpoint, GPU, or production backend required |
 
 ## Non-functional requirements
@@ -105,7 +105,7 @@ An unknown Xid or DCGM field causes a hard refusal. The response asks for a comp
 | Citation validity | ≥90% | 100.0% |
 | Refusal precision | ≥90% | 100.0% |
 | Refusal recall | ≥90% | 100.0% |
-| p95 local analysis latency | <5 seconds | 4.96 ms |
+| p95 local analysis latency | <5 seconds | 1.73 ms |
 | Unapproved production writes | 0 | 0 by design |
 
 ## Production extension path

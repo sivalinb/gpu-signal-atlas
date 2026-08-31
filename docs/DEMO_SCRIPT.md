@@ -42,17 +42,17 @@ Scroll to **System flow**.
 
 “The pipeline has five visible stages: extract, embed, retrieve, rerank, and ground or refuse. The embedding is a deterministic 256-dimensional feature-hash baseline, so the complete demonstration works without a model key or GPU. It is a replaceable component, not a claim of state-of-the-art semantic search.
 
-The optional integration replays GPU logs through Fluent Bit to an OpenTelemetry Collector over OTLP. That validates collection shape while keeping the RAG evaluation reproducible.”
+The optional integration replays GPU logs through Fluent Bit to an OpenTelemetry Collector over OTLP. The checked-in path ends at the Collector debug exporter; I paste a replayed record into the browser analyzer. That explicit boundary keeps the RAG evaluation reproducible and avoids implying an unimplemented backend.”
 
 ## 3:35–4:20 — Evaluation and testing
 
 Scroll to **Evaluation evidence**.
 
-“The checked-in evaluation has 25 independent expectations across exact identifiers, semantic symptoms, multi-source retrieval, and unanswerable questions.
+“The checked-in evaluation has 31 independent expectations across exact identifiers, semantic symptoms, multi-source retrieval, unanswerable questions, and six adversarial same-domain negatives.
 
-The current run records 100 percent Recall@5, 0.931 mean reciprocal rank, 100 percent citation validity, and 100 percent refusal precision and recall. These are regression results for the curated corpus, not generalized GPU diagnostic accuracy.
+The current run records 100 percent Recall@5, 0.931 mean reciprocal rank, 100 percent citation validity, 100 percent field-level claim grounding, and 100 percent refusal precision and recall. These are regression results for the curated corpus, not generalized GPU diagnostic accuracy.
 
-The repository also has 13 unit and regression tests, type checking, a production website build, and GitHub Actions CI.”
+The repository also has 17 unit and regression tests, type checking, linting, a production website build, and GitHub Actions CI.”
 
 ## 4:20–4:55 — Local reproduction and close
 

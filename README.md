@@ -6,7 +6,7 @@ The project is intentionally different from a root-cause or remediation agent. I
 
 ## One-line definition
 
-GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM metric anomalies from version-pinned official documentation and demonstration runbooks in a web application, targeting at least 90% citation validity, Recall@5 above 85%, and p95 local retrieval latency below five seconds.
+GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM metric anomalies from reviewed official-documentation snapshots and demonstration runbooks in a web application, targeting at least 90% citation validity, Recall@5 above 85%, and p95 local retrieval latency below five seconds.
 
 ## What is implemented
 
@@ -18,10 +18,10 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 - Exact-identifier, GPU-model, and driver-context boosts
 - Reranked top-five retrieval trace
 - Cited, template-generated signal cards
-- Hard refusal for unknown exact identifiers and unrelated questions
+- Hard refusal for unknown identifiers, unrelated questions, and unsupported same-domain telemetry
 - Compatibility notes for unsupported GPU/driver combinations
 - Four interactive browser replays, including a refusal example
-- Twenty-five-case retrieval and refusal evaluation
+- Thirty-one-case retrieval, claim-grounding, and refusal evaluation
 - Node test suite, type checking, production build, and GitHub Actions CI
 - Optional Fluent Bit → OTLP → OpenTelemetry Collector replay configuration
 
@@ -71,16 +71,17 @@ See [`docs/LOCAL_TESTING.md`](docs/LOCAL_TESTING.md) for the complete verificati
 
 ## Evaluation snapshot
 
-The checked-in evaluation contains 25 independent cases across exact identifiers, semantic symptoms, multi-source retrieval, and deliberately unsupported inputs.
+The checked-in evaluation contains 31 independent cases across exact identifiers, semantic symptoms, multi-source retrieval, deliberately unsupported inputs, and six adversarial same-domain negatives.
 
 | Metric | Result | Target |
 |---|---:|---:|
 | Recall@5 | 100.0% | ≥85% |
 | Mean reciprocal rank | 0.931 | ≥0.80 |
 | Citation validity | 100.0% | ≥90% |
+| Claim grounding | 100.0% | 100% |
 | Refusal precision | 100.0% | ≥90% |
 | Refusal recall | 100.0% | ≥90% |
-| Local p95 retrieval latency | 4.96 ms | <5 s |
+| Local p95 retrieval latency | 1.73 ms | <5 s |
 
 These results validate the checked-in deterministic corpus and queries. They are regression evidence, not generalized GPU-diagnostic accuracy. Full methodology is in [`docs/EVALUATION_REPORT.md`](docs/EVALUATION_REPORT.md).
 
@@ -109,6 +110,7 @@ docs/                        design, visual, evaluation, testing, and submission
 - The local embedding is deterministic and credential-free; it is not a claim of state-of-the-art semantic quality.
 - Template generation is used so every sentence can be traced to retrieved corpus fields.
 - Official documents are paraphrased into compact curated records; source URLs remain the authority.
+- Every record exposes its review date, rolling/snapshot source status, source section, and deterministic curated-content fingerprint.
 - The application does not issue resets, drains, restarts, reboots, or Kubernetes writes.
 - A real GPU is not required for the evaluated project.
 - Before production use, pin the complete source corpus to approved versions and add organization-specific change-control rules.

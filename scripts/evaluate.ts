@@ -12,6 +12,8 @@ let predictedRefusals = 0;
 let expectedRefusals = 0;
 let validCitations = 0;
 let citationCount = 0;
+let groundedClaimCount = 0;
+let validGroundedClaims = 0;
 const latencies: number[] = [];
 const failures: string[] = [];
 const knownIds = new Set(corpus.map((document) => document.id));
@@ -34,6 +36,16 @@ for (const testCase of evaluationCases) {
     if (knownIds.has(citation.id) && retrievedIds.includes(citation.id)) validCitations += 1;
   }
 
+  if (!refused) {
+    groundedClaimCount += 1;
+    const citedDocuments = corpus.filter((document) => analysis.citations.some((citation) => citation.id === document.id));
+    const meaningGrounded = citedDocuments.some((document) => document.documentedMeaning === analysis.documentedMeaning);
+    const evidenceGrounded = analysis.nextEvidence.every((claim) => citedDocuments.some((document) => document.nextEvidence.includes(claim)));
+    const limitsGrounded = analysis.limitations.every((claim) => citedDocuments.some((document) => document.limitations.includes(claim)));
+    if (meaningGrounded && evidenceGrounded && limitsGrounded) validGroundedClaims += 1;
+    else failures.push(`${testCase.id}: generated claim was not reproduced from cited corpus fields`);
+  }
+
   for (const expectedId of testCase.expectedIds) {
     expectedRetrievals += 1;
     const rank = retrievedIds.indexOf(expectedId);
@@ -54,12 +66,14 @@ const mrr = expectedRetrievals ? reciprocalRankTotal / expectedRetrievals : 1;
 const refusalPrecision = predictedRefusals ? trueRefusals / predictedRefusals : 1;
 const refusalRecall = expectedRefusals ? trueRefusals / expectedRefusals : 1;
 const citationValidity = citationCount ? validCitations / citationCount : 1;
+const claimGrounding = groundedClaimCount ? validGroundedClaims / groundedClaimCount : 1;
 
 console.log('GPU Signal Atlas evaluation');
 console.log(`Cases: ${evaluationCases.length}`);
 console.log(`Recall@5: ${(recallAt5 * 100).toFixed(1)}%`);
 console.log(`MRR: ${mrr.toFixed(3)}`);
 console.log(`Citation validity: ${(citationValidity * 100).toFixed(1)}%`);
+console.log(`Claim grounding: ${(claimGrounding * 100).toFixed(1)}%`);
 console.log(`Refusal precision: ${(refusalPrecision * 100).toFixed(1)}%`);
 console.log(`Refusal recall: ${(refusalRecall * 100).toFixed(1)}%`);
 console.log(`Latency p50: ${percentile(0.5).toFixed(2)} ms`);

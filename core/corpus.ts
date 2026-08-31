@@ -1,6 +1,30 @@
-import type { CorpusDocument } from './types.ts';
+import type { CorpusDocument, SourceProvenance } from './types.ts';
 
-export const corpus: CorpusDocument[] = [
+type CuratedDocument = Omit<CorpusDocument, 'provenance'>;
+
+const REVIEW_DATE = '2026-08-29';
+
+function fnv1aHex(value: string): string {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
+function provenance(document: CuratedDocument): SourceProvenance {
+  const rolling = document.sourceUrl.includes('/latest/') || document.sourceUrl.includes('docs.fluentbit.io');
+  return {
+    sourceVersion: rolling ? `rolling documentation reviewed ${REVIEW_DATE}` : `source snapshot reviewed ${REVIEW_DATE}`,
+    retrievedAt: REVIEW_DATE,
+    sourceSection: document.title,
+    curatedContentHash: `fnv1a:${fnv1aHex(`${document.id}\n${document.content}\n${document.documentedMeaning}`)}`,
+    reviewStatus: 'curated-demo-review',
+  };
+}
+
+const curatedDocuments: CuratedDocument[] = [
   {
     id: 'nvidia-xid-79',
     title: 'Xid 79: GPU has fallen off the bus',
@@ -102,10 +126,10 @@ export const corpus: CorpusDocument[] = [
     driverBranches: [],
     updated: '2026-05-01',
     content:
-      'Xid 43 is emitted when work on the GPU is stopped. It is frequently an outcome after another application or GPU event, so earlier log context is important. Do not discard preceding Xids when building a timeline.',
-    documentedMeaning: 'GPU work was stopped; the event may be an outcome of an earlier failure.',
-    nextEvidence: ['Inspect preceding Xid messages and identify the affected application or container.'],
-    limitations: ['Xid 43 should not automatically be labeled as the initiating fault.'],
+      'Xid 43 indicates a software-induced fault: an application hit a fault and the GPU stopped its work. NVIDIA describes the GPU as remaining healthy for this event class. Preserve the affected process and preceding events because Xid 43 does not identify the source-code location by itself.',
+    documentedMeaning: 'An application fault stopped GPU work; the event class does not by itself indicate an unhealthy GPU.',
+    nextEvidence: ['Identify the affected application or container and inspect its preceding CUDA and driver errors.'],
+    limitations: ['Xid 43 does not identify the faulty instruction or justify labeling the GPU hardware unhealthy.'],
   },
   {
     id: 'nvidia-xid-154',
@@ -315,3 +339,8 @@ export const corpus: CorpusDocument[] = [
     limitations: ['This workflow gathers evidence; it does not authorize continued operation or hardware replacement.'],
   },
 ];
+
+export const corpus: CorpusDocument[] = curatedDocuments.map((document) => ({
+  ...document,
+  provenance: provenance(document),
+}));

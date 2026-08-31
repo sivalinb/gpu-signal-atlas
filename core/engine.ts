@@ -8,6 +8,32 @@ import type {
 
 const EMBEDDING_DIMENSIONS = 256;
 const RRF_K = 60;
+const CORPUS_VERSION = '2026-08-29-review-2';
+
+const semanticIntents: Array<{ id: string; pattern: RegExp }> = [
+  { id: 'nvidia-xid-79', pattern: /fallen off (?:the )?bus|driver (?:can(?:not|'t)|cannot) access (?:the )?gpu|gpu .*disappeared.*host/i },
+  { id: 'nvidia-xid-48', pattern: /double[- ]bit ecc|uncorrectable .*ecc/i },
+  { id: 'nvidia-xid-31', pattern: /gpu .*page fault|memory management unit .*fault|mmu .*fault/i },
+  { id: 'nvidia-xid-13', pattern: /graphics engine exception/i },
+  { id: 'nvidia-xid-43', pattern: /gpu work stopped|application fault .*gpu|gpu stopped .*work/i },
+  { id: 'nvidia-xid-154', pattern: /gpu recovery action|recovery-action classification/i },
+  { id: 'dcgm-pcie-replay', pattern: /pcie replay (?:count|counter|activity)|cumulative .*pcie replay|pcie replay .*baseline/i },
+  { id: 'dcgm-gpu-temp', pattern: /gpu temperature|thermal throttl/i },
+  { id: 'dcgm-power-usage', pattern: /gpu .*power usage|board power|power limit/i },
+  { id: 'gpu-operator-telemetry', pattern: /gpu operator.*dcgm exporter|dcgm exporter.*workload labels/i },
+  { id: 'fluent-bit-kubernetes', pattern: /fluent bit.*(?:pod|namespace|container|owner).*metadata|kubernetes filter.*metadata/i },
+  { id: 'fluent-bit-otlp', pattern: /fluent bit.*(?:opentelemetry|otlp|\/v1\/logs)/i },
+  { id: 'otel-semconv', pattern: /opentelemetry.*resource attributes|semantic conventions.*(?:logs|metrics|traces)/i },
+];
+
+function nowMs(): number {
+  return typeof performance === 'undefined' ? Date.now() : performance.now();
+}
+
+function traceId(): string {
+  const seed = `${Date.now()}-${Math.random()}-${Math.random()}`;
+  return `${fnv1a(seed).toString(16).padStart(8, '0')}${fnv1a(`${seed}-2`).toString(16).padStart(8, '0')}${fnv1a(`${seed}-3`).toString(16).padStart(8, '0')}${fnv1a(`${seed}-4`).toString(16).padStart(8, '0')}`;
+}
 
 export function tokenize(text: string): string[] {
   return text
@@ -162,18 +188,28 @@ export function analyzeTelemetry(
   query: string,
   documents: CorpusDocument[] = defaultCorpus,
 ): SignalAnalysis {
+  const started = nowMs();
   const observed = extractSignals(query);
   const retrieval = retrieve(query, documents, 5);
   const unknown = unknownExactSignals(observed, documents);
   const hasExact = observed.xids.length + observed.metrics.length > 0;
   const top = retrieval[0];
-  const hasDomainLanguage = /\b(gpu|nvidia|dcgm|pcie|ecc|fluent\s*bit|opentelemetry|otlp|thermal|power|kubernetes|prometheus|graphics\s+engine|page\s+fault)\b/i.test(
-    query,
-  );
+  const matchedSemanticIntents = semanticIntents.filter((intent) => intent.pattern.test(query)).map((intent) => intent.id);
+  const intentRetrieved = matchedSemanticIntents.some((id) => retrieval.slice(0, 3).some((result) => result.document.id === id));
+  const evidenceMargin = top ? Number((top.score - (retrieval[1]?.score ?? 0)).toFixed(4)) : 0;
   const refuse =
     query.trim().length < 8 ||
     unknown.length > 0 ||
-    (!hasExact && (!hasDomainLanguage || !top || top.score < 0.075));
+    (!hasExact && (!intentRetrieved || !top));
+
+  const diagnostics = (decisionReasons: string[]) => ({
+    traceId: traceId(),
+    durationMs: Number((nowMs() - started).toFixed(2)),
+    evidenceMargin,
+    matchedSemanticIntents,
+    decisionReasons,
+    corpusVersion: CORPUS_VERSION,
+  });
 
   if (refuse) {
     const reason = unknown.length
@@ -181,7 +217,7 @@ export function analyzeTelemetry(
       : 'The input does not contain enough supported GPU telemetry context for a grounded answer.';
     return {
       status: 'refused',
-      confidence: 0,
+      evidenceStrength: 'insufficient',
       observed,
       headline: 'Not enough grounded evidence',
       documentedMeaning: reason,
@@ -194,6 +230,11 @@ export function analyzeTelemetry(
       compatibilityNotes: [],
       citations: [],
       retrieval,
+      diagnostics: diagnostics([
+        ...(unknown.length ? ['unknown exact identifier'] : []),
+        ...(!hasExact && !intentRetrieved ? ['no supported semantic intent matched retrieved evidence'] : []),
+        ...(query.trim().length < 8 ? ['input too short'] : []),
+      ]),
     };
   }
 
@@ -221,11 +262,11 @@ export function analyzeTelemetry(
   const secondaryMeanings = grounded
     .filter((result) => result.document.id !== official.document.id)
     .map((result) => result.document.documentedMeaning);
-  const confidence = Math.min(0.99, 0.55 + top.score * 1.9 + (top.exactMatches.length > 0 ? 0.12 : 0));
+  const evidenceStrength = hasExact || (intentRetrieved && evidenceMargin >= 0.005) ? 'strong' : 'moderate';
 
   return {
     status: compatibilityNotes.length > 0 ? 'needs-investigation' : 'grounded',
-    confidence: Number(confidence.toFixed(2)),
+    evidenceStrength,
     observed,
     headline: official.document.title,
     documentedMeaning: official.document.documentedMeaning,
@@ -240,7 +281,13 @@ export function analyzeTelemetry(
       url: result.document.sourceUrl,
       authority: result.document.authority,
       score: result.score,
+      provenance: result.document.provenance,
     })),
     retrieval,
+    diagnostics: diagnostics([
+      hasExact ? 'supported exact identifier' : 'supported semantic intent',
+      `${grounded.length} retrieved passages cleared the evidence boundary`,
+      official.document.authority === 'official' ? 'official source selected for primary meaning' : 'internal source selected for primary meaning',
+    ]),
   };
 }

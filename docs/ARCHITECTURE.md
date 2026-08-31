@@ -88,6 +88,13 @@ interface CorpusDocument {
   gpuModels: string[];
   driverBranches: string[];
   updated: string;
+  provenance: {
+    sourceVersion: string;
+    retrievedAt: string;
+    sourceSection: string;
+    curatedContentHash: string;
+    reviewStatus: 'curated-demo-review';
+  };
   content: string;
   documentedMeaning: string;
   nextEvidence: string[];
@@ -143,7 +150,7 @@ The system then adds bounded terms for:
 - normalized lexical score; and
 - normalized vector similarity.
 
-Scores are ranking features, not probabilities. UI confidence is a bounded presentation score based on the top result and exact-match coverage.
+Scores are ranking features, not probabilities. The UI reports a categorical evidence strength and exposes the trace ID, execution time, corpus version, and decision reasons; it never presents a ranking score as diagnostic probability.
 
 ## Refusal design
 
@@ -155,7 +162,7 @@ flowchart TD
     C --> D{Unknown Xid or DCGM field?}
     D -->|Yes| R
     D -->|No| E[Hybrid retrieval]
-    E --> F{Exact signal or domain language with enough score?}
+    E --> F{Exact supported signal or explicit supported semantic intent?}
     F -->|No| R
     F -->|Yes| G[Generate from top evidence]
     R --> H[Ask for exact identifier and environment context]
@@ -165,13 +172,15 @@ The refusal response intentionally contains no citations because no evidence cle
 
 ## Citation contract
 
-A citation is valid only when:
+A generated answer is valid only when:
 
 1. its document ID exists in the corpus;
 2. the same ID appears in the current retrieval result; and
 3. its URL is taken directly from that corpus record.
+4. the documented meaning exactly matches a cited record field; and
+5. every evidence step and limitation is reproduced from one of the cited records.
 
-The evaluation runner checks this contract for every generated citation.
+The evaluation runner checks citation membership and field-level claim grounding for every non-refused answer.
 
 ## Compatibility behavior
 
@@ -196,7 +205,8 @@ The graphite and mint visual system references telemetry terminals, signal trace
 - No secret is included in the repository.
 - External links are static authoritative documentation URLs.
 - Observability configuration outputs to localhost only.
-- CI requires tests, evaluation, type checking, and a production build.
+- The optional replay ends at the OpenTelemetry Collector debug exporter; the browser analyzer accepts copied or pasted text and is not wired to that collector.
+- CI requires tests, evaluation, type checking, linting, and a production build.
 
 ## Key design decisions
 

@@ -17,7 +17,7 @@ If an exact identifier is absent from the corpus, the application refuses rather
 
 ## One-liner
 
-GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM metric anomalies from version-pinned official documentation and internal runbooks through a web application with measurable retrieval, citation, refusal, and latency targets.
+GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM metric anomalies from reviewed official-documentation snapshots and internal runbooks through a web application with measurable retrieval, citation, claim-grounding, refusal, and latency targets.
 
 ## Why this problem
 
@@ -64,8 +64,7 @@ The system refuses when:
 
 - the input is too short;
 - an exact Xid or DCGM identifier is unknown;
-- the input lacks GPU/observability domain language; or
-- the retrieval score does not cross the evidence boundary.
+- an input without an exact identifier does not match an explicitly supported semantic intent in the retrieved evidence.
 
 ## Prompts and instructions
 
@@ -87,14 +86,16 @@ The final implementation does not call a generative model, so no hidden prompt o
 - Replaced fixed-length narrative chunks with identifier-centered records.
 - Added exact identifier boosts after observing numeric ambiguity.
 - Expanded Xid parsing to support parenthesized PCI bus syntax.
-- Added a domain-language gate after an unrelated question received a weak RRF result.
+- Replaced the broad domain-language gate with explicit supported-intent routing after six same-domain hard negatives exposed false answers.
+- Added record-level provenance and field-level claim-grounding evaluation.
+- Replaced pseudo-probabilistic confidence with categorical evidence strength and analysis diagnostics.
 - Added compatibility notes for model/driver mismatches.
 - Exposed sparse and vector ranks in the browser.
 - Added a hard refusal example to the primary demo.
 
 ## Evaluation
 
-Twenty-five independent cases cover exact identifiers, semantic symptoms, multi-source questions, and unsupported inputs.
+Thirty-one independent cases cover exact identifiers, semantic symptoms, multi-source questions, unsupported inputs, and six adversarial same-domain negatives.
 
 Recorded result:
 
@@ -103,17 +104,18 @@ Recorded result:
 | Recall@5 | 100.0% |
 | MRR | 0.931 |
 | Citation validity | 100.0% |
+| Claim grounding | 100.0% |
 | Refusal precision | 100.0% |
 | Refusal recall | 100.0% |
-| p95 local latency | 4.96 ms |
+| p95 local latency | 1.73 ms |
 
-The full test suite contains 13 passing tests. These results validate the checked-in regression set only.
+The full test suite contains 17 passing tests. These results validate the checked-in regression set only.
 
 ## Observability integration
 
-The repository contains a Fluent Bit tail/parser configuration and an OpenTelemetry Collector OTLP receiver with debug output. It replays a synthetic Xid 79 log through `http://127.0.0.1:4318/v1/logs`.
+The repository contains a Fluent Bit tail/parser configuration, resource enrichment, and an OpenTelemetry Collector OTLP receiver with resource normalization and debug output. It replays synthetic GPU logs through `http://127.0.0.1:4318/v1/logs`.
 
-This optional path shows how GPU telemetry can be normalized and transported. It is separate from the deterministic RAG evaluation so the project works on any laptop.
+This optional path shows how GPU telemetry can be normalized and transported. It intentionally ends at the Collector debug exporter. The browser analyzer consumes pasted text; it does not imply an unimplemented collector-to-RAG backend.
 
 ## User interface
 

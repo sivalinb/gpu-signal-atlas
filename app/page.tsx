@@ -40,7 +40,7 @@ import { samples } from '@/core/samples';
 import type { SignalAnalysis } from '@/core/types';
 
 const evaluationMetrics = [
-  ['Recall@5', '100%', '25 labeled cases'],
+  ['Recall@5', '100%', '31 labeled cases'],
   ['MRR', '0.931', 'rank quality'],
   ['Citations', '100%', 'retriever-backed'],
   ['Refusals', '100%', 'precision & recall'],
@@ -139,7 +139,7 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
           <div>
             <CardTitle className="text-white">{analysis.headline}</CardTitle>
             <CardDescription className="mt-1 text-slate-400">
-              {analysis.citations.length} evidence passages · {Math.round(analysis.confidence * 100)}% retrieval confidence
+              {analysis.citations.length} evidence passages · {analysis.evidenceStrength} evidence strength
             </CardDescription>
           </div>
           <Badge className={analysis.status === 'grounded' ? 'bg-emerald-300/12 text-emerald-200' : 'bg-amber-300/12 text-amber-200'}>
@@ -149,6 +149,12 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
       </CardHeader>
       <CardContent className="space-y-6 pt-5 text-slate-200">
         <SignalTokens analysis={analysis} />
+
+        <div className="grid gap-2 rounded-xl border border-primary/15 bg-primary/[0.035] p-3 font-mono text-[10px] text-slate-400 sm:grid-cols-3">
+          <span>trace {analysis.diagnostics.traceId.slice(0, 12)}…</span>
+          <span>{analysis.diagnostics.durationMs.toFixed(2)} ms analysis</span>
+          <span>corpus {analysis.diagnostics.corpusVersion}</span>
+        </div>
 
         <div>
           <p className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
@@ -208,6 +214,7 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
                   <span className="mr-2 font-mono text-xs text-primary">[{index + 1}]</span>
                   <span className="text-sm text-slate-200">{citation.title}</span>
                   <span className="ml-2 hidden text-xs text-slate-500 sm:inline">{citation.source}</span>
+                  <span className="mt-1 block truncate pl-6 font-mono text-[9px] text-slate-600">reviewed {citation.provenance.retrievedAt} · {citation.provenance.curatedContentHash}</span>
                 </span>
                 <ExternalLink className="size-3.5 shrink-0 text-slate-500 transition group-hover:text-primary" />
               </a>
@@ -266,7 +273,7 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-2 lg:w-[360px]">
             {[
               [corpus.length.toString(), 'chunks'],
-              ['25', 'evals'],
+              ['31', 'evals'],
               ['0', 'API keys'],
             ].map(([value, label]) => (
               <div key={label} className="rounded-xl border border-border/70 bg-card/70 px-3 py-4 text-center backdrop-blur">
@@ -365,17 +372,18 @@ export default function Home() {
             <Card className="border border-border/70 bg-card/70">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Network className="size-4 text-primary" /> Telemetry integration</CardTitle>
-                <CardDescription>Optional replay path for Fluent Bit and OpenTelemetry.</CardDescription>
+                <CardDescription>Optional collection replay; the browser analyzer remains a separate, local input surface.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-muted-foreground">
-                  {['GPU/kernel log', 'Fluent Bit', 'OTLP', 'OTel Collector', 'Signal Atlas'].map((label, index) => (
+                  {['GPU/kernel log', 'Fluent Bit', 'OTLP', 'OTel Collector', 'Debug exporter'].map((label, index) => (
                     <span key={label} className="contents">
                       <span className="rounded-lg border border-border bg-black/15 px-3 py-2 text-foreground">{label}</span>
                       {index < 4 && <ChevronRight className="size-3.5 text-primary" />}
                     </span>
                   ))}
                 </div>
+                <p className="mt-3 text-xs leading-5 text-muted-foreground">The checked-in replay ends at the Collector debug exporter. Copy a replayed record into Signal Atlas for deterministic analysis; no hidden backend connection is implied.</p>
               </CardContent>
             </Card>
             <Card className="border border-border/70 bg-card/70">
@@ -415,14 +423,15 @@ export default function Home() {
             <Card className="border border-border/70 bg-card/70">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Gauge className="size-4 text-primary" /> Query mix</CardTitle>
-                <CardDescription>Twenty-five independent expectations.</CardDescription>
+                <CardDescription>Thirty-one independent expectations, including adversarial same-domain negatives.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {[
-                  ['Exact identifiers', 11, '44%'],
-                  ['Semantic symptoms', 10, '40%'],
-                  ['Multi-source', 1, '4%'],
-                  ['Unanswerable', 3, '12%'],
+                  ['Exact identifiers', 11, '35%'],
+                  ['Semantic symptoms', 10, '32%'],
+                  ['Multi-source', 1, '3%'],
+                  ['Unanswerable', 3, '10%'],
+                  ['Hard negatives', 6, '19%'],
                 ].map(([label, count, width]) => (
                   <div key={label as string} className="grid grid-cols-[120px_1fr_28px] items-center gap-3 text-xs">
                     <span className="text-muted-foreground">{label}</span>

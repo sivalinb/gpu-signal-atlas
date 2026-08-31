@@ -27,6 +27,7 @@ The corpus paraphrases source material. The linked vendor/specification URL rema
 - documented meaning;
 - evidence to collect next; and
 - explicit limitations.
+- reviewed source version/status, retrieval date, source section, and curated-content fingerprint.
 
 The application never silently treats a demonstration runbook as an official vendor definition.
 
@@ -56,7 +57,7 @@ For a production corpus:
 - require review when an exact identifier changes meaning or recommended action; and
 - display corpus version and staleness in the UI.
 
-The demonstration corpus uses explicit `updated` metadata but does not make network requests.
+The demonstration corpus uses explicit `updated` and provenance metadata but does not make network requests. Rolling documentation URLs are labeled as rolling rather than falsely described as version-pinned.
 
 ## Chunking comparison
 
@@ -116,6 +117,7 @@ Do not convert a possible interpretation into a confirmed fact.
 Copy evidence steps only from retrieved records.
 Copy limitations only from retrieved records.
 Attach citations only to documents present in the current retrieval result.
+Reproduce meaning, evidence steps, and limitations only from cited structured fields.
 If an exact identifier is unknown, refuse and request more context.
 Never recommend or execute a reset, drain, reboot, restart, or hardware replacement.
 ```
@@ -145,6 +147,8 @@ These prompts summarize the design work used to create the project:
 6. **Unlabeled runbooks** — authority is now explicit on every citation.
 7. **Model-generated prose** — replaced by deterministic structured generation for reproducible evaluation.
 8. **Static mockup** — replaced by a live browser analysis that runs the real retrieval core.
+9. **Broad domain gate** — replaced by supported semantic-intent routing after adversarial same-domain inputs produced false answers.
+10. **Pseudo-confidence percentage** — replaced by categorical evidence strength plus trace diagnostics.
 
 ## Learnings
 

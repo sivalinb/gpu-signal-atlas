@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   metadataBase: siteUrl,
   title: 'GPU Signal Atlas',
   description: 'Citation-first RAG for NVIDIA Xid events and DCGM telemetry.',
+  icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'GPU Signal Atlas',
     description: 'Citation-first RAG for GPU telemetry.',
