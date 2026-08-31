@@ -1,14 +1,19 @@
 import { corpus as defaultCorpus } from './corpus.ts';
+import { precomputedVectorIndex } from './generated/vector-index.ts';
 import type {
   CorpusDocument,
   ExtractedSignals,
   RetrievalResult,
   SignalAnalysis,
 } from './types.ts';
+import { cosine, documentText, embed, fnv1a, tokenize } from './vector.ts';
 
-const EMBEDDING_DIMENSIONS = 256;
 const RRF_K = 60;
 const CORPUS_VERSION = '2026-08-29-review-2';
+
+export { cosine, embed, tokenize } from './vector.ts';
+
+export type RetrievalStrategy = 'bm25' | 'vector' | 'hybrid' | 'hybrid-rerank';
 
 const semanticIntents: Array<{ id: string; pattern: RegExp }> = [
   { id: 'nvidia-xid-79', pattern: /fallen off (?:the )?bus|driver (?:can(?:not|'t)|cannot) access (?:the )?gpu|gpu .*disappeared.*host/i },
@@ -30,47 +35,9 @@ function nowMs(): number {
   return typeof performance === 'undefined' ? Date.now() : performance.now();
 }
 
-function traceId(): string {
-  const seed = `${Date.now()}-${Math.random()}-${Math.random()}`;
+function traceId(query: string): string {
+  const seed = `${CORPUS_VERSION}:${query}`;
   return `${fnv1a(seed).toString(16).padStart(8, '0')}${fnv1a(`${seed}-2`).toString(16).padStart(8, '0')}${fnv1a(`${seed}-3`).toString(16).padStart(8, '0')}${fnv1a(`${seed}-4`).toString(16).padStart(8, '0')}`;
-}
-
-export function tokenize(text: string): string[] {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9_./+-]+/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter((token) => token.length > 1);
-}
-
-function fnv1a(value: string): number {
-  let hash = 0x811c9dc5;
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return hash >>> 0;
-}
-
-export function embed(text: string, dimensions = EMBEDDING_DIMENSIONS): number[] {
-  const tokens = tokenize(text);
-  const features = [...tokens, ...tokens.slice(0, -1).map((token, index) => `${token}::${tokens[index + 1]}`)];
-  const vector = Array.from({ length: dimensions }, () => 0);
-  const counts = new Map<string, number>();
-  for (const feature of features) counts.set(feature, (counts.get(feature) ?? 0) + 1);
-  for (const [feature, count] of counts) {
-    const hash = fnv1a(feature);
-    const bucket = hash % dimensions;
-    const sign = hash & 1 ? 1 : -1;
-    vector[bucket] += sign * (1 + Math.log(count));
-  }
-  const magnitude = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0));
-  return magnitude === 0 ? vector : vector.map((value) => value / magnitude);
-}
-
-export function cosine(left: number[], right: number[]): number {
-  return left.reduce((sum, value, index) => sum + value * (right[index] ?? 0), 0);
 }
 
 export function extractSignals(text: string): ExtractedSignals {
@@ -88,10 +55,6 @@ export function extractSignals(text: string): ExtractedSignals {
     gpuModels: [...new Set(gpuModels)],
     driverBranches: [...new Set(driverBranches)],
   };
-}
-
-function documentText(document: CorpusDocument): string {
-  return [document.title, document.content, ...document.identifiers, ...document.signalTypes].join(' ');
 }
 
 function bm25(queryTokens: string[], documents: CorpusDocument[]): number[] {
@@ -138,16 +101,25 @@ function exactMatches(document: CorpusDocument, signals: ExtractedSignals): stri
   return matches;
 }
 
-export function retrieve(
+export function retrieveWithStrategy(
   query: string,
   documents: CorpusDocument[] = defaultCorpus,
   limit = 5,
+  strategy: RetrievalStrategy = 'hybrid-rerank',
 ): RetrievalResult[] {
   const queryTokens = tokenize(query);
   const signals = extractSignals(query);
   const sparseScores = bm25(queryTokens, documents);
   const queryVector = embed(query);
-  const denseScores = documents.map((document) => Math.max(0, cosine(queryVector, embed(documentText(document)))));
+  const usePrecomputed = documents === defaultCorpus;
+  const denseScores = documents.map((document) => {
+    const stored = usePrecomputed
+      ? (precomputedVectorIndex.vectors[
+          document.id as keyof typeof precomputedVectorIndex.vectors
+        ] as readonly number[] | undefined)
+      : undefined;
+    return Math.max(0, cosine(queryVector, stored ?? embed(documentText(document))));
+  });
   const sparseRanks = ranks(sparseScores);
   const denseRanks = ranks(denseScores);
 
@@ -160,9 +132,17 @@ export function retrieve(
       const driverBoost = signals.driverBranches.some((driver) => document.driverBranches.includes(driver)) ? 0.015 : 0;
       const lexical = Math.min(0.12, sparseScores[index] / 60);
       const semantic = Math.min(0.1, denseScores[index] * 0.1);
+      const score =
+        strategy === 'bm25'
+          ? sparseScores[index]
+          : strategy === 'vector'
+            ? denseScores[index]
+            : strategy === 'hybrid'
+              ? rrf
+              : rrf + exactBoost + modelBoost + driverBoost + lexical + semantic;
       return {
         document,
-        score: Number((rrf + exactBoost + modelBoost + driverBoost + lexical + semantic).toFixed(4)),
+        score: Number(score.toFixed(4)),
         sparseRank: sparseRanks[index],
         denseRank: denseRanks[index],
         exactMatches: matches,
@@ -170,6 +150,14 @@ export function retrieve(
     })
     .sort((left, right) => right.score - left.score)
     .slice(0, limit);
+}
+
+export function retrieve(
+  query: string,
+  documents: CorpusDocument[] = defaultCorpus,
+  limit = 5,
+): RetrievalResult[] {
+  return retrieveWithStrategy(query, documents, limit, 'hybrid-rerank');
 }
 
 function unknownExactSignals(signals: ExtractedSignals, documents: CorpusDocument[]): string[] {
@@ -203,12 +191,14 @@ export function analyzeTelemetry(
     (!hasExact && (!intentRetrieved || !top));
 
   const diagnostics = (decisionReasons: string[]) => ({
-    traceId: traceId(),
+    traceId: traceId(query),
     durationMs: Number((nowMs() - started).toFixed(2)),
     evidenceMargin,
     matchedSemanticIntents,
     decisionReasons,
     corpusVersion: CORPUS_VERSION,
+    vectorIndexVersion: precomputedVectorIndex.version,
+    generationMode: 'deterministic-template' as const,
   });
 
   if (refuse) {

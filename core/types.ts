@@ -12,6 +12,8 @@ export interface SourceProvenance {
 
 export interface CorpusDocument {
   id: string;
+  parentDocumentId?: string;
+  sourceDocumentIds?: string[];
   title: string;
   source: string;
   sourceUrl: string;
@@ -72,5 +74,7 @@ export interface SignalAnalysis {
     matchedSemanticIntents: string[];
     decisionReasons: string[];
     corpusVersion: string;
+    vectorIndexVersion: string;
+    generationMode: 'deterministic-template' | 'schema-constrained-llm';
   };
 }

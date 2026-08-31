@@ -2,6 +2,8 @@
 
 Target duration: 4 minutes 30 seconds to 5 minutes.
 
+Open the **Visual demo** section and click **Run full pipeline** during the architecture portion. The animation advances through all nine implemented stages and can be paused or inspected one stage at a time.
+
 ## 0:00–0:35 — Problem and project
 
 “GPU Signal Atlas is a citation-first RAG application for NVIDIA Xid events, DCGM metrics, and GPU observability pipelines. GPU telemetry is full of exact but cryptic identifiers, and the supporting meaning is distributed across vendor catalogs, field references, deployment guides, and internal runbooks.

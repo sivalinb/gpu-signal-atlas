@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   ArrowUpRight,
@@ -10,18 +10,24 @@ import {
   ChevronRight,
   CircleAlert,
   Cpu,
+  Database,
   ExternalLink,
+  FileCheck2,
   FileSearch,
   Gauge,
   GitBranch,
   Layers3,
   Network,
+  Pause,
+  Play,
   Radar,
   RefreshCw,
   Search,
   ShieldAlert,
   Sparkles,
   TerminalSquare,
+  WandSparkles,
+  Workflow,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +52,13 @@ const evaluationMetrics = [
   ['Refusals', '100%', 'precision & recall'],
 ];
 
+const retrievalAblation = [
+  ['BM25 only', '100.0%', '0.931', '100%'],
+  ['Vector only', '91.7%', '0.753', '91.7%'],
+  ['Hybrid RRF', '95.8%', '0.889', '95.8%'],
+  ['Hybrid + rerank', '100.0%', '0.931', '100%'],
+];
+
 const flow = [
   {
     icon: Activity,
@@ -57,7 +70,7 @@ const flow = [
     icon: Braces,
     number: '02',
     title: 'Embed',
-    text: 'Create deterministic 256-dimensional feature-hash embeddings for local, credential-free replay.',
+    text: 'Read deterministic 256-dimensional vectors from a checked-in, integrity-verified index.',
   },
   {
     icon: Search,
@@ -78,6 +91,210 @@ const flow = [
     text: 'Generate a signal card from retrieved passages—or stop when the corpus cannot support an answer.',
   },
 ];
+
+const walkthroughSteps = [
+  {
+    icon: FileCheck2,
+    number: '01',
+    short: 'Ingest',
+    title: 'Allow-listed sources enter a review queue',
+    technology: 'Source manifest · HTTPS fetch · FNV-1a fingerprint',
+    explanation: 'Vendor pages and internal runbooks are fetched only from approved URLs. The workflow records fetch metadata and creates a candidate snapshot; it never changes operational guidance automatically.',
+    input: 'NVIDIA Xid catalog + DCGM field reference',
+    output: 'Candidate snapshot · ETag · content hash',
+  },
+  {
+    icon: ShieldAlert,
+    number: '02',
+    short: 'Clean',
+    title: 'Cleaning and freshness gates protect the corpus',
+    technology: 'HTML cleaner · 7-day SLA · human review',
+    explanation: 'Navigation and page chrome are removed while headings, tables, identifiers, and code survive. Changed meaning or applicability must pass human review and regression tests.',
+    input: 'Rolling documentation page',
+    output: 'Reviewed text · freshness status: fresh',
+  },
+  {
+    icon: Layers3,
+    number: '03',
+    short: 'Chunk',
+    title: 'Structure-aware records preserve signal meaning',
+    technology: 'Identifier-centered chunks · authority metadata',
+    explanation: 'Each Xid or DCGM concept becomes one bounded record with meaning, evidence, limitations, compatibility, source authority, and a citation URL.',
+    input: 'Page containing Xids 13, 31, 43, 48, 79, 154',
+    output: 'One reviewed record per identifier',
+  },
+  {
+    icon: Database,
+    number: '04',
+    short: 'Index',
+    title: 'Vectors are computed once and persisted',
+    technology: '256d feature hash · checked-in index · integrity gate',
+    explanation: 'The build writes one normalized vector per corpus record. CI compares the stored corpus hash and every vector so stale indexes cannot ship.',
+    input: '17 reviewed records',
+    output: '17 × 256 precomputed vector matrix',
+  },
+  {
+    icon: Activity,
+    number: '05',
+    short: 'Extract',
+    title: 'Raw telemetry becomes exact searchable signals',
+    technology: 'Xid/DCGM parser · GPU and driver context',
+    explanation: 'The analyzer extracts Xid 79, the PCIe replay metric, H100, and R565 before retrieval. Unknown exact identifiers are remembered for the refusal gate.',
+    input: 'NVRM Xid 79 · PCIE_REPLAY_COUNTER=184 · H100 · R565',
+    output: 'Xid 79 · DCGM field · H100 · R565',
+  },
+  {
+    icon: Search,
+    number: '06',
+    short: 'Retrieve',
+    title: 'Sparse and vector retrieval run side by side',
+    technology: 'BM25 · precomputed cosine similarity · top-k',
+    explanation: 'BM25 protects exact machine identifiers while the vector path helps symptom language. Both preserve their independent rank for inspection.',
+    input: 'Parsed query + stored vector index',
+    output: 'Sparse rank S1 · vector rank V1',
+  },
+  {
+    icon: GitBranch,
+    number: '07',
+    short: 'Rerank',
+    title: 'RRF and bounded context boosts reorder evidence',
+    technology: 'Reciprocal-rank fusion · exact-ID/model/driver boosts',
+    explanation: 'Rank fusion combines incomparable score spaces. Small bounded boosts reward exact telemetry coverage and compatible hardware context without turning scores into probabilities.',
+    input: 'BM25 ranks + vector ranks + extracted context',
+    output: 'Top 5 evidence trace with decision reasons',
+  },
+  {
+    icon: ShieldAlert,
+    number: '08',
+    short: 'Gate',
+    title: 'The evidence boundary decides answer or refusal',
+    technology: 'Known-ID check · supported-intent routing',
+    explanation: 'Known identifiers and supported semantic intent can proceed. Xid 999, unrelated questions, and unsupported same-domain telemetry stop with zero citations.',
+    input: 'Top evidence + unknown-signal list',
+    output: 'Grounded · needs investigation · or refused',
+  },
+  {
+    icon: WandSparkles,
+    number: '09',
+    short: 'Generate',
+    title: 'A schema-constrained signal card closes the loop',
+    technology: 'Deterministic template · optional strict LLM JSON schema',
+    explanation: 'The default template copies reviewed fields. Optional model mode can compose the same contract, but post-validation rejects unknown citations and any claim not reproduced from cited evidence.',
+    input: 'Only retrieved, reviewed evidence fields',
+    output: 'Meaning · next evidence · limitations · citations',
+  },
+];
+
+function PipelineWalkthrough() {
+  const [activeStep, setActiveStep] = useState(0);
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    if (!running) return;
+    const timer = window.setTimeout(() => {
+      if (activeStep >= walkthroughSteps.length - 1) setRunning(false);
+      else setActiveStep((current) => current + 1);
+    }, 1150);
+    return () => window.clearTimeout(timer);
+  }, [activeStep, running]);
+
+  const step = walkthroughSteps[activeStep];
+  return (
+    <section id="walkthrough" className="relative z-10 border-y border-border/70 bg-[radial-gradient(circle_at_18%_15%,oklch(0.82_0.16_165/.08),transparent_34%),linear-gradient(180deg,oklch(0.18_0.02_240),oklch(0.145_0.015_250))] py-16">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="mb-8 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+          <div className="max-w-3xl">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">Interactive visual demo</p>
+            <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">Watch one signal travel through the complete RAG system.</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">One button advances from reviewed source ingestion to a grounded, cited signal card. Select any stage to inspect its technology, input, and output.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => { setRunning(false); setActiveStep(0); }}>
+              <RefreshCw className="size-4" /> Reset
+            </Button>
+            <Button
+              className="min-w-48 bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={() => {
+                if (activeStep === walkthroughSteps.length - 1) setActiveStep(0);
+                setRunning((current) => !current);
+              }}
+            >
+              {running ? <Pause className="size-4" /> : <Play className="size-4" />}
+              {running ? 'Pause pipeline' : activeStep === 0 ? 'Run full pipeline' : 'Continue pipeline'}
+            </Button>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto pb-3">
+          <ol className="grid min-w-[980px] grid-cols-9 gap-2" aria-label="RAG pipeline stages">
+            {walkthroughSteps.map((item, index) => {
+              const complete = index < activeStep;
+              const active = index === activeStep;
+              return (
+                <li key={item.number}>
+                  <button
+                    type="button"
+                    aria-current={active ? 'step' : undefined}
+                    onClick={() => { setRunning(false); setActiveStep(index); }}
+                    className={`group relative h-full w-full rounded-xl border px-3 py-3 text-left transition ${active ? 'border-primary/60 bg-primary/12 shadow-lg shadow-primary/5' : complete ? 'border-primary/20 bg-primary/[0.045]' : 'border-border/70 bg-black/15 hover:border-primary/25'}`}
+                  >
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className={`grid size-7 place-items-center rounded-lg ${active || complete ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                      {complete ? <Check className="size-3.5" /> : <item.icon className="size-3.5" />}
+                    </span>
+                    <span className="font-mono text-[9px] text-muted-foreground">{item.number}</span>
+                  </div>
+                  <span className={`text-xs font-medium ${active ? 'text-primary' : 'text-foreground'}`}>{item.short}</span>
+                  {index < walkthroughSteps.length - 1 && <ChevronRight className="absolute -right-2.5 top-1/2 z-10 size-3.5 -translate-y-1/2 text-primary/45" />}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+
+        <div className="mt-3 grid gap-4 lg:grid-cols-[1.2fr_.8fr]" aria-live="polite">
+          <Card className="overflow-hidden border border-primary/20 bg-card/85">
+            <CardContent className="p-0">
+              <div className="grid gap-0 sm:grid-cols-[110px_1fr]">
+                <div className="grid min-h-44 place-items-center border-b border-primary/15 bg-primary/[0.055] p-5 sm:border-b-0 sm:border-r">
+                  <div className="text-center">
+                    <span className="mx-auto grid size-14 place-items-center rounded-2xl border border-primary/30 bg-primary/12 text-primary"><step.icon className="size-6" /></span>
+                    <p className="mt-3 font-mono text-xs text-primary">STEP {step.number}</p>
+                  </div>
+                </div>
+                <div className="p-5 sm:p-6">
+                  <Badge variant="outline" className="border-primary/25 bg-primary/5 font-mono text-[10px] text-primary">{step.technology}</Badge>
+                  <h3 className="mt-4 font-heading text-xl font-semibold">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{step.explanation}</p>
+                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${((activeStep + 1) / walkthroughSteps.length) * 100}%` }} />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border border-border/70 bg-black/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm"><Workflow className="size-4 text-primary" /> Live stage artifact</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 font-mono text-xs">
+              <div className="rounded-xl border border-border/70 bg-card/60 p-3">
+                <p className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Input</p>
+                <p className="mt-2 leading-5 text-slate-300">{step.input}</p>
+              </div>
+              <div className="flex justify-center"><ChevronRight className="size-4 rotate-90 text-primary" /></div>
+              <div className="rounded-xl border border-primary/20 bg-primary/[0.055] p-3">
+                <p className="text-[9px] uppercase tracking-[0.18em] text-primary">Output</p>
+                <p className="mt-2 leading-5 text-slate-200">{step.output}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function SignalTokens({ analysis }: { analysis: SignalAnalysis }) {
   const tokens = [
@@ -150,10 +367,11 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
       <CardContent className="space-y-6 pt-5 text-slate-200">
         <SignalTokens analysis={analysis} />
 
-        <div className="grid gap-2 rounded-xl border border-primary/15 bg-primary/[0.035] p-3 font-mono text-[10px] text-slate-400 sm:grid-cols-3">
+        <div className="grid gap-2 rounded-xl border border-primary/15 bg-primary/[0.035] p-3 font-mono text-[10px] text-slate-400 sm:grid-cols-2 lg:grid-cols-4">
           <span>trace {analysis.diagnostics.traceId.slice(0, 12)}…</span>
-          <span>{analysis.diagnostics.durationMs.toFixed(2)} ms analysis</span>
-          <span>corpus {analysis.diagnostics.corpusVersion}</span>
+          <span suppressHydrationWarning>{analysis.diagnostics.durationMs.toFixed(2)} ms analysis</span>
+          <span>index {analysis.diagnostics.vectorIndexVersion}</span>
+          <span>{analysis.diagnostics.generationMode}</span>
         </div>
 
         <div>
@@ -247,6 +465,7 @@ export default function Home() {
           </a>
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex" aria-label="Main navigation">
             <a className="transition hover:text-foreground" href="#analyze">Analyze</a>
+            <a className="transition hover:text-foreground" href="#walkthrough">Visual demo</a>
             <a className="transition hover:text-foreground" href="#architecture">Architecture</a>
             <a className="transition hover:text-foreground" href="#evaluation">Evaluation</a>
           </nav>
@@ -345,6 +564,8 @@ export default function Home() {
         </div>
       </section>
 
+      <PipelineWalkthrough />
+
       <section id="architecture" className="relative z-10 border-y border-border/70 bg-black/10 py-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <div className="mb-9 flex flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -352,7 +573,7 @@ export default function Home() {
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">System flow</p>
               <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">A transparent RAG path, not an agent maze.</h2>
             </div>
-            <p className="max-w-xl text-sm leading-6 text-muted-foreground">Every transformation is deterministic and inspectable. Provider-backed embeddings or generation can replace the local stages without changing the retrieval contract.</p>
+            <p className="max-w-xl text-sm leading-6 text-muted-foreground">Every transformation is inspectable. The default path uses a persisted local index and deterministic generation; an optional strict-schema LLM can replace only the final composer.</p>
           </div>
 
           <div className="grid gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/70 sm:grid-cols-2 lg:grid-cols-5">
@@ -418,6 +639,42 @@ export default function Home() {
               </Card>
             ))}
           </div>
+
+          <Card className="mt-5 border border-primary/20 bg-primary/[0.03]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><GitBranch className="size-4 text-primary" /> Retrieval and chunking ablations</CardTitle>
+              <CardDescription>Same expectations, isolated strategy changes. Recall@5 and MRR are generated by <span className="font-mono">npm run ablate</span>.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
+              <div className="space-y-3">
+                <div className="grid grid-cols-[1fr_58px_50px] gap-3 px-2 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+                  <span>Retrieval strategy</span><span>Recall</span><span>MRR</span>
+                </div>
+                {retrievalAblation.map(([label, recall, mrr, width]) => (
+                  <div key={label} className="grid grid-cols-[1fr_58px_50px] items-center gap-3 rounded-xl border border-border/70 bg-black/15 px-3 py-2.5 text-xs">
+                    <div>
+                      <div className="mb-2 flex justify-between gap-2"><span>{label}</span></div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary/75" style={{ width }} /></div>
+                    </div>
+                    <span className="font-mono text-primary">{recall}</span>
+                    <span className="font-mono text-muted-foreground">{mrr}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="grid content-start gap-3">
+                <p className="px-2 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">Chunk topology comparison</p>
+                <div className="rounded-xl border border-border/70 bg-black/15 p-4">
+                  <div className="flex items-end justify-between gap-3"><span className="text-sm">Fixed 90-token windows</span><span className="font-mono text-sm text-muted-foreground">91.7% · .896</span></div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted"><div className="h-full w-[91.7%] rounded-full bg-slate-500" /></div>
+                </div>
+                <div className="rounded-xl border border-primary/25 bg-primary/[0.06] p-4">
+                  <div className="flex items-end justify-between gap-3"><span className="text-sm text-primary">Structure-aware records</span><span className="font-mono text-sm text-primary">100% · .931</span></div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted"><div className="h-full w-full rounded-full bg-primary" /></div>
+                </div>
+                <p className="px-2 text-xs leading-5 text-muted-foreground">Format: Recall@5 · MRR. The selected structure preserves identifier and citation boundaries while improving retrieval.</p>
+              </div>
+            </CardContent>
+          </Card>
 
           <div className="mt-5 grid gap-5 lg:grid-cols-2">
             <Card className="border border-border/70 bg-card/70">

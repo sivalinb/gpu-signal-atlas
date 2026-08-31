@@ -13,6 +13,12 @@
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "evaluate": "node --experimental-strip-types scripts/evaluate.ts",
     "analyze": "node --experimental-strip-types scripts/analyze.ts",
+    "analyze:llm": "node --experimental-strip-types scripts/analyze-llm.ts",
+    "index:build": "node --experimental-strip-types scripts/build-index.ts",
+    "index:check": "node --experimental-strip-types scripts/check-index.ts",
+    "ingest": "node --experimental-strip-types scripts/ingest-source.ts",
+    "freshness": "node --experimental-strip-types scripts/freshness.ts",
+    "ablate": "node --experimental-strip-types scripts/ablate.ts",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint app components core evaluation lib scripts",
     "format": "oxfmt"

@@ -1,17 +1,9 @@
 import type { CorpusDocument, SourceProvenance } from './types.ts';
+import { curatedContentHash } from './ingestion.ts';
 
 type CuratedDocument = Omit<CorpusDocument, 'provenance'>;
 
 const REVIEW_DATE = '2026-08-29';
-
-function fnv1aHex(value: string): string {
-  let hash = 0x811c9dc5;
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0).toString(16).padStart(8, '0');
-}
 
 function provenance(document: CuratedDocument): SourceProvenance {
   const rolling = document.sourceUrl.includes('/latest/') || document.sourceUrl.includes('docs.fluentbit.io');
@@ -19,7 +11,7 @@ function provenance(document: CuratedDocument): SourceProvenance {
     sourceVersion: rolling ? `rolling documentation reviewed ${REVIEW_DATE}` : `source snapshot reviewed ${REVIEW_DATE}`,
     retrievedAt: REVIEW_DATE,
     sourceSection: document.title,
-    curatedContentHash: `fnv1a:${fnv1aHex(`${document.id}\n${document.content}\n${document.documentedMeaning}`)}`,
+    curatedContentHash: curatedContentHash(document),
     reviewStatus: 'curated-demo-review',
   };
 }

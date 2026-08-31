@@ -78,12 +78,18 @@ Citation validity: 100.0%
 Claim grounding: 100.0%
 Refusal precision: 100.0%
 Refusal recall: 100.0%
-Latency p50: 0.96 ms
-Latency p95: 1.73 ms
+Latency p50: 0.30 ms
+Latency p95: 2.31 ms
 Failures: 0
 ```
 
 Latency varies by machine. The acceptance threshold is five seconds, so the result has substantial margin.
+
+## Ablation evidence
+
+`npm run ablate` evaluates retrieval changes independently of refusal and generation. The checked-in report compares BM25-only, vector-only, RRF, hybrid-plus-contextual-rerank, fixed 90-token source windows, and structure-aware identifier records. See [`ABLATION_REPORT.md`](ABLATION_REPORT.md).
+
+The recorded run shows 100% Recall@5 and 0.931 MRR for BM25 and hybrid-plus-rerank, while the vector-only baseline reaches 91.7% and 0.753. Structure-aware records reach 100% and 0.931 versus 91.7% and 0.896 for fixed windows.
 
 ## What the tests verify
 

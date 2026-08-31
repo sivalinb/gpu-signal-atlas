@@ -1,5 +1,7 @@
 # Visual Guide: From GPU Event to Cited Signal Card
 
+The public website includes an interactive nine-stage walkthrough. Click **Run full pipeline** to animate source ingestion, cleaning and freshness, structure-aware chunking, persistent indexing, signal extraction, dual retrieval, reranking, the evidence gate, and deterministic or optional schema-constrained generation. Every stage can be paused and selected directly.
+
 This guide explains the project without requiring source-code familiarity.
 
 ## One-screen mental model

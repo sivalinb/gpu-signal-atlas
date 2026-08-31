@@ -32,7 +32,8 @@ flowchart LR
     subgraph Retrieval core
       X[Signal extractor]
       T[Tokenizer]
-      V[256d feature-hash embedding]
+      V[256d feature-hash query embedding]
+      P[Persistent precomputed document index]
       M[BM25]
       R[Dense and sparse ranks]
       F[RRF + contextual boosts]
@@ -55,6 +56,7 @@ flowchart LR
     B --> X
     X --> T
     T --> V
+    P --> R
     T --> M
     V --> R
     M --> R
@@ -120,7 +122,7 @@ The embedding stage creates a 256-dimensional deterministic feature-hash vector:
 4. Apply logarithmic term-frequency weighting.
 5. L2-normalize the vector.
 
-The result is local, reproducible, and suitable for demonstrating vector retrieval without secrets. It is best understood as a retrieval baseline rather than a semantic-model substitute.
+The result is local, reproducible, and suitable for demonstrating vector retrieval without secrets. Document vectors are generated once into `core/generated/vector-index.ts`; CI verifies its dimensions, corpus fingerprint, record coverage, and numerical equivalence. Query vectors remain computed at analysis time. The method is best understood as a retrieval baseline rather than a semantic-model substitute.
 
 ### BM25
 
@@ -182,6 +184,14 @@ A generated answer is valid only when:
 
 The evaluation runner checks citation membership and field-level claim grounding for every non-refused answer.
 
+## Optional LLM generation boundary
+
+The public and evaluated path uses the deterministic template. `core/llm.ts` adds an optional server-side OpenAI-compatible composer that receives only the top-three reviewed evidence records and requests a strict JSON schema. A second validation layer rejects unknown citation IDs, unexpected fields, paraphrased unsupported claims, and any output that cannot be reproduced from cited structured fields. Unknown telemetry refuses before a provider call, and no credential is exposed to the browser.
+
+## Ingestion and freshness boundary
+
+`ingestion/source-manifest.ts` is the source allow-list. `npm run ingest` fetches one selected source or cleans a local HTML capture and writes a candidate snapshot. It does not mutate the operational corpus. `npm run freshness` validates allow-list coverage, HTTPS, curated-content fingerprints, and seven-day official-source or 30-day internal-source review SLAs. An approved corpus change must rebuild the vector index and pass the full evaluation.
+
 ## Compatibility behavior
 
 When an input names a GPU model or driver branch and the selected document contains a restricted applicability list, the response adds a compatibility note if there is no overlap. It does not remove the source because the identifier may still be useful; it marks the uncertainty for operator review.
@@ -212,7 +222,7 @@ The graphite and mint visual system references telemetry terminals, signal trace
 
 | Decision | Reason | Tradeoff |
 |---|---|---|
-| Deterministic local embedding | Credential-free, reproducible evaluation | Weaker semantic generalization than a trained model |
+| Persistent deterministic local index | Credential-free, reproducible evaluation without per-query document embedding | Weaker semantic generalization than a trained model; rebuild required after corpus change |
 | Structured corpus records | Exact identifiers and bounded generation | Manual curation effort |
 | RRF rather than raw-score mixing | Dense and sparse scores have different scales | Rank positions lose some score magnitude |
 | Template generation | Complete citation traceability | Less conversational flexibility |

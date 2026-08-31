@@ -37,8 +37,8 @@ npm test
 Expected summary:
 
 ```text
-tests 17
-pass 17
+tests 26
+pass 26
 fail 0
 ```
 
@@ -56,6 +56,19 @@ Expected acceptance conditions:
 - Refusal precision and recall at least 90%
 - p95 latency below 5000 ms
 
+Run the retrieval and chunking ablations:
+
+```bash
+npm run ablate
+```
+
+Verify the persistent index and source freshness controls:
+
+```bash
+npm run index:check
+npm run freshness
+```
+
 ## 4. Type-check and build the website
 
 ```bash
@@ -64,7 +77,7 @@ npm run lint
 npm run build
 ```
 
-Both commands should exit with status zero.
+All commands should exit with status zero.
 
 ## 5. Start the interactive website
 
@@ -89,7 +102,10 @@ Also verify:
 - citation links open the named official source;
 - the retrieval trace shows top result plus sparse/vector rank;
 - the page remains usable at narrow/mobile width; and
-- keyboard focus is visible on buttons and links.
+- keyboard focus is visible on buttons and links;
+- clicking **Run full pipeline** advances through all nine visual stages;
+- pause, reset, and direct stage selection work; and
+- the browser console contains no hydration error.
 
 ## 6. Run a CLI analysis
 
@@ -120,6 +136,14 @@ Expected fields:
   "citations": []
 }
 ```
+
+## Optional schema-constrained model mode
+
+See [`LLM_MODE.md`](LLM_MODE.md) for local provider configuration. Unknown identifiers are refused before the model call, and accepted model output must pass both JSON-schema and field-level grounding validation.
+
+## Refresh an allow-listed source
+
+See [`INGESTION_AND_FRESHNESS.md`](INGESTION_AND_FRESHNESS.md). A refresh creates a review candidate; it never changes the corpus automatically.
 
 ## 7. Optional Fluent Bit and OpenTelemetry replay
 
@@ -153,7 +177,10 @@ To demonstrate the full project flow, copy a record printed by Fluent Bit or the
 
 ```bash
 npm test
+npm run index:check
+npm run freshness
 npm run evaluate
+npm run ablate
 npm run typecheck
 npm run lint
 npm run build

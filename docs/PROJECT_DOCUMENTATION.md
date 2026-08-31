@@ -42,7 +42,7 @@ Synthetic telemetry replays are used for the demo so no production logs, credent
 
 ## Ingestion, cleaning, and freshness
 
-The production design fetches allow-listed sources, records version and content hash, removes page chrome, preserves tables and code, and creates one structured record per Xid or DCGM field. The demonstration freezes reviewed records so evaluation stays reproducible.
+The implemented ingestion workflow fetches only allow-listed sources or accepts a local HTML capture, records HTTP metadata and a cleaned-content fingerprint, removes page chrome, and preserves headings, tables, identifiers, and code. It produces a review candidate rather than silently changing the corpus. The demonstration freezes approved records so evaluation stays reproducible.
 
 Official pages should be refreshed weekly in a production extension. Any changed identifier meaning or applicability should trigger human review and the complete regression suite.
 
@@ -50,7 +50,7 @@ Official pages should be refreshed weekly in a production extension. Any changed
 
 Fixed-size chunks were rejected because one chunk could contain multiple Xids or lose table-row relationships. The selected strategy creates one identifier-centered record with separate meaning, evidence, and limitation fields.
 
-The application computes a 256-dimensional local feature-hash embedding over unigrams and adjacent bigrams. This credential-free baseline runs in both Node and the browser. BM25 provides exact keyword retrieval, especially for numeric Xids and long DCGM field names.
+The application computes a 256-dimensional local feature-hash embedding over unigrams and adjacent bigrams. Vectors are persisted in a checked-in index and verified against the corpus fingerprint in CI. This credential-free baseline runs in both Node and the browser. BM25 provides exact keyword retrieval, especially for numeric Xids and long DCGM field names.
 
 ## Retrieval and reranking
 
@@ -78,7 +78,7 @@ Representative design instructions included:
 6. Refuse unknown identifiers with zero citations.
 7. Test successful retrieval and refusal behavior independently.
 
-The final implementation does not call a generative model, so no hidden prompt or API output is presented as real evidence.
+The evaluated website does not call a generative model, so no hidden prompt or API output is presented as real evidence. An optional server-side mode requests a strict JSON schema and then rejects unknown citations, unsupported fields, and claims that are not reproduced from cited evidence.
 
 ## Iterations tried
 
@@ -95,7 +95,7 @@ The final implementation does not call a generative model, so no hidden prompt o
 
 ## Evaluation
 
-Thirty-one independent cases cover exact identifiers, semantic symptoms, multi-source questions, unsupported inputs, and six adversarial same-domain negatives.
+Thirty-one independent cases cover exact identifiers, semantic symptoms, multi-source questions, unsupported inputs, and six adversarial same-domain negatives. A separate ablation runner compares BM25, vector-only, RRF, contextual reranking, fixed windows, and structure-aware records.
 
 Recorded result:
 
@@ -107,9 +107,9 @@ Recorded result:
 | Claim grounding | 100.0% |
 | Refusal precision | 100.0% |
 | Refusal recall | 100.0% |
-| p95 local latency | 1.73 ms |
+| p95 local latency | 2.31 ms |
 
-The full test suite contains 17 passing tests. These results validate the checked-in regression set only.
+The expanded test suite contains 26 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, model contracts, ablations, and observability configuration. These results validate the checked-in regression set only.
 
 ## Observability integration
 
@@ -153,3 +153,8 @@ Below the analyzer, the website explains the five-stage RAG flow, optional telem
 - Fluent Bit/OpenTelemetry replay assets
 - Local setup and verification guide
 - Five-minute demo script
+- Interactive start-to-finish visual pipeline walkthrough
+- Persistent vector-index build and verification scripts
+- Implemented ingestion and freshness workflow
+- Optional schema-constrained LLM mode
+- Retrieval and chunking ablation report

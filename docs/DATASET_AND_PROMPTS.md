@@ -31,9 +31,9 @@ The corpus paraphrases source material. The linked vendor/specification URL rema
 
 The application never silently treats a demonstration runbook as an official vendor definition.
 
-## Ingestion and cleaning design
+## Ingestion and cleaning implementation
 
-The production ingestion design is:
+The checked-in ingestion workflow is:
 
 1. Fetch only allow-listed documentation URLs.
 2. Record source URL, fetch timestamp, document version, and content hash.
@@ -43,8 +43,10 @@ The production ingestion design is:
 6. Keep narrative troubleshooting sections as heading-aware chunks.
 7. Validate that every chunk contains a human-readable title and canonical source URL.
 8. Reject duplicate IDs and non-HTTPS citations.
+9. Write a candidate snapshot for human comparison rather than updating the corpus automatically.
+10. Rebuild and verify the persistent vector index after an approved corpus change.
 
-The checked-in project uses reviewed static records so evaluation cannot change when an external page changes.
+Use `npm run ingest` to fetch an allow-listed source or clean a local HTML capture. The checked-in project uses reviewed static records so evaluation cannot change when an external page changes.
 
 ## Freshness strategy
 
@@ -83,7 +85,7 @@ This design is the main reason exact query retrieval is stable in the small corp
 
 ## Embedding choice
 
-The local build uses a deterministic 256-dimensional feature-hash embedding of unigrams and adjacent bigrams. It was selected because it:
+The local build uses a deterministic 256-dimensional feature-hash embedding of unigrams and adjacent bigrams. Document vectors are precomputed, checked in, and verified against the corpus hash. It was selected because it:
 
 - works offline and without credentials;
 - runs in a browser and Node;
@@ -123,6 +125,8 @@ Never recommend or execute a reset, drain, reboot, restart, or hardware replacem
 ```
 
 The implementation uses a deterministic template, not an LLM, so compliance is directly testable.
+
+An optional OpenAI-compatible mode uses a strict JSON schema but is still constrained to exact retrieved fields. Schema validation alone is not accepted: post-validation rejects every citation outside the current evidence and every claim that is not reproduced from cited records.
 
 ## Representative build prompts
 
