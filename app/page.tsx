@@ -10,7 +10,6 @@ import {
   Check,
   ChevronRight,
   CircleAlert,
-  ClipboardCheck,
   Cpu,
   Database,
   ExternalLink,
@@ -29,7 +28,6 @@ import {
   ShieldAlert,
   Sparkles,
   TerminalSquare,
-  Video,
   WandSparkles,
   Workflow,
 } from 'lucide-react';
@@ -93,27 +91,6 @@ const retrievalAblation = [
   ['Vector only', '91.7%', '0.753', '91.7%'],
   ['Hybrid RRF', '95.8%', '0.889', '95.8%'],
   ['Hybrid + rerank', '100.0%', '0.931', '100%'],
-];
-
-const week2Score = [
-  ['Use case & targets', '10/10'],
-  ['Corpus lifecycle', '14/15'],
-  ['Chunking & vectors', '15/15'],
-  ['Retrieval & safety', '20/20'],
-  ['Evaluation', '19/20'],
-  ['Demo & reproducibility', '10/10'],
-  ['Documentation', '10/10'],
-];
-
-const recordingPlan = [
-  ['0:00–0:25', 'Problem', 'Frame the evidence-before-inference goal.'],
-  ['0:25–1:05', 'Live analysis', 'Run Xid 79 and inspect Pinecone-backed evidence.'],
-  ['1:05–1:50', 'Telemetry flow', 'Animate Fluent Bit → OTel → gateway → SSE → RAG → LangSmith.'],
-  ['1:50–2:40', 'RAG lifecycle', 'Run the nine corpus/retrieval stages and show the control planes.'],
-  ['2:40–3:20', 'Graph & voice', 'Map Mistral, Neo4j, and Deepgram responsibilities.'],
-  ['3:20–3:45', 'Refusal', 'Run Xid 999 and show zero diagnostic citations.'],
-  ['3:45–4:25', 'Evaluation', 'Show retrieval, refusal, ablations, and 50 passing tests.'],
-  ['4:25–4:55', 'Build story', 'Explain AI coding usage, GitHub, and the key learning.'],
 ];
 
 const flow = [
@@ -991,7 +968,6 @@ export default function Home() {
             <a className="transition hover:text-foreground" href="#architecture">Architecture</a>
             <a className="transition hover:text-foreground" href="#integrations">AI observability</a>
             <a className="transition hover:text-foreground" href="#evaluation">Evaluation</a>
-            <a className="transition hover:text-foreground" href="#submission">Submission</a>
           </nav>
           <Badge variant="outline" className="border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
             <span className="size-1.5 rounded-full bg-emerald-300" /> Pinecone-backed corpus
@@ -1390,72 +1366,6 @@ export default function Home() {
                 <p className="mt-3 text-xs leading-5 text-muted-foreground">The repository also includes Fluent Bit and OpenTelemetry Collector replay configurations, architecture diagrams, a CI workflow, and a detailed verification guide.</p>
               </CardContent>
             </Card>
-          </div>
-        </div>
-      </section>
-
-      <section id="submission" className="relative z-10 border-t border-border/70 bg-black/10 py-16">
-        <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <div className="mb-9 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-            <div className="max-w-3xl">
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">Week 2 submission kit</p>
-              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">Record the story. Submit the evidence.</h2>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">The public application, repository, documentation, evaluation, and recording sequence are aligned to the project handout. The only remaining human step is capturing and submitting the video.</p>
-            </div>
-            <div className="rounded-2xl border border-primary/25 bg-primary/[0.06] px-6 py-4 text-center">
-              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Expert review</p>
-              <p className="mt-1 font-mono text-4xl text-primary">98<span className="text-lg text-muted-foreground">/100</span></p>
-              <p className="mt-1 text-xs text-emerald-300">Technical review · video pending</p>
-            </div>
-          </div>
-
-          <div className="grid gap-5 lg:grid-cols-[.82fr_1.18fr]">
-            <Card className="border border-border/70 bg-card/75">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><ClipboardCheck className="size-4 text-primary" /> Judge scorecard</CardTitle>
-                <CardDescription>Strongest areas: evidence safety, reproducibility, and observability differentiation.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {week2Score.map(([label, score]) => (
-                  <div key={label} className="flex items-center justify-between rounded-xl border border-border/70 bg-black/15 px-3 py-2.5 text-sm">
-                    <span className="text-muted-foreground">{label}</span>
-                    <span className="font-mono text-primary">{score}</span>
-                  </div>
-                ))}
-                <p className="pt-2 text-xs leading-5 text-muted-foreground">Remaining evidence risk: the corpus and evaluation set are small. The trained-embedding result is an ablation until a controlled Pinecone namespace migration and blinded GPU-SME review are complete.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-primary/20 bg-primary/[0.03]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Video className="size-4 text-primary" /> 4:55 recording plan</CardTitle>
-                <CardDescription>Follow this order while keeping the application and visual pipeline on screen.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {recordingPlan.map(([time, title, instruction]) => (
-                  <div key={time} className="grid gap-1 rounded-xl border border-border/70 bg-black/15 px-3 py-2.5 sm:grid-cols-[86px_110px_1fr] sm:items-center">
-                    <span className="font-mono text-xs text-primary">{time}</span>
-                    <span className="text-sm font-medium">{title}</span>
-                    <span className="text-xs leading-5 text-muted-foreground">{instruction}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <a href="#analyze" className="group rounded-2xl border border-primary/25 bg-primary/[0.045] p-4 transition hover:border-primary/50">
-              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-primary">Public asset 01</p>
-              <p className="mt-2 flex items-center justify-between font-medium">Live demonstration <ArrowUpRight className="size-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></p>
-            </a>
-            <a href="https://github.com/sivalinb/gpu-signal-atlas" target="_blank" rel="noreferrer" className="group rounded-2xl border border-border/70 bg-card/70 p-4 transition hover:border-primary/40">
-              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">Public asset 02</p>
-              <p className="mt-2 flex items-center justify-between font-medium">GitHub repository <ArrowUpRight className="size-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></p>
-            </a>
-            <a href="https://docs.google.com/document/d/1bksyAMQVZFTTbXAq5TY1KnvXqq1rBO-trVjV1gjTezI/edit" target="_blank" rel="noreferrer" className="group rounded-2xl border border-border/70 bg-card/70 p-4 transition hover:border-primary/40">
-              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">Public asset 03</p>
-              <p className="mt-2 flex items-center justify-between font-medium">Project documentation <ArrowUpRight className="size-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></p>
-            </a>
           </div>
         </div>
       </section>
