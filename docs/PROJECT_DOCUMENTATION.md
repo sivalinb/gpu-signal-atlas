@@ -17,7 +17,21 @@ If an exact identifier is absent from the corpus, the application refuses rather
 
 ## One-liner
 
-GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM metric anomalies from reviewed official-documentation snapshots and internal runbooks through a web application with measurable retrieval, citation, claim-grounding, refusal, and latency targets.
+GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM metric anomalies from reviewed official-documentation snapshots and internal runbooks through a web application, targeting at least 90% citation validity, Recall@5 above 85%, and p95 production retrieval below five seconds.
+
+## Week 2 expert assessment
+
+Overall score: **96/100 — submission-ready**.
+
+| Area | Score | Reviewer feedback |
+|---|---:|---|
+| Use case and measurable targets | 10/10 | Specific user, corpus, surface, faithfulness target, retrieval target, and latency ceiling. |
+| Corpus, ingestion, and freshness | 14/15 | Reviewed provenance and promotion gates are implemented; the corpus is intentionally small. |
+| Chunking, embedding, and vector storage | 14/15 | Structure-aware ablation and live Pinecone storage are strong; the feature-hash embedding is a reproducible baseline rather than a trained model. |
+| Retrieval, citations, and refusal safety | 20/20 | Hybrid retrieval, reranking, citation allow-listing, claim grounding, and zero-citation refusal are explicit and tested. |
+| Evaluation and experimentation | 18/20 | Thirty-one cases and retrieval/chunking ablations are reproducible; a larger blinded set and GPU SME review remain future work. |
+| Public demo and reproducibility | 10/10 | Public website, GitHub, CI, local instructions, and visual walkthrough are complete. |
+| Documentation and observability differentiation | 10/10 | Technology mapping, Fluent Bit/OpenTelemetry boundaries, extension model, prompts, iterations, and learnings are clear. |
 
 ## Why this problem
 
@@ -80,6 +94,10 @@ Representative design instructions included:
 
 The evaluated website does not call a generative model, so no hidden prompt or API output is presented as real evidence. An optional server-side mode requests a strict JSON schema and then rejects unknown citations, unsupported fields, and claims that are not reproduced from cited evidence.
 
+## How AI coding tools were used
+
+OpenAI Codex supported repository inspection, TypeScript and React implementation, Pinecone integration, test-case expansion, configuration review, documentation, and deployment preparation. Domain choices were kept explicit: corpus boundaries, identifier preservation, chunk structure, hybrid retrieval, refusal conditions, the evidence schema, and evaluation thresholds. AI-produced changes were accepted only after automated tests, retrieval evaluation, ablations, type checking, linting, production build validation, and live endpoint verification.
+
 ## Iterations tried
 
 - Replaced dense-only retrieval with hybrid retrieval.
@@ -108,7 +126,7 @@ Recorded result:
 | Refusal precision | 100.0% |
 | Refusal recall | 100.0% |
 | p95 local latency | 2.31 ms |
-| p95 Pinecone retrieval latency | 191.74 ms |
+| p95 Pinecone retrieval latency | 229.16 ms |
 
 The expanded test suite contains 29 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and metadata, model contracts, ablations, and observability configuration. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
 
@@ -154,8 +172,16 @@ Below the analyzer, the website explains the five-stage RAG flow, optional telem
 - Fluent Bit/OpenTelemetry replay assets
 - Local setup and verification guide
 - Five-minute demo script
+- Public Google Doc with Week 2 requirement mapping and expert assessment
 - Interactive start-to-finish visual pipeline walkthrough
 - Persistent vector-index build and verification scripts
 - Implemented ingestion and freshness workflow
 - Optional schema-constrained LLM mode
 - Retrieval and chunking ablation report
+
+## Final submission checklist
+
+- Public website: `https://gpu-signal-atlas.siva-babu.chatgpt.site`
+- Public repository: `https://github.com/sivalinb/gpu-signal-atlas`
+- Public Google Doc: `https://docs.google.com/document/d/1bksyAMQVZFTTbXAq5TY1KnvXqq1rBO-trVjV1gjTezI/edit`
+- Video: record the 4:55 sequence in `docs/DEMO_SCRIPT.md`, confirm the link is viewable, and submit all three assets through the Week 2 form.

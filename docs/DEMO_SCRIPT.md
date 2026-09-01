@@ -1,10 +1,18 @@
 # Five-Minute Demo Script
 
-Target duration: 4 minutes 30 seconds to 5 minutes.
+Target duration: 4 minutes 55 seconds. Stop at five minutes even if a secondary point is skipped.
+
+## Pre-recording checklist
+
+- Open the public website in a clean browser window and confirm the Xid 79 result loads.
+- Keep the GitHub repository and public Google Doc available in adjacent tabs.
+- Use 100% browser zoom and record at 1080p when possible.
+- Close notifications and hide bookmarks or tabs containing personal information.
+- Do one timed rehearsal. The recording should demonstrate the application rather than read every paragraph.
 
 Open the **Visual demo** section and click **Run full pipeline** during the architecture portion. The animation advances through all nine implemented stages and can be paused or inspected one stage at a time.
 
-## 0:00–0:35 — Problem and project
+## 0:00–0:30 — Problem and project
 
 “GPU Signal Atlas is a citation-first RAG application for NVIDIA Xid events, DCGM metrics, and GPU observability pipelines. GPU telemetry is full of exact but cryptic identifiers, and the supporting meaning is distributed across vendor catalogs, field references, deployment guides, and internal runbooks.
 
@@ -12,7 +20,7 @@ This project is intentionally not another autonomous incident agent. It retrieve
 
 Show the website title and the Xid 79 sample.
 
-## 0:35–1:30 — Primary Xid 79 flow
+## 0:30–1:20 — Primary Xid 79 flow
 
 “The first replay contains Xid 79, a PCIe replay counter, an H100 model, and driver branch R565. When I click Analyze, the application extracts those identifiers before retrieval.
 
@@ -22,7 +30,7 @@ The output is a signal card—not a root-cause verdict. It shows the official do
 
 Click the first NVIDIA citation.
 
-## 1:30–2:15 — Multi-source ECC example
+## 1:20–2:00 — Multi-source ECC example
 
 Select **Xid 48 + ECC**.
 
@@ -30,7 +38,15 @@ Select **Xid 48 + ECC**.
 
 The generator only uses reviewed fields from retrieved records. An official source leads the definition; an internal demonstration runbook can add evidence steps but cannot redefine the vendor event.”
 
-## 2:15–2:50 — Refusal behavior
+## 2:00–3:25 — Visual architecture and Pinecone
+
+Scroll to **Interactive visual demo** and click **Run full pipeline**.
+
+“This button exposes all nine stages: allow-listed ingestion, cleaning, identifier-centered chunking, vector promotion into Pinecone, telemetry extraction, dense and sparse retrieval, reranking, evidence gating, and structured generation.
+
+Pinecone is the managed dense-vector store for the public application. The API key stays on the server. BM25 and the application-level reranker remain important because telemetry contains exact numeric Xids and long metric identifiers. Fluent Bit and OpenTelemetry are a separate optional transport lane: they collect and normalize telemetry, while Pinecone stores reviewed documentation vectors.”
+
+## 3:25–3:55 — Refusal behavior
 
 Select **Unknown identifier**.
 
@@ -38,15 +54,7 @@ Select **Unknown identifier**.
 
 This behavior is automated in both unit tests and the evaluation suite.”
 
-## 2:50–3:35 — Architecture
-
-Scroll to **System flow**.
-
-“The pipeline has five visible stages: extract, embed, retrieve, rerank, and ground or refuse. The embedding is a deterministic 256-dimensional feature-hash baseline stored in a versioned Pinecone namespace. The API key stays server-side, and Pinecone replaces storage and serving rather than the evidence gate. This remains a replaceable component, not a claim of state-of-the-art semantic search.
-
-The optional integration replays GPU logs through Fluent Bit to an OpenTelemetry Collector over OTLP. The checked-in path ends at the Collector debug exporter; I paste a replayed record into the browser analyzer. That explicit boundary keeps the RAG evaluation reproducible and avoids implying an unimplemented backend.”
-
-## 3:35–4:20 — Evaluation and testing
+## 3:55–4:25 — Evaluation and testing
 
 Scroll to **Evaluation evidence**.
 
@@ -56,10 +64,14 @@ The current run records 100 percent Recall@5, 0.931 mean reciprocal rank, 100 pe
 
 The repository also has 29 unit and regression tests, a separate live Pinecone evaluation, type checking, linting, a production website build, and GitHub Actions CI.”
 
-## 4:20–4:55 — Local reproduction and close
+## 4:25–4:55 — AI coding tools, assets, and close
 
-Show the command block.
+Show the submission section, GitHub link, and public Google Doc.
 
-“Anyone can reproduce the project with Node 22: install dependencies, run the tests, run the evaluation, and start the website. No production telemetry, credentials, Kubernetes cluster, or GPU is required.
+“I used OpenAI Codex as the AI coding assistant for repository inspection, TypeScript and React implementation, Pinecone integration, test expansion, configuration review, and documentation. I kept the domain decisions explicit and accepted changes only after tests, evaluation, type checking, linting, a production build, and live endpoint verification.
 
-The main learning is that observability RAG needs exact retrieval and strong refusal boundaries as much as it needs semantic search. GPU Signal Atlas makes that retrieval path visible and testable.”
+The public GitHub repository contains the code and evaluation assets, and the public Google Doc contains the complete Week 2 narrative. My main learning is that observability RAG needs exact retrieval and a tested refusal boundary as much as it needs semantic search.”
+
+## If time runs long
+
+Keep the Xid 79 result, the nine-stage visual pipeline, the refusal, the metrics, and the AI coding explanation. Skip opening an individual citation or describing the optional replay in detail.

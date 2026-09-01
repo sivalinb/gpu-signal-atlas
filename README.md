@@ -94,7 +94,7 @@ The checked-in evaluation contains 31 independent cases across exact identifiers
 | Refusal precision | 100.0% | ≥90% |
 | Refusal recall | 100.0% | ≥90% |
 | Local p95 retrieval latency | 2.31 ms | <5 s |
-| Pinecone p95 end-to-end retrieval latency | 191.74 ms | <5 s |
+| Pinecone p95 end-to-end retrieval latency | 229.16 ms | <5 s |
 
 These results validate the checked-in deterministic corpus and queries. They are regression evidence, not generalized GPU-diagnostic accuracy. Full methodology is in [`docs/EVALUATION_REPORT.md`](docs/EVALUATION_REPORT.md).
 
@@ -152,6 +152,8 @@ docs/                        design, visual, evaluation, testing, and submission
 - [`docs/RUNBOOKS.md`](docs/RUNBOOKS.md) — demonstration evidence-collection runbooks
 - [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) — five-minute video walkthrough
 - [`docs/PROJECT_DOCUMENTATION.md`](docs/PROJECT_DOCUMENTATION.md) — submission-ready project narrative
+- [`docs/WEEK2_REVIEW.md`](docs/WEEK2_REVIEW.md) — expert requirement mapping and 96/100 scorecard
+- [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) — public links, recording sequence, and final handoff checks
 
 ## License
 

@@ -99,8 +99,8 @@ MRR: 0.931
 Citation validity: 100.0%
 Refusal precision: 100.0%
 Refusal recall: 100.0%
-Latency p50: 102.90 ms
-Latency p95: 191.74 ms
+Latency p50: 106.37 ms
+Latency p95: 229.16 ms
 Failures: 0
 ```
 
