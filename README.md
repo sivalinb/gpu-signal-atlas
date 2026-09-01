@@ -29,6 +29,8 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 - Allow-listed ingestion, HTML cleaning, source fingerprinting, and freshness-SLA gates
 - Node test suite, type checking, production build, and GitHub Actions CI
 - Optional Fluent Bit → OTLP → OpenTelemetry Collector replay configuration
+- Governed You.com source discovery with domain allow-listing and a mandatory review queue
+- Optional LangSmith OTLP trace export with raw-telemetry redaction and fail-open behavior
 
 ## Architecture
 
@@ -69,7 +71,7 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-The website and Pinecone evaluation require the four server-only variables shown in `.env.example`. The CLI, unit tests, local evaluation, and ablations remain credential-free.
+The website and Pinecone evaluation require the four Pinecone server-only variables shown in `.env.example`. You.com and LangSmith are optional server-only integrations. The CLI, unit tests, local evaluation, and ablations remain credential-free.
 
 Analyze a sample from the command line:
 
@@ -110,6 +112,8 @@ core/
   generated/vector-index.ts persistent precomputed document vectors
   ingestion.ts               cleaning, fingerprint, source validation, freshness logic
   llm.ts                     optional strict-schema model adapter
+  you.ts                     allow-listed You.com discovery and review candidates
+  langsmith.ts               redacted OpenTelemetry trace export
   ablation.ts                retrieval and chunking comparison primitives
   samples.ts                 browser replay inputs
   types.ts                   public data contracts
@@ -121,6 +125,7 @@ scripts/evaluate-pinecone.ts live managed-index evaluation runner
 scripts/sync-pinecone.ts     reviewed-corpus Pinecone promotion workflow
 scripts/ablate.ts            retrieval and chunking ablation report
 scripts/ingest-source.ts     allow-listed source snapshot workflow
+scripts/discover-you-sources.ts You.com review-candidate workflow
 observability/               Fluent Bit and OTel Collector replay configs
 examples/gpu-events.log      synthetic, labeled GPU telemetry replay
 docs/                        design, visual, evaluation, testing, and submission documentation
@@ -131,6 +136,8 @@ docs/                        design, visual, evaluation, testing, and submission
 - The included telemetry is synthetic and labeled as replay data.
 - The feature-hash embedding is deterministic and reproducible; Pinecone manages storage and similarity search but does not make the representation state of the art.
 - The public website queries Pinecone only from a server route. No Pinecone credential is included in browser JavaScript.
+- You.com receives public documentation discovery queries only; results cannot write to the corpus or Pinecone automatically.
+- LangSmith receives redacted identifiers, ranks, timings, and outcomes; the raw pasted telemetry string is excluded by default.
 - Template generation is used so every sentence can be traced to retrieved corpus fields.
 - Official documents are paraphrased into compact curated records; source URLs remain the authority.
 - Every record exposes its review date, rolling/snapshot source status, source section, and deterministic curated-content fingerprint.
@@ -148,6 +155,7 @@ docs/                        design, visual, evaluation, testing, and submission
 - [`docs/ABLATION_REPORT.md`](docs/ABLATION_REPORT.md) — retrieval and chunking comparisons
 - [`docs/INGESTION_AND_FRESHNESS.md`](docs/INGESTION_AND_FRESHNESS.md) — source refresh and human-review workflow
 - [`docs/LLM_MODE.md`](docs/LLM_MODE.md) — optional model contract and grounding boundary
+- [`docs/YOU_LANGSMITH_INTEGRATION.md`](docs/YOU_LANGSMITH_INTEGRATION.md) — discovery, AI observability, privacy, and scale-out design
 - [`docs/LOCAL_TESTING.md`](docs/LOCAL_TESTING.md) — local setup and end-to-end verification
 - [`docs/RUNBOOKS.md`](docs/RUNBOOKS.md) — demonstration evidence-collection runbooks
 - [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) — five-minute video walkthrough

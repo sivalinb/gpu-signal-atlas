@@ -44,7 +44,7 @@ Scroll to **Interactive visual demo** and click **Run full pipeline**.
 
 “This button exposes all nine stages: allow-listed ingestion, cleaning, identifier-centered chunking, vector promotion into Pinecone, telemetry extraction, dense and sparse retrieval, reranking, evidence gating, and structured generation.
 
-Pinecone is the managed dense-vector store for the public application. The API key stays on the server. BM25 and the application-level reranker remain important because telemetry contains exact numeric Xids and long metric identifiers. Fluent Bit and OpenTelemetry are a separate optional transport lane: they collect and normalize telemetry, while Pinecone stores reviewed documentation vectors.”
+Now scroll to the technology map. Pinecone is the managed dense-vector store for the public application. You.com is an optional discovery adapter: it searches only approved public documentation and puts every result in a human review queue—it never writes to Pinecone. LangSmith is an optional AI-observability adapter: it receives redacted OpenTelemetry spans for extraction, retrieval, evidence gating, and generation, with ranks, latency, and outcomes but no original telemetry. Fluent Bit collects and enriches logs; OpenTelemetry transports logs and traces.”
 
 ## 3:25–3:55 — Refusal behavior
 
@@ -62,7 +62,7 @@ Scroll to **Evaluation evidence**.
 
 The current run records 100 percent Recall@5, 0.931 mean reciprocal rank, 100 percent citation validity, 100 percent field-level claim grounding, and 100 percent refusal precision and recall. These are regression results for the curated corpus, not generalized GPU diagnostic accuracy.
 
-The repository also has 29 unit and regression tests, a separate live Pinecone evaluation, type checking, linting, a production website build, and GitHub Actions CI.”
+The repository also has 34 unit and regression tests, a separate live Pinecone evaluation, type checking, linting, a production website build, and GitHub Actions CI.”
 
 ## 4:25–4:55 — AI coding tools, assets, and close
 

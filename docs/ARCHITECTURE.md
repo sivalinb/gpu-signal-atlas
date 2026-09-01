@@ -199,6 +199,16 @@ The public and evaluated path uses the deterministic template. `core/llm.ts` add
 
 `ingestion/source-manifest.ts` is the source allow-list. `npm run ingest` fetches one selected source or cleans a local HTML capture and writes a candidate snapshot. It does not mutate the operational corpus. `npm run freshness` validates allow-list coverage, HTTPS, curated-content fingerprints, and seven-day official-source or 30-day internal-source review SLAs. An approved corpus change must rebuild the offline baseline, upsert a new Pinecone namespace, pass both evaluations, and only then promote the namespace configuration.
 
+### You.com discovery extension
+
+`core/you.ts` adds a second, optional discovery input. It submits documentation-focused queries to You.com with an explicit domain allow-list, rejects non-allow-listed response URLs, and labels every result `pending-review`. It never receives pasted telemetry, edits the corpus, rebuilds the index, or upserts Pinecone. The existing human review, fingerprint, regression, staging-namespace, and promotion gates remain authoritative.
+
+## AI observability boundary
+
+The analysis route measures signal extraction, hybrid retrieval, and evidence-gate/generation stages. `core/langsmith.ts` represents those stages as OpenTelemetry spans and can export them to LangSmith over OTLP/HTTP. The trace contains exact identifiers, model/driver context, input length, ranks, latency, corpus/index versions, result status, evidence strength, and citation count. It does not contain the submitted telemetry string.
+
+Trace export is optional and fail-open. A missing key reports `disabled`; an exporter or network failure reports `failed`; neither condition changes the grounded/refused result. `observability/otel-collector-langsmith.yaml` demonstrates an alternative Collector fan-out with generic input/output attribute deletion before export.
+
 ## Compatibility behavior
 
 When an input names a GPU model or driver branch and the selected document contains a restricted applicability list, the response adds a compatibility note if there is no overlap. It does not remove the source because the identifier may still be useful; it marks the uncertainty for operator review.
@@ -219,6 +229,9 @@ The graphite and mint visual system references telemetry terminals, signal trace
 
 - Analysis is sent only to the same-origin server route and is not persisted by the application.
 - The Pinecone API key is a server secret and is never bundled into browser JavaScript.
+- You.com and LangSmith keys are optional server secrets and are never bundled into browser JavaScript.
+- You.com is restricted to public documentation discovery and cannot auto-promote a result.
+- LangSmith trace payloads explicitly set `rag.raw_telemetry_exported=false`; the exporter is tested to exclude the original input string.
 - Submitted telemetry is used as a transient query vector; no raw telemetry record is upserted into the documentation index.
 - No input is transmitted to a model provider.
 - No secret is included in the repository.

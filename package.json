@@ -18,6 +18,7 @@
     "index:build": "node --experimental-strip-types scripts/build-index.ts",
     "index:check": "node --experimental-strip-types scripts/check-index.ts",
     "pinecone:sync": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/sync-pinecone.ts",
+    "discover:you": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/discover-you-sources.ts",
     "ingest": "node --experimental-strip-types scripts/ingest-source.ts",
     "freshness": "node --experimental-strip-types scripts/freshness.ts",
     "ablate": "node --experimental-strip-types scripts/ablate.ts",

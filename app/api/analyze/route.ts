@@ -1,5 +1,6 @@
 import { corpus } from '@/core/corpus';
-import { analyzeTelemetryFromRetrieval } from '@/core/engine';
+import { analyzeTelemetryFromRetrieval, extractSignals } from '@/core/engine';
+import { exportLangSmithTrace, type TraceStage } from '@/core/langsmith';
 import {
   getPineconeConfig,
   PineconeConfigurationError,
@@ -20,6 +21,7 @@ function json(body: unknown, status = 200): Response {
 
 export async function POST(request: Request): Promise<Response> {
   const startedAt = typeof performance === 'undefined' ? Date.now() : performance.now();
+  const measure = () => (typeof performance === 'undefined' ? Date.now() : performance.now());
   let payload: AnalyzeRequest;
   try {
     payload = (await request.json()) as AnalyzeRequest;
@@ -39,20 +41,64 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   try {
+    const stages: TraceStage[] = [];
+    const extractStarted = measure();
+    const signals = extractSignals(telemetry);
+    stages.push({
+      name: 'rag.extract_signals',
+      durationMs: measure() - extractStarted,
+      status: 'ok',
+      attributes: {
+        'rag.xid.count': signals.xids.length,
+        'rag.metric.count': signals.metrics.length,
+      },
+    });
+
     const config = getPineconeConfig();
+    const retrievalStarted = measure();
     const { retrieval, vectorIndexVersion } = await retrieveFromPinecone(
       telemetry,
       config,
       corpus,
       5,
     );
-    return json(
-      analyzeTelemetryFromRetrieval(telemetry, retrieval, corpus, {
-        vectorIndexVersion,
-        retrievalBackend: 'pinecone',
-        startedAt,
-      }),
+    stages.push({
+      name: 'rag.hybrid_retrieval',
+      durationMs: measure() - retrievalStarted,
+      status: 'ok',
+      attributes: {
+        'rag.candidate.count': retrieval.length,
+        'rag.vector.backend': 'pinecone',
+        'rag.vector.index': vectorIndexVersion,
+      },
+    });
+
+    const generationStarted = measure();
+    const analysis = analyzeTelemetryFromRetrieval(telemetry, retrieval, corpus, {
+      vectorIndexVersion,
+      retrievalBackend: 'pinecone',
+      startedAt,
+    });
+    stages.push({
+      name: 'rag.evidence_gate_and_generate',
+      durationMs: measure() - generationStarted,
+      status: 'ok',
+      attributes: {
+        'rag.result.status': analysis.status,
+        'rag.citation.count': analysis.citations.length,
+      },
+    });
+
+    const observabilityExport = await exportLangSmithTrace(
+      analysis,
+      signals,
+      telemetry.length,
+      stages,
     );
+    return json({
+      ...analysis,
+      diagnostics: { ...analysis.diagnostics, observabilityExport },
+    });
   } catch (error) {
     if (error instanceof PineconeConfigurationError) {
       console.error('Pinecone configuration is incomplete.');

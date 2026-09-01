@@ -94,7 +94,7 @@ const recordingPlan = [
   ['0:00–0:30', 'Problem', 'Frame the evidence-before-inference goal.'],
   ['0:30–1:20', 'Live analysis', 'Run Xid 79 and inspect Pinecone-backed evidence.'],
   ['1:20–2:00', 'Multi-source', 'Show Xid 48, ECC metric, and runbook context.'],
-  ['2:00–3:25', 'Pipeline', 'Run all nine stages and explain the technology map.'],
+  ['2:00–3:25', 'Pipeline', 'Run all nine stages, then show the You.com/Pinecone/LangSmith control planes.'],
   ['3:25–3:55', 'Refusal', 'Run Xid 999 and show zero diagnostic citations.'],
   ['3:55–4:25', 'Evaluation', 'Show retrieval, refusal, and ablation evidence.'],
   ['4:25–4:55', 'Build story', 'Explain AI coding usage, GitHub, and the key learning.'],
@@ -139,8 +139,8 @@ const walkthroughSteps = [
     number: '01',
     short: 'Ingest',
     title: 'Allow-listed sources enter a review queue',
-    technology: 'Source manifest · HTTPS fetch · FNV-1a fingerprint',
-    explanation: 'Vendor pages and internal runbooks are fetched only from approved URLs. The workflow records fetch metadata and creates a candidate snapshot; it never changes operational guidance automatically.',
+    technology: 'Source manifest · optional You.com Search · FNV-1a fingerprint',
+    explanation: 'You.com can discover current vendor pages from an explicit domain allow-list. Every result enters a pending-review queue with provenance and a content hash; discovery never changes Pinecone or operational guidance automatically.',
     input: 'NVIDIA Xid catalog + DCGM field reference',
     output: 'Candidate snapshot · ETag · content hash',
   },
@@ -222,7 +222,7 @@ const walkthroughSteps = [
     technology: 'Deterministic template · optional strict LLM JSON schema',
     explanation: 'The default template copies reviewed fields. Optional model mode can compose the same contract, but post-validation rejects unknown citations and any claim not reproduced from cited evidence.',
     input: 'Only retrieved, reviewed evidence fields',
-    output: 'Meaning · next evidence · limitations · citations',
+    output: 'Signal card · citations · redacted LangSmith trace',
   },
 ];
 
@@ -408,12 +408,13 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
       <CardContent className="space-y-6 pt-5 text-slate-200">
         <SignalTokens analysis={analysis} />
 
-        <div className="grid gap-2 rounded-xl border border-primary/15 bg-primary/[0.035] p-3 font-mono text-[10px] text-slate-400 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-2 rounded-xl border border-primary/15 bg-primary/[0.035] p-3 font-mono text-[10px] text-slate-400 sm:grid-cols-2 lg:grid-cols-6">
           <span>trace {analysis.diagnostics.traceId.slice(0, 12)}…</span>
           <span suppressHydrationWarning>{analysis.diagnostics.durationMs.toFixed(2)} ms analysis</span>
           <span className="truncate" title={analysis.diagnostics.vectorIndexVersion}>index {analysis.diagnostics.vectorIndexVersion}</span>
           <span>{analysis.diagnostics.retrievalBackend}</span>
           <span>{analysis.diagnostics.generationMode}</span>
+          <span>LangSmith {analysis.diagnostics.observabilityExport ?? 'disabled'}</span>
         </div>
 
         <div>
@@ -534,6 +535,7 @@ export default function Home() {
             <a className="transition hover:text-foreground" href="#analyze">Analyze</a>
             <a className="transition hover:text-foreground" href="#walkthrough">Visual demo</a>
             <a className="transition hover:text-foreground" href="#architecture">Architecture</a>
+            <a className="transition hover:text-foreground" href="#integrations">AI observability</a>
             <a className="transition hover:text-foreground" href="#evaluation">Evaluation</a>
             <a className="transition hover:text-foreground" href="#submission">Submission</a>
           </nav>
@@ -683,14 +685,14 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-muted-foreground">
-                  {['GPU/kernel log', 'Fluent Bit', 'OTLP', 'OTel Collector', 'Debug exporter'].map((label, index) => (
+                  {['GPU/kernel log', 'Fluent Bit', 'OTLP', 'OTel Collector', 'Debug + LangSmith*'].map((label, index) => (
                     <span key={label} className="contents">
                       <span className="rounded-lg border border-border bg-black/15 px-3 py-2 text-foreground">{label}</span>
                       {index < 4 && <ChevronRight className="size-3.5 text-primary" />}
                     </span>
                   ))}
                 </div>
-                <p className="mt-3 text-xs leading-5 text-muted-foreground">The checked-in replay ends at the Collector debug exporter. Copy a replayed record into Signal Atlas for deterministic analysis; no hidden backend connection is implied.</p>
+                <p className="mt-3 text-xs leading-5 text-muted-foreground">The default replay ends at the Collector debug exporter. A separate checked-in trace pipeline can fan out redacted RAG spans to LangSmith when its server-only key is configured. Raw GPU telemetry is excluded by default.</p>
               </CardContent>
             </Card>
             <Card className="border border-border/70 bg-card/70">
@@ -704,6 +706,96 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      </section>
+
+      <section id="integrations" className="relative z-10 border-b border-border/70 bg-[radial-gradient(circle_at_82%_12%,oklch(0.82_0.16_165/.07),transparent_32%),linear-gradient(180deg,oklch(0.145_0.015_250),oklch(0.17_0.018_245))] py-16">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <div className="mb-9 grid gap-5 lg:grid-cols-[1fr_.75fr] lg:items-end">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">Technology and data mapping</p>
+              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">One evidence system, three governed control planes.</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">You.com expands what can be reviewed, Pinecone serves what has been approved, and LangSmith explains how the RAG path behaved. Each integration has a narrow job and an explicit privacy boundary.</p>
+            </div>
+            <div className="rounded-2xl border border-primary/20 bg-primary/[0.055] p-4 text-xs leading-5 text-muted-foreground">
+              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">Deployment truth</p>
+              <p className="mt-2"><span className="text-foreground">Pinecone is active.</span> You.com discovery and LangSmith trace export are implemented, tested, and optional; server-side API keys activate them without exposing secrets to the browser.</p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            {[
+              {
+                icon: FileSearch,
+                eyebrow: 'Corpus intelligence',
+                title: 'Discover → review → promote',
+                status: 'Optional adapter implemented',
+                steps: ['Approved public domains', 'You.com Search + page content', 'Pending-review candidates', 'Human approval + regression tests', 'Pinecone versioned namespace'],
+                boundary: 'No pasted telemetry. No automatic index writes.',
+              },
+              {
+                icon: Database,
+                eyebrow: 'Runtime evidence',
+                title: 'Retrieve → gate → cite',
+                status: 'Production path active',
+                steps: ['Submitted telemetry snapshot', 'Exact signal extraction', 'Pinecone candidates + BM25', 'RRF and evidence boundary', 'Grounded card or refusal'],
+                boundary: 'Only reviewed corpus records can support a citation.',
+              },
+              {
+                icon: Activity,
+                eyebrow: 'AI observability',
+                title: 'Trace → evaluate → improve',
+                status: 'Optional export implemented',
+                steps: ['Redacted OpenTelemetry spans', 'Extraction/retrieval/gate timing', 'LangSmith project traces', 'Datasets and evaluators', 'Regression and drift review'],
+                boundary: 'Identifiers, ranks, timing, outcomes—never raw telemetry.',
+              },
+            ].map((lane) => (
+              <Card key={lane.eyebrow} className="overflow-hidden border border-border/70 bg-card/80">
+                <CardHeader className="border-b border-border/60">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="grid size-10 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary"><lane.icon className="size-4" /></span>
+                    <Badge variant="outline" className="border-primary/20 bg-primary/5 font-mono text-[9px] text-primary">{lane.status}</Badge>
+                  </div>
+                  <CardDescription className="pt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-primary">{lane.eyebrow}</CardDescription>
+                  <CardTitle className="text-lg">{lane.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-5">
+                  <ol className="space-y-2">
+                    {lane.steps.map((item, index) => (
+                      <li key={item} className="flex items-center gap-3 rounded-xl border border-border/60 bg-black/15 px-3 py-2.5 text-xs">
+                        <span className="grid size-5 shrink-0 place-items-center rounded-full bg-primary/12 font-mono text-[9px] text-primary">{index + 1}</span>
+                        <span className="text-slate-300">{item}</span>
+                        {index < lane.steps.length - 1 && <ChevronRight className="ml-auto size-3 shrink-0 text-primary/40" />}
+                      </li>
+                    ))}
+                  </ol>
+                  <p className="mt-4 rounded-xl border border-amber-300/12 bg-amber-300/[0.035] px-3 py-2 text-[11px] leading-5 text-amber-100/65"><ShieldAlert className="mr-2 inline size-3 text-amber-300" />{lane.boundary}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="mt-5 border border-primary/20 bg-primary/[0.025]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><Workflow className="size-4 text-primary" /> Technology responsibility matrix</CardTitle>
+              <CardDescription>Collection, evidence, and AI quality are separate concerns connected by inspectable contracts.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-2 md:grid-cols-5">
+              {[
+                ['Fluent Bit', 'Collect + enrich GPU and Kubernetes logs', 'OTLP logs'],
+                ['OpenTelemetry', 'Normalize telemetry and emit redacted RAG spans', 'Logs + traces'],
+                ['You.com', 'Discover allow-listed public documentation', 'Review candidates'],
+                ['Pinecone', 'Serve approved dense-vector candidates', 'Versioned vectors'],
+                ['LangSmith', 'Inspect RAG traces and run evaluation datasets', 'Quality signals'],
+              ].map(([technology, responsibility, artifact]) => (
+                <div key={technology} className="rounded-xl border border-border/70 bg-black/15 p-4">
+                  <p className="font-heading text-sm font-semibold text-primary">{technology}</p>
+                  <p className="mt-2 text-xs leading-5 text-slate-300">{responsibility}</p>
+                  <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">{artifact}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </div>
       </section>
 

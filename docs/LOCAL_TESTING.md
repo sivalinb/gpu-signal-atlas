@@ -169,6 +169,18 @@ See [`LLM_MODE.md`](LLM_MODE.md) for local provider configuration. Unknown ident
 
 See [`INGESTION_AND_FRESHNESS.md`](INGESTION_AND_FRESHNESS.md). A refresh creates a review candidate; it never changes the corpus automatically.
 
+## Optional You.com discovery and LangSmith traces
+
+See [`YOU_LANGSMITH_INTEGRATION.md`](YOU_LANGSMITH_INTEGRATION.md) for the complete data boundaries and scale-out design. Add only the server-side keys you need to `.env.local`.
+
+Create a You.com review queue without editing the corpus or Pinecone:
+
+```bash
+npm run discover:you -- "NVIDIA Xid 79 recovery documentation"
+```
+
+With `LANGSMITH_API_KEY` and `LANGSMITH_PROJECT` configured, every website analysis attempts a redacted OTLP trace export. The response diagnostic is `exported`, `failed`, or `disabled`. The exporter never sends the original telemetry string, and an export failure never blocks analysis.
+
 ## 8. Optional Fluent Bit and OpenTelemetry replay
 
 Start an OpenTelemetry Collector with the checked-in configuration:
@@ -220,6 +232,8 @@ Confirm:
 - the synthetic nature of fixtures is disclosed;
 - source URLs remain reachable; and
 - no production-action code was introduced.
+- You.com output remains `pending-review` and `autoPromoted: false`; and
+- sampled LangSmith traces contain no raw telemetry or tenant/workload identifiers.
 
 ## Troubleshooting
 

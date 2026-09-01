@@ -18,3 +18,11 @@ test('Collector replay receives OTLP logs and ends at the debug exporter', async
   assert.match(config, /exporters: \[debug\]/);
   assert.doesNotMatch(config, /loki|elasticsearch|otlphttp\/backend/i);
 });
+
+test('Optional LangSmith collector path redacts payload fields before OTLP export', async () => {
+  const config = await readFile(new URL('../observability/otel-collector-langsmith.yaml', import.meta.url), 'utf8');
+  assert.match(config, /transform\/redact/);
+  assert.match(config, /delete_key\(attributes, "input\.value"\)/);
+  assert.match(config, /otlphttp\/langsmith/);
+  assert.match(config, /Langsmith-Project/);
+});

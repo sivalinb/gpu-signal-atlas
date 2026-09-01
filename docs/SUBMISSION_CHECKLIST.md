@@ -15,6 +15,8 @@ Verify every link in a private/incognito window before submitting.
 - Show the evaluation and ablation results.
 - State that Pinecone stores reviewed documentation vectors and that the API key is server-side.
 - Explain that Fluent Bit and OpenTelemetry collect and normalize telemetry; they are not the vector database.
+- Show the AI-observability map: You.com discovers review candidates, Pinecone serves approved vectors, and LangSmith receives redacted RAG traces.
+- State that You.com and LangSmith adapters are implemented and optional; do not describe them as active without server-side keys.
 - Explain how OpenAI Codex was used and how tests/evaluation controlled acceptance.
 - Finish on the submission section with the GitHub and Google Doc links.
 

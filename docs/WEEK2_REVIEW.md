@@ -19,7 +19,7 @@ GPU Signal Atlas satisfies the Week 2 requirement to pick a corpus, ingest and c
 | Retrieval | Pinecone dense candidates plus BM25, RRF, exact-ID/context reranking, top five. | Complete |
 | Cited generation | Deterministic structured signal card and optional schema-constrained LLM mode with post-validation. | Complete |
 | Refusal | Unknown identifiers, unrelated questions, and unsupported same-domain inputs return no diagnostic citations. | Excellent |
-| Evaluation | 31 cases, 29 tests, retrieval/chunking ablations, citation and grounding checks, local and Pinecone latency. | Excellent for the bounded corpus |
+| Evaluation | 31 cases, 34 tests, retrieval/chunking ablations, citation and grounding checks, local and Pinecone latency. | Excellent for the bounded corpus |
 | Project documentation | Overview, dataset, prompts/instructions, iterations, learnings, technology map, limitations, and setup. | Complete |
 | Video demo | Exact 4:55 script and interactive nine-stage walkthrough. | Ready to record |
 | Project assets | Public website, public GitHub repository, public Google Doc, CI, and replay configuration. | Complete |
@@ -45,6 +45,7 @@ GPU Signal Atlas satisfies the Week 2 requirement to pick a corpus, ingest and c
 4. Retrieval and chunking decisions are supported by ablations instead of architecture claims alone.
 5. Negative examples and zero-citation refusal are evaluated independently from positive retrieval.
 6. The public visual walkthrough makes the complete lifecycle understandable to a reviewer in under five minutes.
+7. You.com discovery and LangSmith tracing add governed freshness and AI-observability extensions without weakening the Pinecone promotion or raw-telemetry privacy boundaries.
 
 ## Remaining risks and recommended next steps
 

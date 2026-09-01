@@ -125,6 +125,20 @@ flowchart LR
 
 This path demonstrates collection and normalization and intentionally ends at the Collector debug exporter. For the demo, copy a replayed record into the browser analyzer. A production adapter can later read from a log backend or OTLP-derived event stream. The RAG evaluation remains independent so it can run on any laptop without Docker, Fluent Bit, a collector, or a GPU.
 
+## External intelligence and AI observability
+
+```mermaid
+flowchart LR
+    W[Approved public documentation] --> Y[You.com Search]
+    Y --> Q[Pending-review queue]
+    Q -->|human approved + tests pass| P[Pinecone namespace]
+    T[GPU telemetry snapshot] --> R[Hybrid RAG]
+    P --> R --> C[Cited card or refusal]
+    R -. redacted OTel spans .-> L[LangSmith]
+```
+
+The three lanes intentionally carry different data. You.com sees documentation discovery queries and public pages, not GPU telemetry. Pinecone stores approved documentation vectors, not submitted logs. LangSmith sees stage timing, ranks, identifiers, versions, and outcomes, not the raw telemetry string. The public website's **AI observability** section maps each technology to its responsibility and status.
+
 ## Source-code map
 
 ```text
@@ -148,6 +162,12 @@ Answer:   app/page.tsx
 
 Question: Where is the OTLP replay configured?
 Answer:   observability/
+
+Question: Where is governed You.com discovery implemented?
+Answer:   core/you.ts → scripts/discover-you-sources.ts
+
+Question: Where is redacted LangSmith export implemented?
+Answer:   core/langsmith.ts → app/api/analyze/route.ts
 ```
 
 ## What the visual colors mean
