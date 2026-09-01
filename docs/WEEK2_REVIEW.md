@@ -19,7 +19,7 @@ GPU Signal Atlas satisfies the Week 2 requirement to pick a corpus, ingest and c
 | Retrieval | Pinecone dense candidates plus BM25, RRF, exact-ID/context reranking, top five. | Complete |
 | Cited generation | Deterministic structured signal card and optional schema-constrained LLM mode with post-validation. | Complete |
 | Refusal | Unknown identifiers, unrelated questions, and unsupported same-domain inputs return no diagnostic citations. | Excellent |
-| Evaluation | 31 cases, 46 tests, retrieval/chunking ablations, benchmark provenance/SLO/capacity contracts, telemetry-gateway safety and immediate-SSE-flush tests, citation and grounding checks, local and Pinecone latency. | Excellent for the bounded corpus |
+| Evaluation | 31 cases, 52 tests, retrieval/chunking ablations, benchmark provenance/SLO/capacity contracts, provider privacy and contract tests, telemetry-gateway safety and immediate-SSE-flush tests, citation and grounding checks, local and Pinecone latency. | Excellent for the bounded corpus |
 | Project documentation | Overview, dataset, prompts/instructions, iterations, learnings, technology map, limitations, and setup. | Complete |
 | Video demo | Exact 4:55 script, ten-component live telemetry visualization, and nine-stage RAG walkthrough. | Ready to record |
 | Project assets | Public website, public GitHub repository, public Google Doc, successful CI, and replay configuration. | Complete |

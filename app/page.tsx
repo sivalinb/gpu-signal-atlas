@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Activity,
   ArrowUpRight,
@@ -44,6 +44,9 @@ import {
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { PerformanceWorkbench } from '@/components/performance-workbench';
+import { IntelligenceFabric } from '@/components/intelligence-fabric';
+import { TurnstileGate } from '@/components/turnstile-gate';
+import { SpokenBriefing, VoiceCapture } from '@/components/voice-controls';
 import { corpus } from '@/core/corpus';
 import { samples } from '@/core/samples';
 import type { IntegrationStatus } from '@/core/integrations';
@@ -54,13 +57,16 @@ interface AnalysisErrorPayload {
   error?: string;
 }
 
-async function requestSignalAnalysis(telemetry: string, signal?: AbortSignal): Promise<SignalAnalysis> {
+async function requestSignalAnalysis(
+  telemetry: string,
+  options: { generationMode?: 'deterministic' | 'mistral'; turnstileToken?: string | null; signal?: AbortSignal } = {},
+): Promise<SignalAnalysis> {
   const response = await fetch('/api/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ telemetry }),
+    body: JSON.stringify({ telemetry, generationMode: options.generationMode, turnstileToken: options.turnstileToken }),
     cache: 'no-store',
-    signal,
+    signal: options.signal,
   });
   if (!response.ok) {
     const payload = (await response.json().catch(() => ({}))) as AnalysisErrorPayload;
@@ -105,7 +111,7 @@ const recordingPlan = [
   ['1:05–2:05', 'Telemetry flow', 'Animate Fluent Bit → OTel → gateway → SSE → RAG → LangSmith.'],
   ['2:05–3:10', 'RAG lifecycle', 'Run all nine corpus and retrieval stages and show the control planes.'],
   ['3:10–3:40', 'Refusal', 'Run Xid 999 and show zero diagnostic citations.'],
-  ['3:40–4:20', 'Evaluation', 'Show retrieval, refusal, ablation, and 46 passing tests.'],
+  ['3:40–4:20', 'Evaluation', 'Show retrieval, refusal, ablation, and 52 passing tests.'],
   ['4:20–4:55', 'Build story', 'Explain AI coding usage, GitHub, and the key learning.'],
 ];
 
@@ -845,21 +851,12 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
 export default function Home() {
   const [input, setInput] = useState<string>(samples[0].text);
   const [analysis, setAnalysis] = useState<SignalAnalysis | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [integrationStatus, setIntegrationStatus] = useState<IntegrationStatus | null>(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    requestSignalAnalysis(samples[0].text, controller.signal)
-      .then((result) => setAnalysis(result))
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-        setAnalysisError(error instanceof Error ? error.message : 'Analysis is temporarily unavailable.');
-      })
-      .finally(() => setLoading(false));
-    return () => controller.abort();
-  }, []);
+  const [generationMode, setGenerationMode] = useState<'deterministic' | 'mistral'>('deterministic');
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -869,17 +866,25 @@ export default function Home() {
     return () => controller.abort();
   }, []);
 
+  const consumeSecurityToken = useCallback(() => {
+    setTurnstileToken(null);
+    setTurnstileResetKey((current) => current + 1);
+  }, []);
+
+  const acceptSecurityToken = useCallback((token: string | null) => setTurnstileToken(token), []);
+
   async function runAnalysis(telemetry: string): Promise<SignalAnalysis | undefined> {
     setLoading(true);
     setAnalysisError(null);
     try {
-      const result = await requestSignalAnalysis(telemetry);
+      const result = await requestSignalAnalysis(telemetry, { generationMode, turnstileToken });
       setAnalysis(result);
       return result;
     } catch (error) {
       setAnalysisError(error instanceof Error ? error.message : 'Analysis is temporarily unavailable.');
       return undefined;
     } finally {
+      if (integrationStatus?.turnstileEnforced) consumeSecurityToken();
       setLoading(false);
     }
   }
@@ -903,6 +908,7 @@ export default function Home() {
             <a className="transition hover:text-foreground" href="#walkthrough">Visual demo</a>
             <a className="transition hover:text-foreground" href="#telemetry-flow">Telemetry</a>
             <a className="transition hover:text-foreground" href="#performance-lab">Performance</a>
+            <a className="transition hover:text-foreground" href="#intelligence-fabric">Graph & voice</a>
             <a className="transition hover:text-foreground" href="#architecture">Architecture</a>
             <a className="transition hover:text-foreground" href="#integrations">AI observability</a>
             <a className="transition hover:text-foreground" href="#evaluation">Evaluation</a>
@@ -932,7 +938,7 @@ export default function Home() {
             {[
               [corpus.length.toString(), 'chunks'],
               ['31', 'evals'],
-              ['0', 'browser keys'],
+              ['0', 'browser secrets'],
             ].map(([value, label]) => (
               <div key={label} className="rounded-xl border border-border/70 bg-card/70 px-3 py-4 text-center backdrop-blur">
                 <p className="font-mono text-xl text-primary">{value}</p>
@@ -968,13 +974,36 @@ export default function Home() {
                 onChange={(event) => setInput(event.target.value)}
                 spellCheck={false}
               />
+              <VoiceCapture
+                configured={Boolean(integrationStatus?.deepgramConfigured)}
+                securityReady={!integrationStatus?.turnstileEnforced || Boolean(turnstileToken)}
+                turnstileToken={turnstileToken}
+                onConsumed={consumeSecurityToken}
+                onTranscript={(transcript) => setInput(transcript)}
+              />
+              <div className="grid gap-3 rounded-xl border border-border/70 bg-black/15 p-3 sm:grid-cols-[1fr_220px] sm:items-center">
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[.16em] text-primary">Generation mode</p>
+                  <p className="mt-1 text-[10px] leading-4 text-muted-foreground">Deterministic is the default. Mistral receives extracted identifiers plus retrieved evidence—not the original raw message.</p>
+                </div>
+                <select aria-label="Signal card generation mode" value={generationMode} onChange={(event) => setGenerationMode(event.target.value as 'deterministic' | 'mistral')} className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground">
+                  <option value="deterministic">Deterministic template</option>
+                  <option value="mistral" disabled={!integrationStatus?.mistralConfigured}>Mistral structured output</option>
+                </select>
+              </div>
+              <TurnstileGate
+                siteKey={integrationStatus?.turnstileSiteKey}
+                enforced={Boolean(integrationStatus?.turnstileEnforced)}
+                resetKey={turnstileResetKey}
+                onToken={acceptSecurityToken}
+              />
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="font-mono text-[11px] leading-5 text-muted-foreground">BM25 + Pinecone 256d retrieval + exact-ID boost</p>
                 <div className="flex gap-2">
-                  <Button size="lg" variant="outline" disabled={loading} onClick={() => { setInput(samples[0].text); void runAnalysis(samples[0].text); }} aria-label="Reset sample">
+                  <Button size="lg" variant="outline" disabled={loading} onClick={() => { setInput(samples[0].text); setAnalysis(null); setAnalysisError(null); }} aria-label="Reset sample">
                     <RefreshCw className="size-4" /> Reset
                   </Button>
-                  <Button size="lg" disabled={loading} className="bg-primary px-5 text-primary-foreground hover:bg-primary/90" onClick={() => void runAnalysis(input)}>
+                  <Button size="lg" disabled={loading || (Boolean(integrationStatus?.turnstileEnforced) && !turnstileToken)} className="bg-primary px-5 text-primary-foreground hover:bg-primary/90" onClick={() => void runAnalysis(input)}>
                     {loading ? <LoaderCircle className="size-4 animate-spin" /> : <Sparkles className="size-4" />} {loading ? 'Retrieving evidence' : 'Analyze signal'}
                   </Button>
                 </div>
@@ -1017,7 +1046,26 @@ export default function Home() {
                 <p className="mt-2 text-sm leading-6 text-amber-50/60">{analysisError} No diagnostic response was generated.</p>
               </CardContent>
             </Card>
-          ) : analysis ? <ResultPanel analysis={analysis} /> : null}
+          ) : analysis ? (
+            <div>
+              <ResultPanel analysis={analysis} />
+              <SpokenBriefing
+                analysis={analysis}
+                configured={Boolean(integrationStatus?.deepgramConfigured)}
+                securityReady={!integrationStatus?.turnstileEnforced || Boolean(turnstileToken)}
+                turnstileToken={turnstileToken}
+                onConsumed={consumeSecurityToken}
+              />
+            </div>
+          ) : (
+            <Card className="grid min-h-96 place-items-center border border-primary/15 bg-card/70">
+              <CardContent className="max-w-md pt-6 text-center">
+                <ShieldAlert className="mx-auto size-7 text-primary" />
+                <p className="mt-3 font-heading text-lg">Ready for an evidence request</p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">Choose deterministic or Mistral generation, complete the security check when enabled, and analyze a sample, pasted event, or voice transcript.</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </section>
 
@@ -1031,6 +1079,8 @@ export default function Home() {
       />
 
       <PerformanceWorkbench />
+
+      <IntelligenceFabric status={integrationStatus} />
 
       <section id="architecture" className="relative z-10 border-y border-border/70 bg-black/10 py-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -1092,14 +1142,14 @@ export default function Home() {
           <div className="mb-9 grid gap-5 lg:grid-cols-[1fr_.75fr] lg:items-end">
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">Technology and data mapping</p>
-              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">One evidence system, three governed control planes.</h2>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">You.com expands what can be reviewed, Pinecone serves what has been approved, and LangSmith explains how the RAG path behaved. Each integration has a narrow job and an explicit privacy boundary.</p>
+              <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">One evidence system, deliberately separated control planes.</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">You.com discovers review candidates, Pinecone serves approved evidence, Neo4j exposes relationships, Mistral offers grounded generation, Deepgram adds opt-in voice, Turnstile protects public AI requests, and LangSmith explains RAG behavior. Each provider has one bounded job.</p>
             </div>
             <div className="rounded-2xl border border-primary/20 bg-primary/[0.055] p-4 text-xs leading-5 text-muted-foreground">
               <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">Deployment truth</p>
               <p className="mt-2">
                 <span className="text-foreground">{integrationStatus?.pineconeConfigured ? 'Pinecone is active.' : 'Pinecone configuration is unavailable.'}</span>{' '}
-                You.com discovery is <span className="text-foreground">{integrationStatus?.youConfigured ? 'configured' : 'optional'}</span>; LangSmith trace export is <span className="text-foreground">{integrationStatus?.langsmithConfigured ? 'configured' : 'optional'}</span>. No provider key is returned to the browser.
+                You.com is <span className="text-foreground">{integrationStatus?.youConfigured ? 'configured' : 'optional'}</span>, LangSmith is <span className="text-foreground">{integrationStatus?.langsmithConfigured ? 'configured' : 'optional'}</span>, and the multimodal provider state is shown in the live fabric below. No provider key is returned to the browser.
               </p>
             </div>
           </div>
@@ -1161,13 +1211,17 @@ export default function Home() {
               <CardTitle className="flex items-center gap-2"><Workflow className="size-4 text-primary" /> Technology responsibility matrix</CardTitle>
               <CardDescription>Collection, evidence, and AI quality are separate concerns connected by inspectable contracts.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-2 md:grid-cols-3 lg:grid-cols-6">
+            <CardContent className="grid gap-2 md:grid-cols-3 lg:grid-cols-5">
               {[
                 ['Fluent Bit', 'Collect + enrich GPU and Kubernetes logs', 'OTLP logs'],
                 ['OpenTelemetry', 'Normalize telemetry and emit redacted RAG spans', 'Logs + traces'],
                 ['Safe gateway', 'Authenticate, bound, redact, and stream selected telemetry', 'Sanitized SSE'],
+                ['Turnstile', 'Verify single-use visitor actions on the server', 'Verified token'],
                 ['You.com', 'Discover allow-listed public documentation', 'Review candidates'],
                 ['Pinecone', 'Serve approved dense-vector candidates', 'Versioned vectors'],
+                ['Neo4j', 'Connect signals, evidence, benchmark runs, and technologies', 'Bounded graph paths'],
+                ['Mistral', 'Generate grounded schema output and compare embeddings', 'JSON + ablation'],
+                ['Deepgram', 'Transcribe opt-in audio and synthesize a briefing', 'Text + MP3'],
                 ['LangSmith', 'Inspect RAG traces and run evaluation datasets', 'Quality signals'],
               ].map(([technology, responsibility, artifact]) => (
                 <div key={technology} className="rounded-xl border border-border/70 bg-black/15 p-4">

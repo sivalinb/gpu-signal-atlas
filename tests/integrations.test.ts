@@ -62,14 +62,29 @@ test('public integration status reports configuration without returning secrets'
     PINECONE_NAMESPACE: 'corpus-test',
     YOU_API_KEY: 'you-secret',
     LANGSMITH_API_KEY: 'langsmith-secret',
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: 'public-site-key',
+    TURNSTILE_SECRET_KEY: 'turnstile-secret',
+    TURNSTILE_ENFORCED: 'true',
+    MISTRAL_API_KEY: 'mistral-secret',
+    NEO4J_URI: 'neo4j+s://graph.example',
+    NEO4J_USERNAME: 'neo4j',
+    NEO4J_PASSWORD: 'neo4j-secret',
+    NEO4J_DATABASE: 'neo4j',
+    DEEPGRAM_API_KEY: 'deepgram-secret',
   });
   assert.deepEqual(status, {
     pineconeConfigured: true,
     youConfigured: true,
     langsmithConfigured: true,
+    turnstileConfigured: true,
+    turnstileEnforced: true,
+    turnstileSiteKey: 'public-site-key',
+    mistralConfigured: true,
+    neo4jConfigured: true,
+    deepgramConfigured: true,
     secretsExposedToBrowser: false,
   });
-  assert.doesNotMatch(JSON.stringify(status), /pinecone-secret|you-secret|langsmith-secret/);
+  assert.doesNotMatch(JSON.stringify(status), /pinecone-secret|you-secret|langsmith-secret|turnstile-secret|mistral-secret|neo4j-secret|deepgram-secret/);
 });
 
 test('LangSmith trace payload contains retrieval outcomes but no raw telemetry', () => {

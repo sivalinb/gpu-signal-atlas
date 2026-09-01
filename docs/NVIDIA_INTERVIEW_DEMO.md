@@ -1,6 +1,6 @@
 # NVIDIA solution architecture interview demo
 
-Target: 7–8 minutes, with optional depth for follow-up questions.
+Target: 8–10 minutes, with optional depth for follow-up questions.
 
 ## Executive framing — 45 seconds
 
@@ -22,6 +22,18 @@ Run **Telemetry → Run end-to-end flow**. Map responsibilities:
 - LangSmith receives redacted RAG-stage traces, not raw telemetry.
 
 Then open **Performance → Signal correlation** and explain the join keys: benchmark/run ID, model revision, pod/node, GPU UUID or MIG identity, and synchronized timestamps.
+
+## Multimodal evidence fabric — 90 seconds
+
+Open **Graph & voice**. Frame the section as an architecture demonstration, not a pile of vendor logos:
+
+- Turnstile verifies each public AI/voice action on the server; it is abuse control, not user identity.
+- Pinecone and BM25 retrieve reviewed text evidence, while Neo4j answers relationship questions across signals, evidence, benchmark runs, models, backends, and technologies.
+- Mistral is an optional schema-constrained generator. It receives bounded identifiers and retrieved evidence, and its result must pass the same grounding validator as the deterministic path.
+- Deepgram makes the workflow accessible in both directions: opt-in speech becomes editable input, and a grounded result becomes an executive audio briefing.
+- OpenTelemetry and LangSmith show the AI-system timing and outcome without exporting the raw pasted telemetry.
+
+Refresh the Neo4j paths, record “Xid 79 with PCIe replay counter on H100,” run the analysis, and play the briefing. Emphasize that credentials remain server-only and that no provider is permitted to diagnose or remediate outside the evidence gate.
 
 ## Performance architecture decision — 2 minutes
 
@@ -74,3 +86,7 @@ No single utilization metric. Align queue latency, compute time, SM/tensor/memor
 ### How would this scale?
 
 Object storage for immutable artifacts, PostgreSQL/ClickHouse for experiments, Prometheus/Mimir for metrics, Tempo/Jaeger for traces, Loki/OpenSearch for logs, and Pinecone for semantic evidence. OTel resource attributes and benchmark IDs tie them together.
+
+### Why both Pinecone and Neo4j?
+
+Pinecone retrieves semantically similar reviewed passages. Neo4j traverses explicit, inspectable relationships such as a Signal supported by Evidence or a BenchmarkRun using a ServingBackend. A production GraphRAG path can combine them, but the current demo keeps retrieval and graph context visibly separate so their evidence roles are not overstated.

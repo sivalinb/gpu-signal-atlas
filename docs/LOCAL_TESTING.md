@@ -16,6 +16,7 @@ Optional integration tools:
 - Fluent Bit
 - OpenTelemetry Collector Contrib
 - Docker or Podman, if you prefer containers for the optional replay
+- Mistral, Neo4j Aura, Deepgram, and Cloudflare Turnstile accounts for the optional multimodal evidence fabric
 
 A GPU, Kubernetes cluster, model API key, and telemetry backend are not required. Pinecone is optional for the local CLI, unit tests, ablations, and offline evaluation.
 
@@ -39,11 +40,11 @@ npm ci
 npm test
 ```
 
-Expected summary:
+Expected summary (the exact test count may grow; zero failures is authoritative):
 
 ```text
-tests 40
-pass 40
+tests 52
+pass 52
 fail 0
 ```
 
@@ -167,6 +168,27 @@ Expected fields:
 
 See [`LLM_MODE.md`](LLM_MODE.md) for local provider configuration. Unknown identifiers are refused before the model call, and accepted model output must pass both JSON-schema and field-level grounding validation.
 
+## Optional multimodal evidence fabric
+
+See [`MULTIMODAL_EVIDENCE_FABRIC.md`](MULTIMODAL_EVIDENCE_FABRIC.md) for the provider-by-provider data contract. Add the relevant server-only variables from `.env.example`; never commit `.env.local` or credential source files.
+
+Validate the optional trained-embedding comparison and seed the relationship graph:
+
+```bash
+npm run ablate:mistral
+npm run neo4j:sync
+```
+
+In the website:
+
+1. confirm `/api/integrations` reports the intended providers and `secretsExposedToBrowser: false`;
+2. choose **Mistral structured output**, complete Turnstile when it is enforced, and analyze Xid 79;
+3. refresh **Live Neo4j evidence paths** and confirm bounded Signal, Evidence, BenchmarkRun, and Technology relationships;
+4. click **Record question**, grant microphone access, say a short GPU signal, click **Stop**, and review the editable transcript; and
+5. analyze the transcript, complete a fresh security check, and click **Listen to briefing**.
+
+Turnstile tokens are single use. A new widget completion is expected after analysis, transcription, or speech. For ordinary localhost development, keep `TURNSTILE_ENFORCED=false`; use a separate Cloudflare test/development widget when validating localhost.
+
 ## Refresh an allow-listed source
 
 See [`INGESTION_AND_FRESHNESS.md`](INGESTION_AND_FRESHNESS.md). A refresh creates a review candidate; it never changes the corpus automatically.
@@ -189,7 +211,7 @@ Verify the safe public status endpoint:
 curl http://localhost:3000/api/integrations
 ```
 
-The booleans should match the integrations configured in `.env.local`, and `secretsExposedToBrowser` must remain `false`. The current public deployment reports Pinecone, You.com, and LangSmith configured.
+The booleans should match the integrations configured in `.env.local`, and `secretsExposedToBrowser` must remain `false`. The response may include the Turnstile site key because it is intentionally public; it must never include a Turnstile secret or another provider credential.
 
 ## 8. Optional Fluent Bit and OpenTelemetry replay
 

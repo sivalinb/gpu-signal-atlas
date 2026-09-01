@@ -1,15 +1,20 @@
 import { corpus } from '@/core/corpus';
 import { analyzeTelemetryFromRetrieval, extractSignals } from '@/core/engine';
 import { exportLangSmithTrace, type TraceStage } from '@/core/langsmith';
+import { generateSchemaConstrainedSignalCard, LlmContractError } from '@/core/llm';
+import { getMistralConfig, MistralError } from '@/core/mistral';
 import {
   getPineconeConfig,
   PineconeConfigurationError,
   PineconeRequestError,
   retrieveFromPinecone,
 } from '@/core/pinecone';
+import { TurnstileError, verifyTurnstile } from '@/core/turnstile';
 
 interface AnalyzeRequest {
   telemetry?: unknown;
+  generationMode?: unknown;
+  turnstileToken?: unknown;
 }
 
 function json(body: unknown, status = 200): Response {
@@ -42,6 +47,12 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const stages: TraceStage[] = [];
+    const generationMode = payload.generationMode === 'mistral' ? 'mistral' : 'deterministic';
+    await verifyTurnstile(
+      typeof payload.turnstileToken === 'string' ? payload.turnstileToken : undefined,
+      'analyze',
+      request,
+    );
     const extractStarted = measure();
     const signals = extractSignals(telemetry);
     stages.push({
@@ -74,11 +85,26 @@ export async function POST(request: Request): Promise<Response> {
     });
 
     const generationStarted = measure();
-    const analysis = analyzeTelemetryFromRetrieval(telemetry, retrieval, corpus, {
+    let analysis = analyzeTelemetryFromRetrieval(telemetry, retrieval, corpus, {
       vectorIndexVersion,
       retrievalBackend: 'pinecone',
       startedAt,
     });
+    if (generationMode === 'mistral' && analysis.status !== 'refused') {
+      const mistral = getMistralConfig();
+      if (!mistral) throw new MistralError('Mistral generation is not configured.');
+      const boundedQuery = JSON.stringify({
+        xids: signals.xids,
+        metrics: signals.metrics,
+        gpuModels: signals.gpuModels,
+        driverBranches: signals.driverBranches,
+      });
+      analysis = await generateSchemaConstrainedSignalCard(boundedQuery, analysis, {
+        baseUrl: mistral.baseUrl,
+        apiKey: mistral.apiKey,
+        model: mistral.chatModel,
+      });
+    }
     stages.push({
       name: 'rag.evidence_gate_and_generate',
       durationMs: measure() - generationStarted,
@@ -100,6 +126,16 @@ export async function POST(request: Request): Promise<Response> {
       diagnostics: { ...analysis.diagnostics, observabilityExport },
     });
   } catch (error) {
+    if (error instanceof TurnstileError) {
+      return json({ error: error.message, code: error.code }, 403);
+    }
+    if (error instanceof MistralError || error instanceof LlmContractError) {
+      console.error('Bounded Mistral generation failed contract validation.');
+      return json(
+        { error: 'Mistral could not produce a safely grounded signal card.', code: 'mistral_generation_failed' },
+        503,
+      );
+    }
     if (error instanceof PineconeConfigurationError) {
       console.error('Pinecone configuration is incomplete.');
       return json(

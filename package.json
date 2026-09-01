@@ -22,6 +22,8 @@
     "ingest": "node --experimental-strip-types scripts/ingest-source.ts",
     "freshness": "node --experimental-strip-types scripts/freshness.ts",
     "ablate": "node --experimental-strip-types scripts/ablate.ts",
+    "ablate:mistral": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/evaluate-mistral-embeddings.ts",
+    "neo4j:sync": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/sync-neo4j.ts",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint app components core evaluation lib scripts",
     "format": "oxfmt"
