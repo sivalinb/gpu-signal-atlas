@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Activity,
   ArrowUpRight,
@@ -45,7 +45,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { PerformanceWorkbench } from '@/components/performance-workbench';
 import { IntelligenceFabric } from '@/components/intelligence-fabric';
-import { TurnstileGate } from '@/components/turnstile-gate';
 import { SpokenBriefing, VoiceCapture } from '@/components/voice-controls';
 import { corpus } from '@/core/corpus';
 import { samples } from '@/core/samples';
@@ -59,12 +58,12 @@ interface AnalysisErrorPayload {
 
 async function requestSignalAnalysis(
   telemetry: string,
-  options: { generationMode?: 'deterministic' | 'mistral'; turnstileToken?: string | null; signal?: AbortSignal } = {},
+  options: { generationMode?: 'deterministic' | 'mistral'; signal?: AbortSignal } = {},
 ): Promise<SignalAnalysis> {
   const response = await fetch('/api/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ telemetry, generationMode: options.generationMode, turnstileToken: options.turnstileToken }),
+    body: JSON.stringify({ telemetry, generationMode: options.generationMode }),
     cache: 'no-store',
     signal: options.signal,
   });
@@ -110,9 +109,9 @@ const recordingPlan = [
   ['0:25–1:05', 'Live analysis', 'Run Xid 79 and inspect Pinecone-backed evidence.'],
   ['1:05–1:50', 'Telemetry flow', 'Animate Fluent Bit → OTel → gateway → SSE → RAG → LangSmith.'],
   ['1:50–2:40', 'RAG lifecycle', 'Run the nine corpus/retrieval stages and show the control planes.'],
-  ['2:40–3:20', 'Graph & voice', 'Map Turnstile, Mistral, Neo4j, and Deepgram responsibilities.'],
+  ['2:40–3:20', 'Graph & voice', 'Map Mistral, Neo4j, and Deepgram responsibilities.'],
   ['3:20–3:45', 'Refusal', 'Run Xid 999 and show zero diagnostic citations.'],
-  ['3:45–4:25', 'Evaluation', 'Show retrieval, refusal, ablations, and 52 passing tests.'],
+  ['3:45–4:25', 'Evaluation', 'Show retrieval, refusal, ablations, and 50 passing tests.'],
   ['4:25–4:55', 'Build story', 'Explain AI coding usage, GitHub, and the key learning.'],
 ];
 
@@ -856,8 +855,6 @@ export default function Home() {
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [integrationStatus, setIntegrationStatus] = useState<IntegrationStatus | null>(null);
   const [generationMode, setGenerationMode] = useState<'deterministic' | 'mistral'>('deterministic');
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -867,25 +864,17 @@ export default function Home() {
     return () => controller.abort();
   }, []);
 
-  const consumeSecurityToken = useCallback(() => {
-    setTurnstileToken(null);
-    setTurnstileResetKey((current) => current + 1);
-  }, []);
-
-  const acceptSecurityToken = useCallback((token: string | null) => setTurnstileToken(token), []);
-
   async function runAnalysis(telemetry: string): Promise<SignalAnalysis | undefined> {
     setLoading(true);
     setAnalysisError(null);
     try {
-      const result = await requestSignalAnalysis(telemetry, { generationMode, turnstileToken });
+      const result = await requestSignalAnalysis(telemetry, { generationMode });
       setAnalysis(result);
       return result;
     } catch (error) {
       setAnalysisError(error instanceof Error ? error.message : 'Analysis is temporarily unavailable.');
       return undefined;
     } finally {
-      if (integrationStatus?.turnstileEnforced) consumeSecurityToken();
       setLoading(false);
     }
   }
@@ -977,9 +966,6 @@ export default function Home() {
               />
               <VoiceCapture
                 configured={Boolean(integrationStatus?.deepgramConfigured)}
-                securityReady={!integrationStatus?.turnstileEnforced || Boolean(turnstileToken)}
-                turnstileToken={turnstileToken}
-                onConsumed={consumeSecurityToken}
                 onTranscript={(transcript) => setInput(transcript)}
               />
               <div className="grid gap-3 rounded-xl border border-border/70 bg-black/15 p-3 sm:grid-cols-[1fr_220px] sm:items-center">
@@ -992,19 +978,13 @@ export default function Home() {
                   <option value="mistral" disabled={!integrationStatus?.mistralConfigured}>Mistral structured output</option>
                 </select>
               </div>
-              <TurnstileGate
-                siteKey={integrationStatus?.turnstileSiteKey}
-                enforced={Boolean(integrationStatus?.turnstileEnforced)}
-                resetKey={turnstileResetKey}
-                onToken={acceptSecurityToken}
-              />
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="font-mono text-[11px] leading-5 text-muted-foreground">BM25 + Pinecone 256d retrieval + exact-ID boost</p>
                 <div className="flex gap-2">
                   <Button size="lg" variant="outline" disabled={loading} onClick={() => { setInput(samples[0].text); setAnalysis(null); setAnalysisError(null); }} aria-label="Reset sample">
                     <RefreshCw className="size-4" /> Reset
                   </Button>
-                  <Button size="lg" disabled={loading || (Boolean(integrationStatus?.turnstileEnforced) && !turnstileToken)} className="bg-primary px-5 text-primary-foreground hover:bg-primary/90" onClick={() => void runAnalysis(input)}>
+                  <Button size="lg" disabled={loading} className="bg-primary px-5 text-primary-foreground hover:bg-primary/90" onClick={() => void runAnalysis(input)}>
                     {loading ? <LoaderCircle className="size-4 animate-spin" /> : <Sparkles className="size-4" />} {loading ? 'Retrieving evidence' : 'Analyze signal'}
                   </Button>
                 </div>
@@ -1053,9 +1033,6 @@ export default function Home() {
               <SpokenBriefing
                 analysis={analysis}
                 configured={Boolean(integrationStatus?.deepgramConfigured)}
-                securityReady={!integrationStatus?.turnstileEnforced || Boolean(turnstileToken)}
-                turnstileToken={turnstileToken}
-                onConsumed={consumeSecurityToken}
               />
             </div>
           ) : (
@@ -1063,7 +1040,7 @@ export default function Home() {
               <CardContent className="max-w-md pt-6 text-center">
                 <ShieldAlert className="mx-auto size-7 text-primary" />
                 <p className="mt-3 font-heading text-lg">Ready for an evidence request</p>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">Choose deterministic or Mistral generation, complete the security check when enabled, and analyze a sample, pasted event, or voice transcript.</p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">Choose deterministic or Mistral generation, then analyze a sample, pasted event, or voice transcript.</p>
               </CardContent>
             </Card>
           )}
@@ -1144,7 +1121,7 @@ export default function Home() {
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">Technology and data mapping</p>
               <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">One evidence system, deliberately separated control planes.</h2>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">You.com discovers review candidates, Pinecone serves approved evidence, Neo4j exposes relationships, Mistral offers grounded generation, Deepgram adds opt-in voice, Turnstile protects public AI requests, and LangSmith explains RAG behavior. Each provider has one bounded job.</p>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">You.com discovers review candidates, Pinecone serves approved evidence, Neo4j exposes relationships, Mistral offers grounded generation, Deepgram adds opt-in voice, and LangSmith explains RAG behavior. Each provider has one bounded job.</p>
             </div>
             <div className="rounded-2xl border border-primary/20 bg-primary/[0.055] p-4 text-xs leading-5 text-muted-foreground">
               <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">Deployment truth</p>
@@ -1217,7 +1194,6 @@ export default function Home() {
                 ['Fluent Bit', 'Collect + enrich GPU and Kubernetes logs', 'OTLP logs'],
                 ['OpenTelemetry', 'Normalize telemetry and emit redacted RAG spans', 'Logs + traces'],
                 ['Safe gateway', 'Authenticate, bound, redact, and stream selected telemetry', 'Sanitized SSE'],
-                ['Turnstile', 'Verify single-use visitor actions on the server', 'Verified token'],
                 ['You.com', 'Discover allow-listed public documentation', 'Review candidates'],
                 ['Pinecone', 'Serve approved dense-vector candidates', 'Versioned vectors'],
                 ['Neo4j', 'Connect signals, evidence, benchmark runs, and technologies', 'Bounded graph paths'],

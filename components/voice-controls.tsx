@@ -8,13 +8,10 @@ import type { SignalAnalysis } from '@/core/types';
 
 interface VoiceCaptureProps {
   configured: boolean;
-  securityReady: boolean;
-  turnstileToken: string | null;
-  onConsumed: () => void;
   onTranscript: (transcript: string) => void;
 }
 
-export function VoiceCapture({ configured, securityReady, turnstileToken, onConsumed, onTranscript }: VoiceCaptureProps) {
+export function VoiceCapture({ configured, onTranscript }: VoiceCaptureProps) {
   const recorder = useRef<MediaRecorder | null>(null);
   const stream = useRef<MediaStream | null>(null);
   const chunks = useRef<Blob[]>([]);
@@ -23,7 +20,6 @@ export function VoiceCapture({ configured, securityReady, turnstileToken, onCons
 
   async function startRecording() {
     if (!configured) return setMessage('Deepgram is not configured.');
-    if (!securityReady) return setMessage('Complete the security check first.');
     try {
       stream.current = await navigator.mediaDevices.getUserMedia({ audio: true });
       chunks.current = [];
@@ -46,7 +42,7 @@ export function VoiceCapture({ configured, securityReady, turnstileToken, onCons
     try {
       const response = await fetch('/api/voice/transcribe', {
         method: 'POST',
-        headers: { 'Content-Type': contentType, 'x-turnstile-token': turnstileToken ?? '' },
+        headers: { 'Content-Type': contentType },
         body,
       });
       const payload = (await response.json()) as { transcript?: string; confidence?: number; error?: string };
@@ -56,7 +52,6 @@ export function VoiceCapture({ configured, securityReady, turnstileToken, onCons
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Transcription failed safely.');
     } finally {
-      onConsumed();
       setState('idle');
     }
   }
@@ -78,12 +73,11 @@ export function VoiceCapture({ configured, securityReady, turnstileToken, onCons
   );
 }
 
-export function SpokenBriefing({ analysis, configured, securityReady, turnstileToken, onConsumed }: { analysis: SignalAnalysis; configured: boolean; securityReady: boolean; turnstileToken: string | null; onConsumed: () => void }) {
+export function SpokenBriefing({ analysis, configured }: { analysis: SignalAnalysis; configured: boolean }) {
   const [speaking, setSpeaking] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   async function play() {
-    if (!securityReady) return setMessage('Complete the security check before generating audio.');
     setSpeaking(true);
     setMessage(null);
     const text = `${analysis.headline}. ${analysis.documentedMeaning}. Evidence strength is ${analysis.evidenceStrength}. Next evidence: ${analysis.nextEvidence.slice(0, 2).join('. ')}`;
@@ -91,7 +85,7 @@ export function SpokenBriefing({ analysis, configured, securityReady, turnstileT
       const response = await fetch('/api/voice/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, turnstileToken }),
+        body: JSON.stringify({ text }),
       });
       if (!response.ok) {
         const payload = (await response.json().catch(() => ({}))) as { error?: string };
@@ -105,7 +99,6 @@ export function SpokenBriefing({ analysis, configured, securityReady, turnstileT
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Spoken briefing failed safely.');
     } finally {
-      onConsumed();
       setSpeaking(false);
     }
   }

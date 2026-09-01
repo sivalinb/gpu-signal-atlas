@@ -72,7 +72,7 @@
       <text x="24" y="88" fill="#73E6B2" font-size="17" font-weight="700">3:40–4:20</text>
       <text x="24" y="122" fill="#F4F7F7" font-size="23" font-weight="700">Evidence</text>
       <text x="24" y="158" fill="#9DB0B5" font-size="16">31 eval cases,</text>
-      <text x="24" y="181" fill="#9DB0B5" font-size="16">52 tests,</text>
+      <text x="24" y="181" fill="#9DB0B5" font-size="16">50 tests,</text>
       <text x="24" y="204" fill="#9DB0B5" font-size="16">ablation results.</text>
     </g>
     <g transform="translate(1322 270)">

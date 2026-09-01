@@ -11,7 +11,6 @@ import {
   Mic,
   Network,
   RefreshCw,
-  ShieldCheck,
   Sparkles,
 } from 'lucide-react';
 
@@ -22,7 +21,6 @@ import type { IntegrationStatus } from '@/core/integrations';
 import type { GraphPathRecord } from '@/core/neo4j';
 
 const providerLanes = [
-  { key: 'turnstile', icon: ShieldCheck, name: 'Cloudflare Turnstile', role: 'Validates single-use visitor tokens before protected AI and voice requests.', artifact: 'Verified action + hostname' },
   { key: 'mistral', icon: Sparkles, name: 'Mistral', role: 'Generates the same strict signal-card schema and supplies a trained-embedding ablation.', artifact: 'Grounded JSON + embeddings' },
   { key: 'neo4j', icon: Network, name: 'Neo4j Aura', role: 'Connects signals, reviewed evidence, benchmark runs, models, backends, and technologies.', artifact: 'Inspectable Cypher paths' },
   { key: 'deepgram', icon: Mic, name: 'Deepgram', role: 'Transcribes opt-in microphone audio and synthesizes a cited executive briefing.', artifact: 'Transcript + MP3 briefing' },
@@ -62,7 +60,6 @@ export function IntelligenceFabric({ status }: { status: IntegrationStatus | nul
 
   const configured = (key: typeof providerLanes[number]['key']) => {
     if (!status) return false;
-    if (key === 'turnstile') return status.turnstileConfigured;
     if (key === 'mistral') return status.mistralConfigured;
     if (key === 'neo4j') return status.neo4jConfigured;
     return status.deepgramConfigured;
@@ -74,8 +71,8 @@ export function IntelligenceFabric({ status }: { status: IntegrationStatus | nul
         <div className="mb-8 grid gap-5 lg:grid-cols-[1fr_.7fr] lg:items-end">
           <div className="max-w-3xl">
             <p className="font-mono text-[10px] uppercase tracking-[.2em] text-primary">Multimodal evidence fabric</p>
-            <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">Security, grounded generation, graph context, and voice—without collapsing their boundaries.</h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">Each provider has one narrow responsibility. Permanent credentials remain on the server; the browser receives only a public Turnstile site key, sanitized data, graph results, and user-requested audio.</p>
+            <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">Grounded generation, graph context, and voice—without collapsing their boundaries.</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">Each provider has one narrow responsibility. Permanent credentials remain on the server; the browser receives sanitized data, graph results, and user-requested audio.</p>
           </div>
           <div className="rounded-2xl border border-primary/20 bg-primary/[0.045] p-4">
             <p className="font-mono text-[9px] uppercase tracking-[.18em] text-primary">Trust sequence</p>
@@ -83,7 +80,7 @@ export function IntelligenceFabric({ status }: { status: IntegrationStatus | nul
           </div>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 md:grid-cols-3">
           {providerLanes.map((provider) => (
             <Card key={provider.key} className="border border-border/70 bg-card/80">
               <CardContent className="pt-5">
@@ -119,8 +116,7 @@ export function IntelligenceFabric({ status }: { status: IntegrationStatus | nul
           </CardContent>
         </Card>
 
-        <div className="mt-4 grid gap-2 sm:grid-cols-4">{[
-          [ShieldCheck, 'Public boundary', 'Turnstile + server validation'],
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">{[
           [Database, 'Text evidence', 'Pinecone + BM25'],
           [Braces, 'Relationship evidence', 'Neo4j + bounded Cypher'],
           [Activity, 'AI observability', 'OTel + LangSmith'],

@@ -16,7 +16,7 @@ Optional integration tools:
 - Fluent Bit
 - OpenTelemetry Collector Contrib
 - Docker or Podman, if you prefer containers for the optional replay
-- Mistral, Neo4j Aura, Deepgram, and Cloudflare Turnstile accounts for the optional multimodal evidence fabric
+- Mistral, Neo4j Aura, and Deepgram accounts for the optional multimodal evidence fabric
 
 A GPU, Kubernetes cluster, model API key, and telemetry backend are not required. Pinecone is optional for the local CLI, unit tests, ablations, and offline evaluation.
 
@@ -182,12 +182,10 @@ npm run neo4j:sync
 In the website:
 
 1. confirm `/api/integrations` reports the intended providers and `secretsExposedToBrowser: false`;
-2. choose **Mistral structured output**, complete Turnstile when it is enforced, and analyze Xid 79;
+2. choose **Mistral structured output** and analyze Xid 79;
 3. refresh **Live Neo4j evidence paths** and confirm bounded Signal, Evidence, BenchmarkRun, and Technology relationships;
 4. click **Record question**, grant microphone access, say a short GPU signal, click **Stop**, and review the editable transcript; and
-5. analyze the transcript, complete a fresh security check, and click **Listen to briefing**.
-
-Turnstile tokens are single use. A new widget completion is expected after analysis, transcription, or speech. For ordinary localhost development, keep `TURNSTILE_ENFORCED=false`; use a separate Cloudflare test/development widget when validating localhost.
+5. analyze the transcript and click **Listen to briefing**.
 
 ## Refresh an allow-listed source
 
@@ -211,7 +209,7 @@ Verify the safe public status endpoint:
 curl http://localhost:3000/api/integrations
 ```
 
-The booleans should match the integrations configured in `.env.local`, and `secretsExposedToBrowser` must remain `false`. The response may include the Turnstile site key because it is intentionally public; it must never include a Turnstile secret or another provider credential.
+The booleans should match the integrations configured in `.env.local`, and `secretsExposedToBrowser` must remain `false`. The response must never include a provider credential.
 
 ## 8. Optional Fluent Bit and OpenTelemetry replay
 

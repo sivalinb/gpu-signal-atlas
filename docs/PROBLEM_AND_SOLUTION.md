@@ -84,7 +84,7 @@ An unknown Xid or DCGM field causes a hard refusal. The response asks for a comp
 - No production writes or operational side effects
 - Source and authority visible to the user
 - Responsive, keyboard-accessible website
-- Node 22-compatible tests and Cloudflare Worker-compatible production build
+- Node 22-compatible tests and an edge-compatible production build
 - Clear path to swap in provider embeddings without changing the public analysis contract
 
 ## Out of scope

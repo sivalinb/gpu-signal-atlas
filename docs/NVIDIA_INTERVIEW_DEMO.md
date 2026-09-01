@@ -27,7 +27,7 @@ Then open **Performance → Signal correlation** and explain the join keys: benc
 
 Open **Graph & voice**. Frame the section as an architecture demonstration, not a pile of vendor logos:
 
-- Turnstile verifies each public AI/voice action on the server; it is abuse control, not user identity.
+- The public demo intentionally avoids a browser challenge; production scale should add platform-level rate limits, identity, quotas, and provider-cost controls.
 - Pinecone and BM25 retrieve reviewed text evidence, while Neo4j answers relationship questions across signals, evidence, benchmark runs, models, backends, and technologies.
 - Mistral is an optional schema-constrained generator. It receives bounded identifiers and retrieved evidence, and its result must pass the same grounding validator as the deterministic path.
 - Deepgram makes the workflow accessible in both directions: opt-in speech becomes editable input, and a grounded result becomes an executive audio briefing.

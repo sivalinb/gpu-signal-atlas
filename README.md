@@ -33,7 +33,6 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 - Reconnecting Server-Sent Events inbox with a labeled HTTPS short-poll fallback for stream-buffering edge hosts
 - Governed You.com source discovery with domain allow-listing and a mandatory review queue
 - LangSmith OTLP trace export with raw-telemetry redaction and fail-open behavior
-- Cloudflare Turnstile protection with mandatory server-side action and hostname validation
 - Optional Mistral strict-schema generation plus a trained-embedding ablation that does not mutate Pinecone
 - Neo4j Aura evidence graph with idempotent synchronization and bounded, read-only public paths
 - Opt-in Deepgram voice transcription and grounded spoken briefings through server-only routes
@@ -86,9 +85,9 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-The website and Pinecone evaluation require the four Pinecone server-only variables shown in `.env.example`. You.com, LangSmith, Mistral, Neo4j, Deepgram, and Turnstile are independently optional for local installations. The public deployment can enforce Turnstile while local development leaves it disabled. The CLI, unit tests, local evaluation, and core ablations remain credential-free.
+The website and Pinecone evaluation require the four Pinecone server-only variables shown in `.env.example`. You.com, LangSmith, Mistral, Neo4j, and Deepgram are independently optional for local installations. The CLI, unit tests, local evaluation, and core ablations remain credential-free.
 
-The public `/api/integrations` route exposes safe configuration state and the intentionally public Turnstile site key only. It explicitly reports that no provider secret is exposed to the browser.
+The public `/api/integrations` route exposes safe configuration state only. It explicitly reports that no provider secret is exposed to the browser.
 
 Analyze a sample from the command line:
 
@@ -133,7 +132,6 @@ core/
   llm.ts                     optional strict-schema model adapter
   you.ts                     allow-listed You.com discovery and review candidates
   langsmith.ts               redacted OpenTelemetry trace export
-  turnstile.ts               server-side visitor-token verification
   mistral.ts                 provider configuration and embedding comparison
   neo4j.ts                   evidence-graph synchronization and bounded queries
   deepgram.ts                opt-in speech-to-text and text-to-speech adapters
@@ -157,7 +155,7 @@ observability/               Fluent Bit and OTel Collector replay configs
 app/api/telemetry/           token-gated ingest, replay, recent, and SSE routes
 app/api/benchmarks/          public run catalog and comparison report routes
 app/api/graph/               bounded, read-only Neo4j relationship route
-app/api/voice/               protected Deepgram transcription and speech routes
+app/api/voice/               bounded Deepgram transcription and speech routes
 examples/gpu-events.log      synthetic, labeled GPU telemetry replay
 docs/                        design, visual, evaluation, testing, and submission documentation
 ```
@@ -174,7 +172,7 @@ docs/                        design, visual, evaluation, testing, and submission
 - Mistral receives extracted identifiers and reviewed evidence rather than the original raw telemetry; its output must pass the same strict schema and grounding validator.
 - Neo4j stores reviewed relationships and benchmark summaries, not high-frequency telemetry or raw logs.
 - Deepgram is invoked only after explicit record/listen actions; this app does not persist audio.
-- Turnstile reduces anonymous abuse but is not a substitute for identity, authorization, quotas, or cost controls.
+- Public analysis and voice routes intentionally have no browser challenge; production scale should add platform rate limits, authentication, quotas, and provider-cost controls without blocking the core demo.
 - The public replay endpoint accepts only checked-in synthetic samples. External OTLP writes require `TELEMETRY_INGEST_TOKEN`, have a 64 KiB body limit, and expose only allow-listed metadata after redaction.
 - The telemetry inbox is a short-lived demonstration buffer, not a durable log backend; multi-instance production deployments should replace it with a tenant-isolated event bus or short-retention store.
 - Template generation is used so every sentence can be traced to retrieved corpus fields.
@@ -196,7 +194,7 @@ docs/                        design, visual, evaluation, testing, and submission
 - [`docs/TELEMETRY_LIVE_FLOW.md`](docs/TELEMETRY_LIVE_FLOW.md) — implemented Collector-to-browser gateway, SSE contract, safeguards, and extension points
 - [`docs/LLM_MODE.md`](docs/LLM_MODE.md) — optional model contract and grounding boundary
 - [`docs/YOU_LANGSMITH_INTEGRATION.md`](docs/YOU_LANGSMITH_INTEGRATION.md) — discovery, AI observability, privacy, and scale-out design
-- [`docs/MULTIMODAL_EVIDENCE_FABRIC.md`](docs/MULTIMODAL_EVIDENCE_FABRIC.md) — Turnstile, Mistral, Neo4j, and Deepgram flows, controls, and extension design
+- [`docs/MULTIMODAL_EVIDENCE_FABRIC.md`](docs/MULTIMODAL_EVIDENCE_FABRIC.md) — Mistral, Neo4j, and Deepgram flows, controls, and extension design
 - [`docs/PERFORMANCE_INTELLIGENCE.md`](docs/PERFORMANCE_INTELLIGENCE.md) — public benchmark data, technology mapping, SLOs, correlation, MIG, capacity, APIs, and production extension
 - [`docs/NVIDIA_INTERVIEW_DEMO.md`](docs/NVIDIA_INTERVIEW_DEMO.md) — focused solution-architecture interview walkthrough and follow-up answers
 - [`docs/LOCAL_TESTING.md`](docs/LOCAL_TESTING.md) — local setup and end-to-end verification

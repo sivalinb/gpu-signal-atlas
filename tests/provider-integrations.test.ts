@@ -5,44 +5,6 @@ import test from 'node:test';
 import { getDeepgramConfig, synthesizeSpeech, transcribeAudio } from '../core/deepgram.ts';
 import { getMistralConfig, mistralEmbeddings } from '../core/mistral.ts';
 import { getNeo4jConfig, neo4jQuery, readGraphPaths } from '../core/neo4j.ts';
-import { getTurnstileConfig, verifyTurnstile } from '../core/turnstile.ts';
-
-test('Turnstile validates action and hostname server-side without exposing its secret', async () => {
-  const config = getTurnstileConfig({
-    NEXT_PUBLIC_TURNSTILE_SITE_KEY: 'public-key',
-    TURNSTILE_SECRET_KEY: 'server-secret',
-    TURNSTILE_ENFORCED: 'true',
-    TURNSTILE_EXPECTED_HOSTNAME: 'gpu.example',
-  });
-  let sent = '';
-  const result = await verifyTurnstile(
-    'single-use-token',
-    'analyze',
-    new Request('https://gpu.example/api/analyze'),
-    config,
-    async (_input, init) => {
-      sent = String(init?.body);
-      return Response.json({ success: true, hostname: 'gpu.example', action: 'analyze' });
-    },
-  );
-  assert.equal(result, 'verified');
-  assert.match(sent, /server-secret/);
-  assert.doesNotMatch(JSON.stringify({ siteKey: config?.siteKey }), /server-secret/);
-});
-
-test('Turnstile rejects duplicate or expired tokens', async () => {
-  const config = { secretKey: 'secret', siteKey: 'public', enforced: true };
-  await assert.rejects(
-    verifyTurnstile(
-      'expired',
-      'analyze',
-      new Request('https://gpu.example/api/analyze'),
-      config,
-      async () => Response.json({ success: false, 'error-codes': ['timeout-or-duplicate'] }),
-    ),
-    /expired/,
-  );
-});
 
 test('Mistral embedding adapter preserves input order and keeps the key in Authorization', async () => {
   const config = getMistralConfig({ MISTRAL_API_KEY: 'mistral-secret' });

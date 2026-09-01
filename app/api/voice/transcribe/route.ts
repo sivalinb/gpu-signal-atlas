@@ -1,11 +1,9 @@
 import { DeepgramError, getDeepgramConfig, transcribeAudio } from '@/core/deepgram';
-import { TurnstileError, verifyTurnstile } from '@/core/turnstile';
 
 const MAX_AUDIO_BYTES = 5 * 1024 * 1024;
 
 export async function POST(request: Request): Promise<Response> {
   try {
-    await verifyTurnstile(request.headers.get('x-turnstile-token') ?? undefined, 'analyze', request);
     const config = getDeepgramConfig();
     if (!config) return Response.json({ error: 'Voice transcription is not configured.' }, { status: 503 });
     const declared = Number(request.headers.get('content-length') ?? '0');
@@ -20,7 +18,6 @@ export async function POST(request: Request): Promise<Response> {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (error) {
-    if (error instanceof TurnstileError) return Response.json({ error: error.message, code: error.code }, { status: 403 });
     if (error instanceof DeepgramError) return Response.json({ error: 'Voice transcription failed safely.' }, { status: 503 });
     return Response.json({ error: 'Voice transcription is unavailable.' }, { status: 503 });
   }

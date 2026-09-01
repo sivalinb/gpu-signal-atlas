@@ -33,9 +33,9 @@ Neo4j is an implemented bonus evidence graph. The submission does not claim the 
 | Hybrid retrieval | Pinecone dense and BM25 sparse candidates retain independent ranks, then use RRF and bounded reranking. | Excellent |
 | "I don't know" path | Unknown identifiers, unrelated questions, and six same-domain hard negatives refuse with zero diagnostic citations. | Excellent |
 | Cited generation | Deterministic output is default; optional Mistral strict-schema generation uses evidence-derived enums plus post-generation grounding validation. | Excellent |
-| Evaluation | 31 independent cases, 52 tests, retrieval/chunking ablations, 100% Recall@5, 0.931 MRR, 100% citation validity/grounding, and 100% refusal precision/recall on the bounded set. | Excellent for the reviewed corpus |
+| Evaluation | 31 independent cases, 50 tests, retrieval/chunking ablations, 100% Recall@5, 0.931 MRR, 100% citation validity/grounding, and 100% refusal precision/recall on the bounded set. | Excellent for the reviewed corpus |
 | Google Doc | Overview, dataset, prompts/instructions, iterations, learnings, architecture, evaluation, limitations, setup, and requirement mapping. | Complete and updated |
-| Live demo | Public website demonstrates analysis, refusal, telemetry flow, performance intelligence, security, graph context, and voice interaction. | Complete |
+| Live demo | Public website demonstrates analysis, refusal, telemetry flow, performance intelligence, privacy boundaries, graph context, and voice interaction. | Complete |
 | AI coding-tool explanation | Repository and document explain Codex's role and the validation gates used to accept changes. | Complete |
 | Project assets | Public GitHub repository contains code, tests, configs, evaluation, and documentation. | Complete |
 | Video, five minutes or less | Recording-ready script exists; final recording/public link does not yet exist. | **Pending** |
@@ -49,9 +49,8 @@ Neo4j is an implemented bonus evidence graph. The submission does not claim the 
 - Neo4j synchronization created 17 Evidence records, 32 Signal identifiers, three BenchmarkRun records, and supporting technology/model/backend relationships.
 - The public graph endpoint returns a maximum of 40 read-only relationship paths and stores no raw telemetry.
 - Deepgram live validation completed both synthetic text-to-speech and speech-to-text; the website requires explicit microphone and playback actions.
-- Cloudflare Turnstile is enforced on public analysis and voice routes with server-side action/hostname validation; an unverified analysis returns HTTP 403.
-- The public integration endpoint reports every provider configured and `secretsExposedToBrowser=false`.
-- Lint, type checking, 52 tests, freshness, index integrity, and the production build pass locally against the exact published tree.
+- The public integration endpoint reports every remaining provider configured and `secretsExposedToBrowser=false`.
+- Lint, type checking, 50 tests, freshness, index integrity, and the production build pass locally against the exact published tree.
 
 ## Score breakdown
 
@@ -87,7 +86,7 @@ The score is a reviewer-authored assessment because the handout specifies delive
 3. Demonstration telemetry is synthetic; broader model, driver, MIG, NVLink, and workload diversity should be tested with governed incident replays.
 4. The Mistral embedding result is an in-memory ablation; production Pinecone intentionally remains on the reproducible 256d representation until a controlled namespace migration is approved.
 5. Neo4j currently visualizes reviewed relationships; a true GraphRAG answer path and matched-query comparison would be a valuable next experiment, not something the current project should overclaim.
-6. Turnstile is abuse control, not user authentication, authorization, tenancy, or provider-cost governance.
+6. Public AI and voice routes no longer use a browser challenge; production scale requires platform rate limits, authentication, quotas, and provider-cost governance.
 
 ## Final recommendation
 

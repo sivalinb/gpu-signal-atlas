@@ -144,7 +144,7 @@ flowchart LR
     R -. redacted OTel spans .-> L[LangSmith]
 ```
 
-The control planes intentionally carry different data. You.com sees documentation discovery queries and approved public pages, not GPU telemetry. Pinecone stores reviewed documentation vectors, not submitted logs. LangSmith sees redacted stage timing, ranks, identifiers, versions, and outcomes. Turnstile verifies public actions; Mistral receives retrieved evidence for bounded optional generation and trained-embedding comparison; Neo4j stores reviewed relationships without raw telemetry; and Deepgram processes only explicit voice actions. The website reads safe configuration booleans and the intentionally public Turnstile site key; permanent provider credentials remain server-only.
+The control planes intentionally carry different data. You.com sees documentation discovery queries and approved public pages, not GPU telemetry. Pinecone stores reviewed documentation vectors, not submitted logs. LangSmith sees redacted stage timing, ranks, identifiers, versions, and outcomes. Mistral receives retrieved evidence for bounded optional generation and trained-embedding comparison; Neo4j stores reviewed relationships without raw telemetry; and Deepgram processes only explicit voice actions. The website reads safe configuration booleans; permanent provider credentials remain server-only.
 
 ## Source-code map
 

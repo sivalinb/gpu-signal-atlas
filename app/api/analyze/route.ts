@@ -9,12 +9,10 @@ import {
   PineconeRequestError,
   retrieveFromPinecone,
 } from '@/core/pinecone';
-import { TurnstileError, verifyTurnstile } from '@/core/turnstile';
 
 interface AnalyzeRequest {
   telemetry?: unknown;
   generationMode?: unknown;
-  turnstileToken?: unknown;
 }
 
 function json(body: unknown, status = 200): Response {
@@ -48,11 +46,6 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const stages: TraceStage[] = [];
     const generationMode = payload.generationMode === 'mistral' ? 'mistral' : 'deterministic';
-    await verifyTurnstile(
-      typeof payload.turnstileToken === 'string' ? payload.turnstileToken : undefined,
-      'analyze',
-      request,
-    );
     const extractStarted = measure();
     const signals = extractSignals(telemetry);
     stages.push({
@@ -126,9 +119,6 @@ export async function POST(request: Request): Promise<Response> {
       diagnostics: { ...analysis.diagnostics, observabilityExport },
     });
   } catch (error) {
-    if (error instanceof TurnstileError) {
-      return json({ error: error.message, code: error.code }, 403);
-    }
     if (error instanceof MistralError || error instanceof LlmContractError) {
       console.error('Bounded Mistral generation failed contract validation.');
       return json(

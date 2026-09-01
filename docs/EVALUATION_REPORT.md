@@ -150,7 +150,6 @@ A live synthetic Xid 79 check against `mistral-small-latest` returned `schema-co
 - the complete evaluation set meets retrieval and refusal targets.
 - Mistral embeddings preserve response order and the live ablation remains read-only;
 - Mistral structured generation uses the provider-specific schema subset plus local grounding limits;
-- Turnstile verifies action/hostname and rejects expired or replayed tokens;
 - Neo4j uses the HTTPS Query API and returns bounded relationship records; and
 - Deepgram adapters keep authorization server-side for both speech directions.
 

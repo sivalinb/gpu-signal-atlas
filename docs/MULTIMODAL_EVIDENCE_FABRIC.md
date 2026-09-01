@@ -2,15 +2,14 @@
 
 ## Product outcome
 
-GPU Signal Atlas now supports protected public analysis, optional grounded model generation, a relationship graph, and voice interaction while preserving its citation-first safety boundary. These integrations are additive: Pinecone remains the reviewed text-evidence store, BM25 remains the exact-identifier path, and deterministic generation remains the default.
+GPU Signal Atlas supports public analysis without a browser challenge, optional grounded model generation, a relationship graph, and voice interaction while preserving its citation-first safety boundary. These integrations are additive: Pinecone remains the reviewed text-evidence store, BM25 remains the exact-identifier path, and deterministic generation remains the default.
 
 ## End-to-end flow
 
 ```mermaid
 flowchart LR
-    U[Operator text or opt-in voice] --> T[Turnstile server verification]
-    T -->|voice| D[Deepgram transcription]
-    T -->|text| X[Signal extraction]
+    U[Operator text or opt-in voice] -->|voice| D[Deepgram transcription]
+    U -->|text| X[Signal extraction]
     D --> X
     X --> P[Pinecone dense candidates]
     X --> B[BM25 exact-token candidates]
@@ -35,7 +34,6 @@ flowchart LR
 |---|---|---|---|---|
 | Fluent Bit | Tail and enrich GPU/Kubernetes logs | Log records | OTLP logs | No diagnosis or vector indexing |
 | OpenTelemetry | Normalize resource identity and transport logs/traces | OTLP telemetry | Logs plus redacted spans | Not a corpus or reasoning engine |
-| Turnstile | Protect costly public AI/voice routes | Single-use browser token, remote IP | Verification result | Secret validation is server-side; tokens expire and are single use |
 | Pinecone | Serve reviewed semantic evidence | Query vector | Ranked reviewed chunks | Does not store submitted GPU logs |
 | BM25 | Preserve exact Xids and DCGM field names | Tokenized query and corpus | Sparse ranks | Application-local, deterministic |
 | Mistral | Optional structured generation and trained-embedding ablation | Extracted identifiers and retrieved evidence | Strict JSON signal card or vectors | Never receives the original raw telemetry; deterministic mode remains default |
@@ -46,9 +44,9 @@ flowchart LR
 
 ## Implemented paths
 
-### Protected analysis
+### Direct analysis
 
-The browser renders Cloudflare Turnstile with the public site key. `/api/analyze`, `/api/voice/transcribe`, and `/api/voice/speak` submit the resulting token to the server. The server calls Siteverify, validates the action and deployment hostname, and rejects missing, invalid, expired, or replayed tokens. The Turnstile secret is never included in browser JavaScript.
+`/api/analyze`, `/api/voice/transcribe`, and `/api/voice/speak` no longer depend on a browser challenge. Input-length and audio-size bounds, server-only provider credentials, schema validation, evidence grounding, and safe error responses remain in place. Before production scale, add platform-level rate limits, authentication, quotas, and provider-cost budgets that do not block the core deterministic demo.
 
 ### Grounded Mistral mode
 
@@ -65,8 +63,7 @@ The analyzer exposes **Deterministic evidence template** and **Mistral structure
 ## Security and operational controls
 
 - All permanent credentials are server-only environment variables.
-- `/api/integrations` exposes booleans, models, and the public Turnstile site key only.
-- Turnstile is an abuse-control signal, not authentication or authorization.
+- `/api/integrations` exposes configuration booleans and model names only.
 - Provider requests have timeouts, size bounds, and safe error messages.
 - Mistral failures do not silently fall back; the operator can explicitly choose deterministic mode.
 - Neo4j synchronization is an operator workflow, not a request-time write.
@@ -75,7 +72,7 @@ The analyzer exposes **Deterministic evidence template** and **Mistral structure
 
 ## Local configuration and verification
 
-Copy `.env.example` to `.env.local`, populate only the providers you want, leave `TURNSTILE_ENFORCED=false` for ordinary local development, then run:
+Copy `.env.example` to `.env.local`, populate only the providers you want, then run:
 
 ```bash
 npm run neo4j:sync
@@ -87,7 +84,7 @@ npm run build
 npm run dev
 ```
 
-For a local Turnstile test, use Cloudflare's documented test keys or add `localhost` to a development widget. Never reuse the production secret in browser code. Verify `/api/integrations`, run an Xid sample in both generation modes, refresh the graph, record a short question, and play the result briefing.
+Verify `/api/integrations`, run an Xid sample in both generation modes, refresh the graph, record a short question, and play the result briefing.
 
 ## Production extension
 
@@ -95,7 +92,6 @@ For a larger corpus, keep immutable source snapshots in object storage, enqueue 
 
 ## Source references
 
-- [Cloudflare Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)
 - [Mistral chat completion API](https://docs.mistral.ai/api/endpoint/chat)
 - [Mistral embeddings API](https://docs.mistral.ai/api/endpoint/embeddings)
 - [Deepgram streaming speech-to-text](https://developers.deepgram.com/reference/speech-to-text/listen-streaming)

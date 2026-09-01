@@ -5,7 +5,6 @@ Target duration: 4 minutes 55 seconds. Stop at five minutes even if a secondary 
 ## Pre-recording checklist
 
 - Open the public website in a clean browser window and confirm the Xid 79 result loads.
-- Complete the Cloudflare Turnstile check before each protected analysis or voice action; its tokens are single use.
 - Keep the GitHub repository and public Google Doc available in adjacent tabs.
 - Use 100% browser zoom and record at 1080p when possible.
 - Close notifications and hide bookmarks or tabs containing personal information.
@@ -55,7 +54,7 @@ Now scroll to the technology map. Pinecone is the managed dense-vector store for
 
 Scroll to **Graph & voice**.
 
-“These integrations have deliberately separate responsibilities. Turnstile protects public AI and voice requests through server-side verification. Mistral optionally generates the same grounded schema and provides a trained-embedding comparison. Neo4j shows explicit relationships across signals, reviewed evidence, benchmark runs, models, backends, and technologies; it does not replace Pinecone semantic retrieval. Deepgram turns an opt-in spoken GPU question into editable input and can read the grounded result as an executive briefing.
+“These integrations have deliberately separate responsibilities. Mistral optionally generates the same grounded schema and provides a trained-embedding comparison. Neo4j shows explicit relationships across signals, reviewed evidence, benchmark runs, models, backends, and technologies; it does not replace Pinecone semantic retrieval. Deepgram turns an opt-in spoken GPU question into editable input and can read the grounded result as an executive briefing.
 
 No permanent credential reaches the browser, Neo4j does not receive raw logs, and Mistral receives extracted identifiers plus retrieved evidence rather than the original telemetry.”
 
@@ -77,7 +76,7 @@ Scroll to **Evaluation evidence**.
 
 The current run records 100 percent Recall@5, 0.931 mean reciprocal rank, 100 percent citation validity, 100 percent field-level claim grounding, and 100 percent refusal precision and recall. These are regression results for the curated corpus, not generalized GPU diagnostic accuracy.
 
-The repository also has 52 unit and regression tests, including retrieval, refusal, Mistral schema contracts, Turnstile validation, Neo4j mapping, Deepgram privacy boundaries, benchmark provenance and SLO math, OTLP normalization, redaction, buffer bounds, and Collector fan-out. The same release gate also runs evaluation, ablations, source freshness, index integrity, type checking, linting, and a production build.”
+The repository also has 50 unit and regression tests, including retrieval, refusal, Mistral schema contracts, Neo4j mapping, Deepgram privacy boundaries, benchmark provenance and SLO math, OTLP normalization, redaction, buffer bounds, and Collector fan-out. The same release gate also runs evaluation, ablations, source freshness, index integrity, type checking, linting, and a production build.”
 
 ## 4:25–4:55 — AI coding tools, assets, and close
 
