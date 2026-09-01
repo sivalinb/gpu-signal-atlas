@@ -26,6 +26,6 @@ The analyzer also emits an application diagnostic envelope on every result: trac
 
 `otel-collector-langsmith.yaml` is the optional trace fan-out configuration. It removes generic `input.value` and `output.value` attributes before sending traces to both the debug exporter and LangSmith. The in-process exporter in `core/langsmith.ts` is narrower: it emits recognized identifiers, input length, ranks, latency, versions, and outcomes, with `rag.raw_telemetry_exported=false`. It never serializes the raw pasted telemetry.
 
-LangSmith export is fail-open. Missing configuration reports `disabled`, and a network/exporter failure reports `failed`; the analysis result is still returned. Set `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`, and optionally `LANGSMITH_OTEL_ENDPOINT` in a server-only environment to activate it.
+LangSmith export is fail-open. The current public deployment has it configured. Missing configuration reports `disabled`, and a network/exporter failure reports `failed`; the analysis result is still returned. Set `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`, and optionally `LANGSMITH_OTEL_ENDPOINT` in a server-only environment to activate it elsewhere.
 
 Do not place raw production logs or credentials in the public demo. Redact workload names, tenant identifiers, and tokens before analysis.

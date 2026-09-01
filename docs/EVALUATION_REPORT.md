@@ -78,8 +78,8 @@ Citation validity: 100.0%
 Claim grounding: 100.0%
 Refusal precision: 100.0%
 Refusal recall: 100.0%
-Latency p50: 0.30 ms
-Latency p95: 2.31 ms
+Latency p50: 0.49 ms
+Latency p95: 0.92 ms
 Failures: 0
 ```
 
@@ -99,8 +99,8 @@ MRR: 0.931
 Citation validity: 100.0%
 Refusal precision: 100.0%
 Refusal recall: 100.0%
-Latency p50: 106.37 ms
-Latency p95: 229.16 ms
+Latency p50: 171.59 ms
+Latency p95: 518.05 ms
 Failures: 0
 ```
 

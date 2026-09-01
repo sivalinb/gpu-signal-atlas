@@ -105,8 +105,8 @@ An unknown Xid or DCGM field causes a hard refusal. The response asks for a comp
 | Citation validity | ≥90% | 100.0% |
 | Refusal precision | ≥90% | 100.0% |
 | Refusal recall | ≥90% | 100.0% |
-| p95 local analysis latency | <5 seconds | 2.31 ms |
-| p95 Pinecone analysis latency | <5 seconds | 229.16 ms |
+| p95 local analysis latency | <5 seconds | 0.92 ms |
+| p95 Pinecone analysis latency | <5 seconds | 518.05 ms |
 | Unapproved production writes | 0 | 0 by design |
 
 ## Production extension path

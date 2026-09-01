@@ -2,7 +2,7 @@
 
 ## Purpose
 
-GPU Signal Atlas uses two optional integrations to improve corpus freshness and RAG quality without weakening its evidence boundary:
+GPU Signal Atlas uses two optional-by-design integrations to improve corpus freshness and RAG quality without weakening its evidence boundary. Both are configured in the current public deployment; local or private deployments can enable either independently:
 
 - **You.com Search API** discovers current public documentation from approved domains. Results become review candidates; they do not enter the operational corpus automatically.
 - **LangSmith** receives redacted OpenTelemetry traces for the extraction, retrieval, evidence-gating, and generation path. The original pasted telemetry is not exported.
@@ -114,6 +114,16 @@ npm run dev
 
 When the LangSmith variables are present, the API response shows `observabilityExport: exported` on success. Without them it shows `disabled`, which is the expected optional-mode behavior.
 
+## Public deployment verification
+
+The production status route intentionally reveals only booleans:
+
+```bash
+curl https://gpu-signal-atlas.siva-babu.chatgpt.site/api/integrations
+```
+
+The reviewed public deployment reports `pineconeConfigured`, `youConfigured`, and `langsmithConfigured` as `true`, with `secretsExposedToBrowser` as `false`. A live Xid 79 analysis reports `retrievalBackend: pinecone` and `observabilityExport: exported`. A live You.com discovery check returned an allow-listed NVIDIA documentation candidate as `pending-review` with `autoPromoted: false`.
+
 For Collector-based trace fan-out:
 
 ```bash
@@ -133,7 +143,7 @@ npm run build
 
 The mocked integration tests verify allow-list filtering, review-only discovery status, OTLP headers, trace structure, optional configuration, failure isolation, and absence of the raw telemetry string.
 
-Before enabling either integration in production:
+Before enabling either integration in another production environment:
 
 - store keys in the hosting platform secret store;
 - confirm LangSmith workspace retention, access control, and regional policy;

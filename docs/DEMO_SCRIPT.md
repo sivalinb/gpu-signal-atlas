@@ -44,7 +44,7 @@ Scroll to **Interactive visual demo** and click **Run full pipeline**.
 
 “This button exposes all nine stages: allow-listed ingestion, cleaning, identifier-centered chunking, vector promotion into Pinecone, telemetry extraction, dense and sparse retrieval, reranking, evidence gating, and structured generation.
 
-Now scroll to the technology map. Pinecone is the managed dense-vector store for the public application. You.com is an optional discovery adapter: it searches only approved public documentation and puts every result in a human review queue—it never writes to Pinecone. LangSmith is an optional AI-observability adapter: it receives redacted OpenTelemetry spans for extraction, retrieval, evidence gating, and generation, with ranks, latency, and outcomes but no original telemetry. Fluent Bit collects and enriches logs; OpenTelemetry transports logs and traces.”
+Now scroll to the technology map. Pinecone is the managed dense-vector store for the public application. You.com is configured in this deployment as a governed discovery adapter: it searches only approved public documentation and puts every result in a human review queue—it never writes to Pinecone. LangSmith is configured as the AI-observability adapter: it receives redacted OpenTelemetry spans for extraction, retrieval, evidence gating, and generation, with ranks, latency, and outcomes but no original telemetry. Both adapters remain optional for local installations. Fluent Bit collects and enriches logs; OpenTelemetry transports logs and traces.”
 
 ## 3:25–3:55 — Refusal behavior
 

@@ -30,7 +30,7 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 - Node test suite, type checking, production build, and GitHub Actions CI
 - Optional Fluent Bit → OTLP → OpenTelemetry Collector replay configuration
 - Governed You.com source discovery with domain allow-listing and a mandatory review queue
-- Optional LangSmith OTLP trace export with raw-telemetry redaction and fail-open behavior
+- LangSmith OTLP trace export with raw-telemetry redaction and fail-open behavior
 
 ## Architecture
 
@@ -71,7 +71,9 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-The website and Pinecone evaluation require the four Pinecone server-only variables shown in `.env.example`. You.com and LangSmith are optional server-only integrations. The CLI, unit tests, local evaluation, and ablations remain credential-free.
+The website and Pinecone evaluation require the four Pinecone server-only variables shown in `.env.example`. You.com and LangSmith are optional server-only integrations: both are configured in the current public deployment, while local installations can omit either one. The CLI, unit tests, local evaluation, and ablations remain credential-free.
+
+The public `/api/integrations` route exposes configuration booleans only. It currently reports Pinecone, You.com, and LangSmith as configured and explicitly reports that no provider secret is exposed to the browser.
 
 Analyze a sample from the command line:
 
@@ -95,8 +97,8 @@ The checked-in evaluation contains 31 independent cases across exact identifiers
 | Claim grounding | 100.0% | 100% |
 | Refusal precision | 100.0% | ≥90% |
 | Refusal recall | 100.0% | ≥90% |
-| Local p95 retrieval latency | 2.31 ms | <5 s |
-| Pinecone p95 end-to-end retrieval latency | 229.16 ms | <5 s |
+| Local p95 retrieval latency | 0.92 ms | <5 s |
+| Pinecone p95 end-to-end retrieval latency | 518.05 ms | <5 s |
 
 These results validate the checked-in deterministic corpus and queries. They are regression evidence, not generalized GPU-diagnostic accuracy. Full methodology is in [`docs/EVALUATION_REPORT.md`](docs/EVALUATION_REPORT.md).
 

@@ -137,7 +137,7 @@ flowchart LR
     R -. redacted OTel spans .-> L[LangSmith]
 ```
 
-The three lanes intentionally carry different data. You.com sees documentation discovery queries and public pages, not GPU telemetry. Pinecone stores approved documentation vectors, not submitted logs. LangSmith sees stage timing, ranks, identifiers, versions, and outcomes, not the raw telemetry string. The public website's **AI observability** section maps each technology to its responsibility and status.
+The three lanes intentionally carry different data. You.com sees documentation discovery queries and public pages, not GPU telemetry. Pinecone stores approved documentation vectors, not submitted logs. LangSmith sees stage timing, ranks, identifiers, versions, and outcomes, not the raw telemetry string. In the current public deployment all three providers are configured; the website's **AI observability** section reads only safe configuration booleans and never receives provider keys.
 
 ## Source-code map
 

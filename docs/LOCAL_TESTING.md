@@ -42,8 +42,8 @@ npm test
 Expected summary:
 
 ```text
-tests 29
-pass 29
+tests 35
+pass 35
 fail 0
 ```
 
@@ -180,6 +180,14 @@ npm run discover:you -- "NVIDIA Xid 79 recovery documentation"
 ```
 
 With `LANGSMITH_API_KEY` and `LANGSMITH_PROJECT` configured, every website analysis attempts a redacted OTLP trace export. The response diagnostic is `exported`, `failed`, or `disabled`. The exporter never sends the original telemetry string, and an export failure never blocks analysis.
+
+Verify the safe public status endpoint:
+
+```bash
+curl http://localhost:3000/api/integrations
+```
+
+The booleans should match the integrations configured in `.env.local`, and `secretsExposedToBrowser` must remain `false`. The current public deployment reports Pinecone, You.com, and LangSmith configured.
 
 ## 8. Optional Fluent Bit and OpenTelemetry replay
 

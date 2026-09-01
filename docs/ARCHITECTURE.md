@@ -201,13 +201,13 @@ The public and evaluated path uses the deterministic template. `core/llm.ts` add
 
 ### You.com discovery extension
 
-`core/you.ts` adds a second, optional discovery input. It submits documentation-focused queries to You.com with an explicit domain allow-list, rejects non-allow-listed response URLs, and labels every result `pending-review`. It never receives pasted telemetry, edits the corpus, rebuilds the index, or upserts Pinecone. The existing human review, fingerprint, regression, staging-namespace, and promotion gates remain authoritative.
+`core/you.ts` adds a second, optional-by-design discovery input. It submits documentation-focused queries to You.com with an explicit domain allow-list, rejects non-allow-listed response URLs, and labels every result `pending-review`. The current public deployment has this adapter configured. It never receives pasted telemetry, edits the corpus, rebuilds the index, or upserts Pinecone. The existing human review, fingerprint, regression, staging-namespace, and promotion gates remain authoritative.
 
 ## AI observability boundary
 
 The analysis route measures signal extraction, hybrid retrieval, and evidence-gate/generation stages. `core/langsmith.ts` represents those stages as OpenTelemetry spans and can export them to LangSmith over OTLP/HTTP. The trace contains exact identifiers, model/driver context, input length, ranks, latency, corpus/index versions, result status, evidence strength, and citation count. It does not contain the submitted telemetry string.
 
-Trace export is optional and fail-open. A missing key reports `disabled`; an exporter or network failure reports `failed`; neither condition changes the grounded/refused result. `observability/otel-collector-langsmith.yaml` demonstrates an alternative Collector fan-out with generic input/output attribute deletion before export.
+Trace export is optional and fail-open. It is configured in the current public deployment. A missing key reports `disabled`; an exporter or network failure reports `failed`; neither condition changes the grounded/refused result. `observability/otel-collector-langsmith.yaml` demonstrates an alternative Collector fan-out with generic input/output attribute deletion before export.
 
 ## Compatibility behavior
 
@@ -229,7 +229,7 @@ The graphite and mint visual system references telemetry terminals, signal trace
 
 - Analysis is sent only to the same-origin server route and is not persisted by the application.
 - The Pinecone API key is a server secret and is never bundled into browser JavaScript.
-- You.com and LangSmith keys are optional server secrets and are never bundled into browser JavaScript.
+- You.com and LangSmith keys are optional server secrets, configured in the current public deployment, and never bundled into browser JavaScript.
 - You.com is restricted to public documentation discovery and cannot auto-promote a result.
 - LangSmith trace payloads explicitly set `rag.raw_telemetry_exported=false`; the exporter is tested to exclude the original input string.
 - Submitted telemetry is used as a transient query vector; no raw telemetry record is upserted into the documentation index.

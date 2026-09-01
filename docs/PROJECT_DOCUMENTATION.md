@@ -125,8 +125,8 @@ Recorded result:
 | Claim grounding | 100.0% |
 | Refusal precision | 100.0% |
 | Refusal recall | 100.0% |
-| p95 local latency | 2.31 ms |
-| p95 Pinecone retrieval latency | 229.16 ms |
+| p95 local latency | 0.92 ms |
+| p95 Pinecone retrieval latency | 518.05 ms |
 
 The expanded test suite contains 35 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and metadata, model contracts, ablations, observability configuration, public status redaction, You.com governance, and LangSmith redaction/export contracts. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
 
@@ -136,9 +136,9 @@ The repository contains a Fluent Bit tail/parser configuration, resource enrichm
 
 This optional path shows how GPU telemetry can be normalized and transported. It intentionally ends at the Collector debug exporter. The browser sends pasted text to the same-origin analysis route, which uses Pinecone only for reviewed-document retrieval; it does not imply a direct collector-to-RAG connection.
 
-The project now also implements two optional external control planes. You.com searches only allow-listed public documentation and emits `pending-review` candidates with provenance and fingerprints; it cannot change the corpus or Pinecone automatically. LangSmith accepts redacted OpenTelemetry traces from extraction, retrieval, evidence gating, and generation. These spans include identifiers, ranks, latency, versions, result status, and citation count, but not the original telemetry string. Both integrations are server-side, key-activated, and fail safely when disabled or unavailable.
+The project now also implements two optional-by-design external control planes that are configured in the current public deployment. You.com searches only allow-listed public documentation and emits `pending-review` candidates with provenance and fingerprints; it cannot change the corpus or Pinecone automatically. LangSmith accepts redacted OpenTelemetry traces from extraction, retrieval, evidence gating, and generation. These spans include identifiers, ranks, latency, versions, result status, and citation count, but not the original telemetry string. Both integrations are server-side, key-activated, and fail safely when disabled or unavailable.
 
-The technology mapping is deliberate: Fluent Bit collects and enriches logs; OpenTelemetry normalizes logs and traces; You.com discovers sources; Pinecone stores reviewed vectors; LangSmith measures the RAG system. Full setup and scale-out guidance is in `docs/YOU_LANGSMITH_INTEGRATION.md`.
+The technology mapping is deliberate: Fluent Bit collects and enriches logs; OpenTelemetry normalizes logs and represents RAG stages as traces; You.com discovers source candidates; Pinecone stores and retrieves reviewed vectors; LangSmith measures the RAG system. The safe public status route exposes configuration booleans only and confirms that no provider key reaches the browser. Full setup and scale-out guidance is in `docs/YOU_LANGSMITH_INTEGRATION.md`.
 
 ## User interface
 
