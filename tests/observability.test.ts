@@ -11,12 +11,15 @@ test('Fluent Bit replay enriches and exports GPU logs over OTLP', async () => {
   }
 });
 
-test('Collector replay receives OTLP logs and ends at the debug exporter', async () => {
+test('Collector replay receives OTLP logs and fans out to debug plus the safe gateway', async () => {
   const config = await readFile(new URL('../observability/otel-collector.yaml', import.meta.url), 'utf8');
   assert.match(config, /http:\s*\n\s*endpoint: 0\.0\.0\.0:4318/);
   assert.match(config, /processors: \[resource, batch\]/);
-  assert.match(config, /exporters: \[debug\]/);
-  assert.doesNotMatch(config, /loki|elasticsearch|otlphttp\/backend/i);
+  assert.match(config, /otlphttp\/gateway/);
+  assert.match(config, /logs_endpoint: http:\/\/127\.0\.0\.1:3000\/api\/telemetry\/v1\/logs/);
+  assert.match(config, /x-telemetry-token: \$\{env:TELEMETRY_INGEST_TOKEN\}/);
+  assert.match(config, /exporters: \[debug, otlphttp\/gateway\]/);
+  assert.doesNotMatch(config, /loki|elasticsearch/i);
 });
 
 test('Optional LangSmith collector path redacts payload fields before OTLP export', async () => {

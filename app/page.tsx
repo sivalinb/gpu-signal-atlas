@@ -43,9 +43,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { PerformanceWorkbench } from '@/components/performance-workbench';
 import { corpus } from '@/core/corpus';
 import { samples } from '@/core/samples';
 import type { IntegrationStatus } from '@/core/integrations';
+import type { TelemetryEvent } from '@/core/telemetry';
 import type { SignalAnalysis } from '@/core/types';
 
 interface AnalysisErrorPayload {
@@ -98,13 +100,13 @@ const week2Score = [
 ];
 
 const recordingPlan = [
-  ['0:00–0:30', 'Problem', 'Frame the evidence-before-inference goal.'],
-  ['0:30–1:20', 'Live analysis', 'Run Xid 79 and inspect Pinecone-backed evidence.'],
-  ['1:20–2:00', 'Multi-source', 'Show Xid 48, ECC metric, and runbook context.'],
-  ['2:00–3:25', 'Pipeline', 'Run all nine stages, then show the You.com/Pinecone/LangSmith control planes.'],
-  ['3:25–3:55', 'Refusal', 'Run Xid 999 and show zero diagnostic citations.'],
-  ['3:55–4:25', 'Evaluation', 'Show retrieval, refusal, and ablation evidence.'],
-  ['4:25–4:55', 'Build story', 'Explain AI coding usage, GitHub, and the key learning.'],
+  ['0:00–0:25', 'Problem', 'Frame the evidence-before-inference goal.'],
+  ['0:25–1:05', 'Live analysis', 'Run Xid 79 and inspect Pinecone-backed evidence.'],
+  ['1:05–2:05', 'Telemetry flow', 'Animate Fluent Bit → OTel → gateway → SSE → RAG → LangSmith.'],
+  ['2:05–3:10', 'RAG lifecycle', 'Run all nine corpus and retrieval stages and show the control planes.'],
+  ['3:10–3:40', 'Refusal', 'Run Xid 999 and show zero diagnostic citations.'],
+  ['3:40–4:20', 'Evaluation', 'Show retrieval, refusal, ablation, and 46 passing tests.'],
+  ['4:20–4:55', 'Build story', 'Explain AI coding usage, GitHub, and the key learning.'],
 ];
 
 const flow = [
@@ -344,6 +346,352 @@ function PipelineWalkthrough() {
   );
 }
 
+const telemetryFlowSteps = [
+  {
+    icon: Cpu,
+    short: 'GPU source',
+    technology: 'NVIDIA kernel · DCGM',
+    artifact: 'Synthetic Xid/DCGM event',
+    explanation: 'A GPU node emits a kernel event or metric snapshot. The public demo uses labeled synthetic data; the local path can tail your own allow-listed file.',
+  },
+  {
+    icon: Activity,
+    short: 'Fluent Bit',
+    technology: 'Tail input · record modifier',
+    artifact: 'Enriched log record',
+    explanation: 'Fluent Bit tails the event, adds service, environment, domain, and source metadata, then exports it as OTLP logs.',
+  },
+  {
+    icon: Network,
+    short: 'OTel Collector',
+    technology: 'OTLP/HTTP · resource · batch',
+    artifact: 'Normalized OTLP JSON batch',
+    explanation: 'The Collector receives OTLP, normalizes resource identity, batches records, keeps its debug exporter, and fans out to the local gateway.',
+  },
+  {
+    icon: ShieldAlert,
+    short: 'Safe gateway',
+    technology: 'Token auth · 64 KiB cap · allow-list',
+    artifact: 'Sanitized telemetry envelope',
+    explanation: 'The gateway rejects unauthenticated external writes, bounds batches, removes unapproved attributes, and redacts inline secrets and workload identifiers.',
+  },
+  {
+    icon: Workflow,
+    short: 'SSE stream',
+    technology: 'SSE + HTTPS fallback · 15 min buffer',
+    artifact: 'Browser-safe event',
+    explanation: 'Only sanitized envelopes enter an ephemeral ring buffer. A reconnecting SSE channel carries events to the browser; a clearly labeled HTTPS poll preserves the same contract when an edge proxy buffers streams.',
+  },
+  {
+    icon: TerminalSquare,
+    short: 'Telemetry inbox',
+    technology: 'React · explicit user action',
+    artifact: 'Selected snapshot',
+    explanation: 'The browser shows what arrived and what was redacted. Collection never triggers an AI diagnosis automatically; the user must select Analyze.',
+  },
+  {
+    icon: Braces,
+    short: 'Evidence API',
+    technology: 'Signal parser · server-only adapters',
+    artifact: 'Xids, metrics, model, driver',
+    explanation: 'The analyzer sends only the selected sanitized snapshot to a server route, extracts exact observability signals, and keeps credentials off the client.',
+  },
+  {
+    icon: Database,
+    short: 'Hybrid retrieval',
+    technology: 'Pinecone · BM25 · RRF',
+    artifact: 'Reranked evidence trace',
+    explanation: 'Pinecone dense candidates and exact-token BM25 results are fused and reranked against the versioned, reviewed corpus.',
+  },
+  {
+    icon: ShieldAlert,
+    short: 'Evidence gate',
+    technology: 'Known-ID check · claim grounding',
+    artifact: 'Cited card or refusal',
+    explanation: 'Unsupported identifiers stop with zero diagnostic citations. Supported signals become a bounded card using only reviewed evidence.',
+  },
+  {
+    icon: Radar,
+    short: 'AI observability',
+    technology: 'OpenTelemetry spans · LangSmith',
+    artifact: 'Redacted RAG trace',
+    explanation: 'Extraction, retrieval, gate, timing, and outcome metadata can fan out to LangSmith. The original GPU message is excluded from the trace export.',
+  },
+] as const;
+
+const waitFor = (milliseconds: number) =>
+  new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
+
+function TelemetryFlowDemo({
+  onAnalyze,
+}: {
+  onAnalyze: (message: string) => Promise<SignalAnalysis | undefined>;
+}) {
+  const [mode, setMode] = useState<'guided' | 'live'>('guided');
+  const [activeStage, setActiveStage] = useState(-1);
+  const [events, setEvents] = useState<TelemetryEvent[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<TelemetryEvent | null>(null);
+  const [running, setRunning] = useState(false);
+  const [streamState, setStreamState] = useState<'idle' | 'connecting' | 'connected' | 'reconnecting' | 'polling'>('idle');
+  const [outcome, setOutcome] = useState<string>('Waiting for a replay.');
+
+  useEffect(() => {
+    if (mode !== 'live') return;
+    let cancelled = false;
+    let cursor = 0;
+    let pollTimer: number | undefined;
+
+    const receive = (event: TelemetryEvent, transport: 'SSE' | 'HTTPS poll') => {
+      cursor = Math.max(cursor, event.sequence);
+      setEvents((current) => [event, ...current.filter((item) => item.id !== event.id)].slice(0, 6));
+      setSelectedEvent((current) => current ?? event);
+      setActiveStage(5);
+      setOutcome(`Sanitized event arrived through the ${transport} telemetry inbox.`);
+    };
+
+    const poll = async () => {
+      try {
+        const response = await fetch(`/api/telemetry/recent?after=${cursor}`, { cache: 'no-store' });
+        if (!response.ok) return;
+        const payload = (await response.json()) as { events: TelemetryEvent[] };
+        for (const event of payload.events) receive(event, 'HTTPS poll');
+      } catch {
+        // EventSource continues reconnecting; the next bounded poll retries.
+      }
+    };
+
+    const startPollingFallback = () => {
+      if (cancelled || pollTimer !== undefined) return;
+      setStreamState('polling');
+      void poll();
+      pollTimer = window.setInterval(() => void poll(), 1_500);
+    };
+
+    const stream = new EventSource('/api/telemetry/stream');
+    stream.addEventListener('ready', () => {
+      setStreamState('connected');
+      window.clearTimeout(fallbackTimer);
+      if (pollTimer !== undefined) window.clearInterval(pollTimer);
+      pollTimer = undefined;
+    });
+    stream.addEventListener('telemetry', (message) => {
+      const event = JSON.parse((message as MessageEvent<string>).data) as TelemetryEvent;
+      receive(event, 'SSE');
+    });
+    stream.onerror = () => {
+      setStreamState((current) => (current === 'polling' ? current : 'reconnecting'));
+      startPollingFallback();
+    };
+    const fallbackTimer = window.setTimeout(startPollingFallback, 2_500);
+    return () => {
+      cancelled = true;
+      stream.close();
+      window.clearTimeout(fallbackTimer);
+      if (pollTimer !== undefined) window.clearInterval(pollTimer);
+    };
+  }, [mode]);
+
+  async function emitSyntheticEvent(sampleId: string = samples[0].id): Promise<TelemetryEvent> {
+    const response = await fetch('/api/telemetry/replay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sampleId }),
+      cache: 'no-store',
+    });
+    if (!response.ok) throw new Error('The safe replay gateway did not accept the event.');
+    const payload = (await response.json()) as { event: TelemetryEvent };
+    setEvents((current) => [payload.event, ...current.filter((item) => item.id !== payload.event.id)].slice(0, 6));
+    setSelectedEvent(payload.event);
+    return payload.event;
+  }
+
+  async function runGuidedReplay(): Promise<void> {
+    if (running) return;
+    setRunning(true);
+    setOutcome('Synthetic GPU event emitted.');
+    setActiveStage(0);
+    try {
+      for (let stage = 1; stage <= 2; stage += 1) {
+        await waitFor(520);
+        setActiveStage(stage);
+      }
+      await waitFor(520);
+      const event = await emitSyntheticEvent();
+      setActiveStage(3);
+      setOutcome(`Gateway accepted the event and removed ${event.redactionCount} unapproved field${event.redactionCount === 1 ? '' : 's'}.`);
+      for (let stage = 4; stage <= 5; stage += 1) {
+        await waitFor(620);
+        setActiveStage(stage);
+      }
+      setOutcome('User-approved analysis is now running on the sanitized snapshot.');
+      setActiveStage(6);
+      const resultPromise = onAnalyze(event.message);
+      await waitFor(650);
+      setActiveStage(7);
+      const result = await resultPromise;
+      setActiveStage(8);
+      setOutcome(
+        result
+          ? `${result.status === 'refused' ? 'Evidence boundary refused unsupported telemetry' : 'Grounded signal card generated'} with ${result.citations.length} citation${result.citations.length === 1 ? '' : 's'}.`
+          : 'Analysis stopped safely because evidence retrieval was unavailable.',
+      );
+      await waitFor(700);
+      setActiveStage(9);
+    } catch (error) {
+      setOutcome(error instanceof Error ? error.message : 'The guided replay could not complete.');
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  async function emitLiveReplay(): Promise<void> {
+    if (running) return;
+    setRunning(true);
+    setActiveStage(0);
+    setOutcome('Sending one labeled synthetic event through the safe gateway.');
+    try {
+      await waitFor(300);
+      setActiveStage(1);
+      await waitFor(300);
+      setActiveStage(2);
+      const event = await emitSyntheticEvent(samples[events.length % samples.length].id);
+      setActiveStage(5);
+      setOutcome(`Gateway accepted event ${event.id}; ${event.redactionCount} field${event.redactionCount === 1 ? '' : 's'} removed before browser delivery.`);
+    } catch (error) {
+      setOutcome(error instanceof Error ? error.message : 'The live replay could not be emitted.');
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  async function analyzeSelected(): Promise<void> {
+    if (!selectedEvent || running) return;
+    setRunning(true);
+    setActiveStage(6);
+    setOutcome('Analyzing only the selected sanitized snapshot.');
+    const resultPromise = onAnalyze(selectedEvent.message);
+    await waitFor(500);
+    setActiveStage(7);
+    const result = await resultPromise;
+    setActiveStage(8);
+    setOutcome(
+      result
+        ? `${result.status === 'refused' ? 'Safely refused' : 'Signal card ready'} · ${result.citations.length} citations · ${result.diagnostics.retrievalBackend}`
+        : 'Analysis stopped safely because the evidence service was unavailable.',
+    );
+    await waitFor(500);
+    setActiveStage(9);
+    setRunning(false);
+  }
+
+  const inspectedStage = telemetryFlowSteps[Math.max(activeStage, 0)];
+  return (
+    <section id="telemetry-flow" className="relative z-10 border-b border-border/70 bg-[radial-gradient(circle_at_80%_10%,oklch(0.82_0.16_165/.08),transparent_30%),linear-gradient(180deg,oklch(0.145_0.015_250),oklch(0.175_0.02_242))] py-16">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="mb-8 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div className="max-w-3xl">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">Live telemetry integration</p>
+            <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight sm:text-4xl">See collection, sanitization, retrieval, and AI observability move as one system.</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">Guided replay demonstrates every component automatically. Live mode opens the real SSE inbox used by the local Fluent Bit → OpenTelemetry Collector → gateway workflow, with a labeled HTTPS fallback when an edge host buffers streams.</p>
+          </div>
+          <fieldset className="flex rounded-xl border border-border/70 bg-black/20 p-1">
+            <legend className="sr-only">Telemetry demo mode</legend>
+            <Button size="sm" variant={mode === 'guided' ? 'secondary' : 'ghost'} onClick={() => { setStreamState('idle'); setMode('guided'); }}>Guided replay</Button>
+            <Button size="sm" variant={mode === 'live' ? 'secondary' : 'ghost'} onClick={() => { setStreamState('connecting'); setMode('live'); }}>Live telemetry</Button>
+          </fieldset>
+        </div>
+
+        <Card className="overflow-hidden border border-primary/20 bg-card/80">
+          <CardHeader className="border-b border-border/60">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <CardTitle className="flex items-center gap-2"><Network className="size-4 text-primary" /> Component flow</CardTitle>
+                <CardDescription className="mt-1">Green means completed; the bright node is the component currently handling the signal.</CardDescription>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {mode === 'live' && (
+                  <Badge variant="outline" className={streamState === 'connected' || streamState === 'polling' ? 'border-emerald-400/25 bg-emerald-400/8 text-emerald-300' : 'border-amber-300/20 bg-amber-300/5 text-amber-200'}>
+                    <span className={`size-1.5 rounded-full ${streamState === 'connected' || streamState === 'polling' ? 'bg-emerald-300' : 'bg-amber-300'}`} /> {streamState === 'polling' ? 'Live HTTPS fallback' : `SSE ${streamState}`}
+                  </Badge>
+                )}
+                <Button disabled={running} onClick={() => void (mode === 'guided' ? runGuidedReplay() : emitLiveReplay())} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                  {running ? <LoaderCircle className="size-4 animate-spin" /> : <Play className="size-4" />}
+                  {mode === 'guided' ? 'Run end-to-end flow' : 'Emit safe replay'}
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-5">
+            <div className="overflow-x-auto pb-3">
+              <ol className="grid min-w-[1180px] grid-cols-10 gap-2" aria-label="Telemetry to RAG component flow">
+                {telemetryFlowSteps.map((step, index) => {
+                  const complete = index < activeStage;
+                  const active = index === activeStage;
+                  return (
+                    <li key={step.short}>
+                      <button type="button" onClick={() => setActiveStage(index)} className={`group relative h-full min-h-28 w-full rounded-xl border p-3 text-left transition ${active ? 'border-primary/60 bg-primary/12 shadow-lg shadow-primary/8' : complete ? 'border-emerald-400/20 bg-emerald-400/[0.045]' : 'border-border/70 bg-black/15 hover:border-primary/30'}`}>
+                        <span className={`grid size-8 place-items-center rounded-lg ${active ? 'bg-primary/18 text-primary' : complete ? 'bg-emerald-400/10 text-emerald-300' : 'bg-muted text-muted-foreground'}`}>{complete ? <Check className="size-4" /> : <step.icon className="size-4" />}</span>
+                        <p className={`mt-4 text-xs font-medium ${active ? 'text-primary' : 'text-foreground'}`}>{step.short}</p>
+                        <p className="mt-1 font-mono text-[8px] leading-4 text-muted-foreground">{step.technology}</p>
+                        {index < telemetryFlowSteps.length - 1 && <ChevronRight className="absolute -right-2.5 top-1/2 z-10 size-3.5 -translate-y-1/2 text-primary/45" />}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+
+            <div className="mt-2 grid gap-4 lg:grid-cols-[.85fr_1.15fr]">
+              <div className="rounded-xl border border-primary/20 bg-primary/[0.045] p-4" aria-live="polite">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">Component inspector</p>
+                  <span className="font-mono text-[9px] text-muted-foreground">{activeStage >= 0 ? `${activeStage + 1}/10` : 'ready'}</span>
+                </div>
+                <h3 className="mt-3 font-heading text-lg font-semibold">{activeStage >= 0 ? inspectedStage.short : 'Start the flow'}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{activeStage >= 0 ? inspectedStage.explanation : 'Run the guided replay to animate the full system, or switch to Live telemetry to watch sanitized events arrive over SSE.'}</p>
+                <div className="mt-4 rounded-lg border border-border/70 bg-black/20 px-3 py-2 font-mono text-[10px] text-slate-300">{activeStage >= 0 ? inspectedStage.artifact : 'No artifact yet'}</div>
+                <p className="mt-3 text-xs leading-5 text-emerald-200/80">{outcome}</p>
+              </div>
+
+              <div className="rounded-xl border border-border/70 bg-black/15 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">Sanitized telemetry inbox</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Ephemeral · last 15 minutes · no raw secret attributes</p>
+                  </div>
+                  <Button size="sm" variant="outline" disabled={!selectedEvent || running} onClick={() => void analyzeSelected()}><Search className="size-3.5" /> Analyze selected</Button>
+                </div>
+                {events.length === 0 ? (
+                  <div className="mt-4 grid min-h-28 place-items-center rounded-xl border border-dashed border-border/70 text-center text-xs leading-5 text-muted-foreground">No events in this browser session.<br />Run a replay or send OTLP JSON locally.</div>
+                ) : (
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                    {events.slice(0, 4).map((event) => (
+                      <button key={event.id} type="button" onClick={() => setSelectedEvent(event)} className={`rounded-xl border p-3 text-left transition ${selectedEvent?.id === event.id ? 'border-primary/45 bg-primary/[0.07]' : 'border-border/70 bg-card/60 hover:border-primary/25'}`}>
+                        <div className="flex items-center justify-between gap-2">
+                          <Badge variant="outline" className="border-primary/20 font-mono text-[8px] text-primary">{event.source}</Badge>
+                          <span className="font-mono text-[8px] text-muted-foreground">{event.redactionCount} removed</span>
+                        </div>
+                        <p className="mt-2 line-clamp-2 font-mono text-[10px] leading-4 text-slate-300">{event.message}</p>
+                        <p className="mt-2 truncate font-mono text-[8px] text-muted-foreground">{event.serviceName} · {event.environment}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-2 text-xs sm:grid-cols-3">
+              <p className="rounded-xl border border-emerald-400/15 bg-emerald-400/[0.035] px-3 py-2.5 text-emerald-100/70"><Check className="mr-2 inline size-3 text-emerald-300" />Public button emits known synthetic samples only.</p>
+              <p className="rounded-xl border border-amber-300/15 bg-amber-300/[0.035] px-3 py-2.5 text-amber-100/70"><ShieldAlert className="mr-2 inline size-3 text-amber-300" />External OTLP writes require a server-only token.</p>
+              <p className="rounded-xl border border-primary/15 bg-primary/[0.035] px-3 py-2.5 text-slate-300"><Database className="mr-2 inline size-3 text-primary" />Buffer is intentionally ephemeral, not a log archive.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
+}
+
 function SignalTokens({ analysis }: { analysis: SignalAnalysis }) {
   const tokens = [
     ...analysis.observed.xids.map((xid) => `Xid ${xid}`),
@@ -521,13 +869,16 @@ export default function Home() {
     return () => controller.abort();
   }, []);
 
-  async function runAnalysis(telemetry: string): Promise<void> {
+  async function runAnalysis(telemetry: string): Promise<SignalAnalysis | undefined> {
     setLoading(true);
     setAnalysisError(null);
     try {
-      setAnalysis(await requestSignalAnalysis(telemetry));
+      const result = await requestSignalAnalysis(telemetry);
+      setAnalysis(result);
+      return result;
     } catch (error) {
       setAnalysisError(error instanceof Error ? error.message : 'Analysis is temporarily unavailable.');
+      return undefined;
     } finally {
       setLoading(false);
     }
@@ -550,6 +901,8 @@ export default function Home() {
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex" aria-label="Main navigation">
             <a className="transition hover:text-foreground" href="#analyze">Analyze</a>
             <a className="transition hover:text-foreground" href="#walkthrough">Visual demo</a>
+            <a className="transition hover:text-foreground" href="#telemetry-flow">Telemetry</a>
+            <a className="transition hover:text-foreground" href="#performance-lab">Performance</a>
             <a className="transition hover:text-foreground" href="#architecture">Architecture</a>
             <a className="transition hover:text-foreground" href="#integrations">AI observability</a>
             <a className="transition hover:text-foreground" href="#evaluation">Evaluation</a>
@@ -670,6 +1023,15 @@ export default function Home() {
 
       <PipelineWalkthrough />
 
+      <TelemetryFlowDemo
+        onAnalyze={async (message) => {
+          setInput(message);
+          return runAnalysis(message);
+        }}
+      />
+
+      <PerformanceWorkbench />
+
       <section id="architecture" className="relative z-10 border-y border-border/70 bg-black/10 py-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <div className="mb-9 flex flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -697,18 +1059,18 @@ export default function Home() {
             <Card className="border border-border/70 bg-card/70">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Network className="size-4 text-primary" /> Telemetry integration</CardTitle>
-                <CardDescription>Optional collection replay; the analyzer sends only the submitted snapshot to a server-side evidence service.</CardDescription>
+                <CardDescription>Implemented collection replay with a sanitized browser inbox and an explicit analysis boundary.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-muted-foreground">
-                  {['GPU/kernel log', 'Fluent Bit', 'OTLP', 'OTel Collector', 'Debug + LangSmith*'].map((label, index) => (
+                  {['GPU/kernel log', 'Fluent Bit', 'OTel Collector', 'Safe gateway', 'SSE inbox', 'Evidence API'].map((label, index) => (
                     <span key={label} className="contents">
                       <span className="rounded-lg border border-border bg-black/15 px-3 py-2 text-foreground">{label}</span>
-                      {index < 4 && <ChevronRight className="size-3.5 text-primary" />}
+                      {index < 5 && <ChevronRight className="size-3.5 text-primary" />}
                     </span>
                   ))}
                 </div>
-                <p className="mt-3 text-xs leading-5 text-muted-foreground">The default replay ends at the Collector debug exporter. A separate checked-in trace pipeline can fan out redacted RAG spans to LangSmith when its server-only key is configured. Raw GPU telemetry is excluded by default.</p>
+                <p className="mt-3 text-xs leading-5 text-muted-foreground">The Collector keeps detailed debug output and also posts OTLP JSON to a token-gated local gateway. The gateway bounds, allow-lists, redacts, and buffers events before SSE delivery. Analysis remains an explicit user action; only the selected sanitized snapshot reaches the evidence API, and only redacted RAG spans can fan out to LangSmith.</p>
               </CardContent>
             </Card>
             <Card className="border border-border/70 bg-card/70">
@@ -799,10 +1161,11 @@ export default function Home() {
               <CardTitle className="flex items-center gap-2"><Workflow className="size-4 text-primary" /> Technology responsibility matrix</CardTitle>
               <CardDescription>Collection, evidence, and AI quality are separate concerns connected by inspectable contracts.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-2 md:grid-cols-5">
+            <CardContent className="grid gap-2 md:grid-cols-3 lg:grid-cols-6">
               {[
                 ['Fluent Bit', 'Collect + enrich GPU and Kubernetes logs', 'OTLP logs'],
                 ['OpenTelemetry', 'Normalize telemetry and emit redacted RAG spans', 'Logs + traces'],
+                ['Safe gateway', 'Authenticate, bound, redact, and stream selected telemetry', 'Sanitized SSE'],
                 ['You.com', 'Discover allow-listed public documentation', 'Review candidates'],
                 ['Pinecone', 'Serve approved dense-vector candidates', 'Versioned vectors'],
                 ['LangSmith', 'Inspect RAG traces and run evaluation datasets', 'Quality signals'],

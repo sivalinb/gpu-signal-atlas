@@ -7,7 +7,7 @@ GPU Signal Atlas uses two optional-by-design integrations to improve corpus fres
 - **You.com Search API** discovers current public documentation from approved domains. Results become review candidates; they do not enter the operational corpus automatically.
 - **LangSmith** receives redacted OpenTelemetry traces for the extraction, retrieval, evidence-gating, and generation path. The original pasted telemetry is not exported.
 
-Pinecone remains the managed vector database for reviewed corpus records. Fluent Bit and OpenTelemetry remain the collection and normalization layer for logs and traces.
+Pinecone remains the managed vector database for reviewed corpus records. Fluent Bit and OpenTelemetry remain the collection and normalization layer for logs and traces. The implemented token-gated telemetry gateway sits between the Collector and browser, so You.com, Pinecone, and LangSmith never become raw-log transport services.
 
 ## End-to-end map
 
@@ -21,7 +21,7 @@ flowchart LR
   end
 
   subgraph R[Runtime evidence plane]
-    T[Pasted GPU telemetry] --> X[Signal extraction]
+    T[Pasted or selected sanitized GPU telemetry] --> X[Signal extraction]
     X --> B[BM25]
     X --> P
     B --> F[RRF + bounded boosts]
@@ -45,6 +45,7 @@ flowchart LR
 |---|---|---|---|
 | Fluent Bit | Tail, parse, and enrich GPU/Kubernetes logs | OTLP log records | It is not a vector database or RAG engine. |
 | OpenTelemetry | Normalize logs and represent RAG work as traces | OTLP logs and spans | Redaction happens before external trace export. |
+| Telemetry gateway + SSE | Authenticate, bound, sanitize, retain briefly, and deliver | Browser-safe event envelope | Public input is synthetic-only; external OTLP requires a token. |
 | You.com | Discover current allow-listed public sources | Pending-review source candidates | No telemetry input and no automatic corpus promotion. |
 | Pinecone | Serve dense candidates from approved corpus records | Versioned 256-dimensional vectors + metadata | Only reviewed records are synchronized. |
 | LangSmith | Inspect RAG traces and support datasets/evaluators | Redacted timings, ranks, outcomes, and identifiers | No raw pasted telemetry by default. |

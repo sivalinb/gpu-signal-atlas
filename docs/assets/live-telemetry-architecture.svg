@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071015"/>
+      <stop offset="1" stop-color="#10252a"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity="0.32"/>
+    </filter>
+    <marker id="green-arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+      <path d="M0 0L11 5.5 0 11Z" fill="#73E6B2"/>
+    </marker>
+    <marker id="gold-arrow" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+      <path d="M0 0L11 5.5 0 11Z" fill="#F2C66D"/>
+    </marker>
+  </defs>
+  <rect width="1600" height="900" rx="36" fill="url(#bg)"/>
+  <g opacity="0.09" stroke="#73E6B2"><path d="M0 150H1600M0 300H1600M0 450H1600M0 600H1600M0 750H1600"/><path d="M200 0V900M400 0V900M600 0V900M800 0V900M1000 0V900M1200 0V900M1400 0V900"/></g>
+
+  <text x="80" y="82" fill="#73E6B2" font-family="Arial, sans-serif" font-size="21" font-weight="700" letter-spacing="4">GPU SIGNAL ATLAS · IMPLEMENTED ARCHITECTURE</text>
+  <text x="80" y="134" fill="#F4F7F7" font-family="Arial, sans-serif" font-size="46" font-weight="700">Live telemetry becomes evidence—only after a safe boundary</text>
+  <text x="80" y="177" fill="#9DB0B5" font-family="Arial, sans-serif" font-size="23">Collection, sanitization, live visualization, retrieval, grounding, and AI observability.</text>
+
+  <g filter="url(#shadow)" font-family="Arial, sans-serif">
+    <g transform="translate(80 246)">
+      <rect width="190" height="126" rx="20" fill="#101D22" stroke="#2D4E50"/>
+      <text x="20" y="34" fill="#73E6B2" font-size="14" font-weight="700" letter-spacing="2">SOURCE</text>
+      <text x="20" y="70" fill="#F4F7F7" font-size="23" font-weight="700">GPU signals</text>
+      <text x="20" y="99" fill="#9DB0B5" font-size="16">Xid · DCGM · logs</text>
+    </g>
+    <g transform="translate(310 246)">
+      <rect width="190" height="126" rx="20" fill="#101D22" stroke="#2D4E50"/>
+      <text x="20" y="34" fill="#73E6B2" font-size="14" font-weight="700" letter-spacing="2">COLLECT</text>
+      <text x="20" y="70" fill="#F4F7F7" font-size="23" font-weight="700">Fluent Bit</text>
+      <text x="20" y="99" fill="#9DB0B5" font-size="16">Tail + enrich</text>
+    </g>
+    <g transform="translate(540 246)">
+      <rect width="210" height="126" rx="20" fill="#101D22" stroke="#2D4E50"/>
+      <text x="20" y="34" fill="#73E6B2" font-size="14" font-weight="700" letter-spacing="2">NORMALIZE</text>
+      <text x="20" y="70" fill="#F4F7F7" font-size="23" font-weight="700">OTel Collector</text>
+      <text x="20" y="99" fill="#9DB0B5" font-size="16">OTLP/HTTP JSON</text>
+    </g>
+    <g transform="translate(790 225)">
+      <rect width="242" height="168" rx="22" fill="#15322F" stroke="#73E6B2" stroke-width="2"/>
+      <text x="22" y="36" fill="#73E6B2" font-size="14" font-weight="700" letter-spacing="2">TRUST BOUNDARY</text>
+      <text x="22" y="73" fill="#F4F7F7" font-size="23" font-weight="700">Safe gateway</text>
+      <text x="22" y="105" fill="#BCEFD9" font-size="16">Token gate · 64 KiB cap</text>
+      <text x="22" y="130" fill="#BCEFD9" font-size="16">Allow-list · redact · bound</text>
+      <text x="22" y="154" fill="#BCEFD9" font-size="16">15-minute memory only</text>
+    </g>
+    <g transform="translate(1072 246)">
+      <rect width="190" height="126" rx="20" fill="#101D22" stroke="#2D4E50"/>
+      <text x="20" y="34" fill="#73E6B2" font-size="14" font-weight="700" letter-spacing="2">VISUALIZE</text>
+      <text x="20" y="70" fill="#F4F7F7" font-size="23" font-weight="700">SSE inbox</text>
+      <text x="20" y="99" fill="#9DB0B5" font-size="16">Sanitized envelope</text>
+    </g>
+    <g transform="translate(1302 246)">
+      <rect width="218" height="126" rx="20" fill="#101D22" stroke="#6A5732"/>
+      <text x="20" y="34" fill="#F2C66D" font-size="14" font-weight="700" letter-spacing="2">USER CONTROL</text>
+      <text x="20" y="70" fill="#F4F7F7" font-size="23" font-weight="700">Analyze</text>
+      <text x="20" y="99" fill="#C6B999" font-size="16">Explicit button click</text>
+    </g>
+  </g>
+
+  <g stroke="#73E6B2" stroke-width="4" fill="none" marker-end="url(#green-arrow)" opacity="0.85">
+    <path d="M272 309H302"/><path d="M502 309H532"/><path d="M752 309H782"/><path d="M1034 309H1064"/>
+  </g>
+  <path d="M1264 309H1294" fill="none" stroke="#F2C66D" stroke-width="4" marker-end="url(#gold-arrow)"/>
+
+  <g font-family="Arial, sans-serif" filter="url(#shadow)">
+    <rect x="270" y="506" width="1060" height="160" rx="26" fill="#0C181D" stroke="#2D4E50"/>
+    <text x="310" y="546" fill="#73E6B2" font-size="14" font-weight="700" letter-spacing="2">EVIDENCE PLANE</text>
+    <text x="310" y="590" fill="#F4F7F7" font-size="25" font-weight="700">Evidence API</text>
+    <text x="495" y="590" fill="#7E9298" font-size="23">→</text>
+    <text x="535" y="590" fill="#F4F7F7" font-size="25" font-weight="700">Pinecone + BM25</text>
+    <text x="775" y="590" fill="#7E9298" font-size="23">→</text>
+    <text x="815" y="590" fill="#F4F7F7" font-size="25" font-weight="700">Evidence gate</text>
+    <text x="1000" y="590" fill="#7E9298" font-size="23">→</text>
+    <text x="1040" y="590" fill="#F4F7F7" font-size="25" font-weight="700">Cited card / refusal</text>
+    <text x="310" y="628" fill="#9DB0B5" font-size="17">Hybrid retrieval · reciprocal-rank fusion · exact-signal checks · claim-to-citation validation</text>
+  </g>
+  <path d="M1410 377V454Q1410 486 1378 486H812Q800 486 800 498" fill="none" stroke="#F2C66D" stroke-width="4" marker-end="url(#gold-arrow)"/>
+
+  <g font-family="Arial, sans-serif">
+    <rect x="80" y="720" width="1440" height="104" rx="24" fill="#0B171B" stroke="#2D4E50"/>
+    <rect x="108" y="748" width="296" height="46" rx="23" fill="#15322F" stroke="#73E6B2"/><text x="256" y="777" fill="#BCEFD9" text-anchor="middle" font-size="17">✓ raw event never indexed</text>
+    <rect x="430" y="748" width="318" height="46" rx="23" fill="#15322F" stroke="#73E6B2"/><text x="589" y="777" fill="#BCEFD9" text-anchor="middle" font-size="17">✓ browser receives sanitized data</text>
+    <rect x="774" y="748" width="326" height="46" rx="23" fill="#15322F" stroke="#73E6B2"/><text x="937" y="777" fill="#BCEFD9" text-anchor="middle" font-size="17">✓ analysis requires user action</text>
+    <rect x="1126" y="748" width="366" height="46" rx="23" fill="#15322F" stroke="#73E6B2"/><text x="1309" y="777" fill="#BCEFD9" text-anchor="middle" font-size="17">✓ LangSmith receives redacted trace</text>
+  </g>
+  <text x="80" y="866" fill="#7E9298" font-family="Arial, sans-serif" font-size="17">Public replay is synthetic · external OTLP ingestion is disabled until a server-side token is configured</text>
+</svg>

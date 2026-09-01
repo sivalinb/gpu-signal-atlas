@@ -9,14 +9,17 @@ examples/gpu-events.log
   -> OTLP/HTTP POST /v1/logs
   -> OpenTelemetry Collector OTLP receiver
   -> resource processor + batch processor
-  -> debug exporter
+  -> debug exporter + token-gated OTLP/JSON gateway
+  -> allow-list + redaction + 15-minute buffer
+  -> SSE browser inbox
+  -> explicit Analyze action
 ```
 
 Fluent Bit reads the synthetic log fixture, parses the timestamp and message, and adds stable resource context: `service.name`, `service.namespace`, `deployment.environment.name`, `event.domain`, and `telemetry.source`. Its OpenTelemetry output serializes records as OTLP logs and sends them to the Collector on localhost.
 
-The Collector accepts OTLP over HTTP or gRPC, upserts the core service resource attributes, batches records, and prints the resulting telemetry through its debug exporter. This proves parsing, enrichment, transport, and Collector normalization without requiring a storage backend.
+The Collector accepts OTLP over HTTP or gRPC, upserts the core service resource attributes, batches records, and prints the resulting telemetry through its debug exporter. A second exporter posts JSON to the local gateway with `TELEMETRY_INGEST_TOKEN`. The gateway enforces body/batch limits, allow-lists metadata, redacts inline secrets and workload identifiers, and exposes only sanitized envelopes to a reconnecting SSE inbox. The website labels and uses a bounded `/api/telemetry/recent` polling fallback when its hosting edge buffers long-lived streams.
 
-The browser application is deliberately separate. Copy a replayed record into the analyzer to run the deterministic retrieval/evidence flow. A production implementation can replace that manual boundary with an authenticated adapter from Loki, OpenSearch, ClickHouse, a SIEM, or an OTLP-derived event stream.
+Collection remains deliberately separate from analysis: an arriving event is displayed but is never diagnosed automatically. The user selects one sanitized event and clicks **Analyze selected** to run the deterministic retrieval/evidence flow. A production implementation can replace the in-memory ring buffer with a tenant-isolated adapter from Loki, OpenSearch, ClickHouse, a SIEM, Kafka, or another OTLP-derived event stream while preserving this explicit boundary.
 
 The analyzer also emits an application diagnostic envelope on every result: trace ID, execution duration, evidence margin, matched semantic intents, decision reasons, and corpus version. The API maps extraction, retrieval, and evidence-gate/generation work to OpenTelemetry spans and can export them to LangSmith:
 
@@ -28,4 +31,4 @@ The analyzer also emits an application diagnostic envelope on every result: trac
 
 LangSmith export is fail-open. The current public deployment has it configured. Missing configuration reports `disabled`, and a network/exporter failure reports `failed`; the analysis result is still returned. Set `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`, and optionally `LANGSMITH_OTEL_ENDPOINT` in a server-only environment to activate it elsewhere.
 
-Do not place raw production logs or credentials in the public demo. Redact workload names, tenant identifiers, and tokens before analysis.
+The public replay endpoint accepts only checked-in synthetic fixtures; do not place production logs or credentials in the public demo. External OTLP ingestion must use a private deployment with tenant isolation, retention controls, quotas, and a rotated token.

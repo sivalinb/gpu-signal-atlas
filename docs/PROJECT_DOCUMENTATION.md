@@ -128,13 +128,13 @@ Recorded result:
 | p95 local latency | 0.92 ms |
 | p95 Pinecone retrieval latency | 518.05 ms |
 
-The expanded test suite contains 35 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and metadata, model contracts, ablations, observability configuration, public status redaction, You.com governance, and LangSmith redaction/export contracts. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
+The expanded test suite contains 46 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and metadata, model contracts, ablations, observability configuration, telemetry redaction and OTLP normalization, immediate SSE delivery, public status redaction, You.com governance, LangSmith redaction/export contracts, public benchmark provenance, SLO evaluation, comparison math, capacity headroom, and report safety boundaries. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
 
 ## Observability integration
 
-The repository contains a Fluent Bit tail/parser configuration, resource enrichment, and an OpenTelemetry Collector OTLP receiver with resource normalization and debug output. It replays synthetic GPU logs through `http://127.0.0.1:4318/v1/logs`.
+The repository contains a Fluent Bit tail/parser configuration, resource enrichment, and an OpenTelemetry Collector OTLP receiver with resource normalization. It replays synthetic GPU logs through `http://127.0.0.1:4318/v1/logs`. The Collector fans out to detailed debug output and a token-gated OTLP/JSON gateway at `http://127.0.0.1:3000/api/telemetry/v1/logs`.
 
-This optional path shows how GPU telemetry can be normalized and transported. It intentionally ends at the Collector debug exporter. The browser sends pasted text to the same-origin analysis route, which uses Pinecone only for reviewed-document retrieval; it does not imply a direct collector-to-RAG connection.
+The gateway accepts at most 64 KiB and 20 events, allow-lists low-risk observability metadata, redacts inline credentials and workload identifiers, and keeps at most 50 sanitized events for 15 minutes. A reconnecting Server-Sent Events route carries only those envelopes to the browser and flushes its ready event immediately. When a hosting edge buffers streams, the UI explicitly labels and uses a 1.5-second HTTPS poll of the same sanitized buffer. The public replay button accepts only checked-in synthetic samples; arbitrary external writes require `TELEMETRY_INGEST_TOKEN`. Collection never triggers analysis automatically. The operator explicitly selects an inbox event, after which only that sanitized snapshot reaches the Pinecone-backed evidence service.
 
 The project now also implements two optional-by-design external control planes that are configured in the current public deployment. You.com searches only allow-listed public documentation and emits `pending-review` candidates with provenance and fingerprints; it cannot change the corpus or Pinecone automatically. LangSmith accepts redacted OpenTelemetry traces from extraction, retrieval, evidence gating, and generation. These spans include identifiers, ranks, latency, versions, result status, and citation count, but not the original telemetry string. Both integrations are server-side, key-activated, and fail safely when disabled or unavailable.
 
@@ -144,7 +144,9 @@ The technology mapping is deliberate: Fluent Bit collects and enriches logs; Ope
 
 The first viewport is a working analysis surface rather than a marketing page. It contains four replay buttons, editable telemetry, a live retrieval trace, grounded/refusal output, evidence steps, limitations, and citations.
 
-Below the analyzer, the website explains the five-stage RAG flow, optional telemetry pipeline, safety contract, evaluation metrics, query mix, and local commands.
+Below the analyzer, the website includes the nine-stage corpus/RAG walkthrough and a separate ten-component telemetry visualization with guided and live modes. The live mode exposes the active transport (SSE or labeled HTTPS fallback), sanitized inbox events, redaction counts, component technology, intermediate artifacts, explicit analysis, safety controls, evaluation metrics, and local commands.
+
+The performance workbench adds five solution-architecture views: public benchmark comparison, SLO evaluation, benchmark-to-telemetry correlation, fleet/MIG and diagnostics governance, capacity/cost scenarios, and an exportable decision package. Public measurements and derived scenarios use different evidence labels. Pinecone remains responsible for textual evidence; structured benchmark results are exposed through dedicated data contracts and APIs.
 
 ## Learnings
 
@@ -161,7 +163,7 @@ Below the analyzer, the website explains the five-stage RAG flow, optional telem
 - Synthetic telemetry fixtures
 - Local feature-hash embedding rather than a trained semantic model
 - Template generator rather than an LLM
-- No live observability backend
+- Ephemeral single-process telemetry buffer rather than a durable, tenant-isolated event bus
 - No production action or remediation
 - No generalized GPU diagnostic-accuracy claim
 
@@ -178,6 +180,7 @@ Below the analyzer, the website explains the five-stage RAG flow, optional telem
 - Five-minute demo script
 - Public Google Doc with Week 2 requirement mapping and expert assessment
 - Interactive start-to-finish visual pipeline walkthrough
+- Implemented Fluent Bit/OpenTelemetry → safe gateway → SSE inbox → explicit RAG analysis flow
 - Persistent vector-index build and verification scripts
 - Implemented ingestion and freshness workflow
 - Optional schema-constrained LLM mode

@@ -1,6 +1,6 @@
 # GPU Signal Atlas
 
-GPU Signal Atlas is a citation-first retrieval-augmented generation (RAG) application for NVIDIA Xid events, DCGM metrics, and GPU observability pipelines. It turns a pasted telemetry sample into a bounded signal card containing documented meaning, evidence to collect next, compatibility cautions, and direct source citations.
+GPU Signal Atlas is an evidence-first GPU observability and performance-intelligence product. Its citation-first RAG path turns NVIDIA Xid events and DCGM metrics into bounded signal cards; its performance workbench turns public or imported inference benchmark results into SLO checks, telemetry correlations, topology/MIG review, capacity scenarios, and exportable architecture evidence.
 
 The project is intentionally different from a root-cause or remediation agent. It does not query production systems, execute recovery actions, or claim that a single telemetry event proves a cause. Its portfolio focus is corpus design, hybrid retrieval, reranking, citation hygiene, refusal behavior, and measurable evaluation.
 
@@ -29,8 +29,17 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 - Allow-listed ingestion, HTML cleaning, source fingerprinting, and freshness-SLA gates
 - Node test suite, type checking, production build, and GitHub Actions CI
 - Optional Fluent Bit → OTLP → OpenTelemetry Collector replay configuration
+- Token-gated OTLP/JSON telemetry gateway with payload bounds, metadata allow-listing, inline redaction, and a 15-minute in-memory buffer
+- Reconnecting Server-Sent Events inbox with a labeled HTTPS short-poll fallback for stream-buffering edge hosts
 - Governed You.com source discovery with domain allow-listing and a mandatory review queue
 - LangSmith OTLP trace export with raw-telemetry redaction and fail-open behavior
+- Interactive benchmark baseline/candidate comparison using attributable public NVIDIA GenAI-Perf example data
+- TTFT, inter-token latency, request latency, output throughput, GPU power, utilization, memory, and SLO decision views
+- Derived benchmark-to-telemetry correlation timeline mapping AIPerf/GenAI-Perf, Triton, DCGM, OpenTelemetry, and LangSmith
+- Fleet/MIG readiness and passive-health versus active-diagnostics safety workflow
+- Headroom-aware GPU capacity and editable cost-scenario calculator
+- Downloadable JSON evidence report plus browser print-to-PDF workflow
+- Public benchmark listing and server-side comparison APIs
 
 ## Architecture
 
@@ -83,7 +92,9 @@ npm run analyze -- "Xid 79 DCGM_FI_DEV_PCIE_REPLAY_COUNTER=184 H100 R565"
 
 See [`docs/LOCAL_TESTING.md`](docs/LOCAL_TESTING.md) for the complete verification procedure and optional observability replay.
 
-Run the interactive **Visual demo** section on the public site to watch ingestion, cleaning, chunking, indexing, extraction, retrieval, reranking, evidence gating, and generation advance one stage at a time.
+Run the interactive **Visual demo** section on the public site to watch ingestion, cleaning, chunking, indexing, extraction, retrieval, reranking, evidence gating, and generation advance one stage at a time. Then run **Telemetry → Run end-to-end flow** to see a synthetic GPU signal pass through Fluent Bit, OpenTelemetry, the sanitizer, browser inbox, analyzer, Pinecone/BM25 retrieval, evidence gate, and redacted LangSmith trace. Live mode uses SSE directly and clearly reports an HTTPS polling fallback if the hosting edge buffers streams.
+
+Open **Performance** in the main navigation for the solution-architecture workflow. Compare the bundled public NVIDIA benchmark runs, inspect SLO decisions, visualize how benchmark and telemetry systems align, review a safe MIG/diagnostics workflow, edit a headroom/cost scenario, and export the evidence report. Public measurements and derived scenarios are labeled separately throughout the interface.
 
 ## Evaluation snapshot
 
@@ -116,6 +127,8 @@ core/
   llm.ts                     optional strict-schema model adapter
   you.ts                     allow-listed You.com discovery and review candidates
   langsmith.ts               redacted OpenTelemetry trace export
+  telemetry.ts               OTLP normalization, sanitization, bounded buffer
+  benchmark.ts               public run provenance, SLOs, comparisons, capacity, reports
   ablation.ts                retrieval and chunking comparison primitives
   samples.ts                 browser replay inputs
   types.ts                   public data contracts
@@ -129,6 +142,8 @@ scripts/ablate.ts            retrieval and chunking ablation report
 scripts/ingest-source.ts     allow-listed source snapshot workflow
 scripts/discover-you-sources.ts You.com review-candidate workflow
 observability/               Fluent Bit and OTel Collector replay configs
+app/api/telemetry/           token-gated ingest, replay, recent, and SSE routes
+app/api/benchmarks/          public run catalog and comparison report routes
 examples/gpu-events.log      synthetic, labeled GPU telemetry replay
 docs/                        design, visual, evaluation, testing, and submission documentation
 ```
@@ -136,10 +151,14 @@ docs/                        design, visual, evaluation, testing, and submission
 ## Honest boundaries
 
 - The included telemetry is synthetic and labeled as replay data.
+- The bundled benchmark numbers reproduce a public NVIDIA documentation example. Because that example omits the GPU model, full configuration, repetitions, and confidence interval, the application never presents it as a hardware purchasing benchmark.
+- Correlation, capacity, fleet, and cost views are explicitly derived demonstration scenarios until connected to a target environment.
 - The feature-hash embedding is deterministic and reproducible; Pinecone manages storage and similarity search but does not make the representation state of the art.
 - The public website queries Pinecone only from a server route. No Pinecone credential is included in browser JavaScript.
 - You.com receives public documentation discovery queries only; results cannot write to the corpus or Pinecone automatically.
 - LangSmith receives redacted identifiers, ranks, timings, and outcomes; the raw pasted telemetry string is excluded by default.
+- The public replay endpoint accepts only checked-in synthetic samples. External OTLP writes require `TELEMETRY_INGEST_TOKEN`, have a 64 KiB body limit, and expose only allow-listed metadata after redaction.
+- The telemetry inbox is a short-lived demonstration buffer, not a durable log backend; multi-instance production deployments should replace it with a tenant-isolated event bus or short-retention store.
 - Template generation is used so every sentence can be traced to retrieved corpus fields.
 - Official documents are paraphrased into compact curated records; source URLs remain the authority.
 - Every record exposes its review date, rolling/snapshot source status, source section, and deterministic curated-content fingerprint.
@@ -156,8 +175,11 @@ docs/                        design, visual, evaluation, testing, and submission
 - [`docs/EVALUATION_REPORT.md`](docs/EVALUATION_REPORT.md) — query set, metrics, results, and failure analysis
 - [`docs/ABLATION_REPORT.md`](docs/ABLATION_REPORT.md) — retrieval and chunking comparisons
 - [`docs/INGESTION_AND_FRESHNESS.md`](docs/INGESTION_AND_FRESHNESS.md) — source refresh and human-review workflow
+- [`docs/TELEMETRY_LIVE_FLOW.md`](docs/TELEMETRY_LIVE_FLOW.md) — implemented Collector-to-browser gateway, SSE contract, safeguards, and extension points
 - [`docs/LLM_MODE.md`](docs/LLM_MODE.md) — optional model contract and grounding boundary
 - [`docs/YOU_LANGSMITH_INTEGRATION.md`](docs/YOU_LANGSMITH_INTEGRATION.md) — discovery, AI observability, privacy, and scale-out design
+- [`docs/PERFORMANCE_INTELLIGENCE.md`](docs/PERFORMANCE_INTELLIGENCE.md) — public benchmark data, technology mapping, SLOs, correlation, MIG, capacity, APIs, and production extension
+- [`docs/NVIDIA_INTERVIEW_DEMO.md`](docs/NVIDIA_INTERVIEW_DEMO.md) — focused solution-architecture interview walkthrough and follow-up answers
 - [`docs/LOCAL_TESTING.md`](docs/LOCAL_TESTING.md) — local setup and end-to-end verification
 - [`docs/RUNBOOKS.md`](docs/RUNBOOKS.md) — demonstration evidence-collection runbooks
 - [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) — five-minute video walkthrough

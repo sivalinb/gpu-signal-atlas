@@ -42,8 +42,8 @@ npm test
 Expected summary:
 
 ```text
-tests 35
-pass 35
+tests 40
+pass 40
 fail 0
 ```
 
@@ -129,6 +129,8 @@ Also verify:
 - keyboard focus is visible on buttons and links;
 - clicking **Run full pipeline** advances through all nine visual stages;
 - pause, reset, and direct stage selection work; and
+- clicking **Telemetry → Run end-to-end flow** advances through all ten collection, sanitization, RAG, and AI-observability components;
+- switching to **Live telemetry** reports either **SSE connected** or the labeled **Live HTTPS fallback**, **Emit safe replay** adds a sanitized inbox event, and **Analyze selected** updates the main signal card; and
 - the browser console contains no hydration error.
 
 ## 7. Run a CLI analysis
@@ -191,9 +193,22 @@ The booleans should match the integrations configured in `.env.local`, and `secr
 
 ## 8. Optional Fluent Bit and OpenTelemetry replay
 
-Start an OpenTelemetry Collector with the checked-in configuration:
+Add a non-production gateway token to `.env.local` before starting the website:
+
+```text
+TELEMETRY_INGEST_TOKEN=local-demo-only-change-me
+```
+
+Start the website first:
 
 ```bash
+npm run dev
+```
+
+In another terminal, export the same token and start an OpenTelemetry Collector with the checked-in configuration:
+
+```bash
+export TELEMETRY_INGEST_TOKEN=local-demo-only-change-me
 otelcol-contrib --config observability/otel-collector.yaml
 ```
 
@@ -209,13 +224,14 @@ Expected behavior:
 - Parsed events appear on standard output.
 - The OpenTelemetry output sends logs to `http://127.0.0.1:4318/v1/logs`.
 - The collector debug exporter prints received log records.
+- The collector's second OTLP/HTTP exporter sends JSON to `http://127.0.0.1:3000/api/telemetry/v1/logs` with the server-only token.
+- The gateway bounds the payload, allow-lists attributes, redacts secrets/workload identifiers, and keeps at most 50 events for 15 minutes.
+- The website's **Telemetry → Live telemetry** inbox receives only the sanitized envelope over Server-Sent Events. On an edge platform that buffers streaming responses, the UI labels and uses the `/api/telemetry/recent` HTTPS fallback instead of pretending SSE is connected.
 - Records carry `service.name`, `service.namespace`, `deployment.environment.name`, `event.domain`, and `telemetry.source` context.
 
 If Fluent Bit is started from a different directory, update the relative `Path` and `Parsers_File` values or run from the repository root.
 
-This replay validates collection shape only. It does not feed the website automatically and does not make any cluster changes.
-
-To demonstrate the full project flow, copy a record printed by Fluent Bit or the Collector into the website analyzer. A production extension can replace this manual boundary with an authenticated adapter that reads from a log backend or receives OTLP-derived events.
+The replay now feeds the live browser inbox automatically but never auto-analyzes an event and never makes cluster changes. Select the inbox event and click **Analyze selected** to cross the explicit evidence boundary. See [`TELEMETRY_LIVE_FLOW.md`](TELEMETRY_LIVE_FLOW.md) for the API contract, redaction rules, and production queue extension.
 
 ## 9. Full release checklist
 
@@ -243,6 +259,27 @@ Confirm:
 - You.com output remains `pending-review` and `autoPromoted: false`; and
 - sampled LangSmith traces contain no raw telemetry or tenant/workload identifiers.
 
+## 10. Performance workbench and public benchmark API
+
+Open `http://localhost:3000/#performance-lab` and verify all five views:
+
+1. **Benchmark studio:** choose Run A as baseline and Run C as candidate. TTFT and request latency should decrease, output-token throughput should increase, and the default demonstration SLO should pass.
+2. **Signal correlation:** confirm the chart is labeled as a derived demonstration series.
+3. **Fleet & MIG:** confirm passive health, change approval, and active diagnostics are presented as distinct stages.
+4. **Capacity planner:** enter `10 req/s`, `30%` headroom, and `$4/hour`; the result should be `11` GPUs and `$32,120/month` for this intentionally illustrative scenario.
+5. **Decision report:** download JSON and confirm it contains `provenance`, `comparison`, `capacity`, and `safetyBoundary`. Use **Print / PDF** to test the human-readable export.
+
+API checks:
+
+```bash
+curl -s http://localhost:3000/api/benchmarks
+curl -s -X POST http://localhost:3000/api/benchmarks/compare \
+  -H 'content-type: application/json' \
+  -d '{"baselineId":"gpt2-config-100","candidateId":"gpt2-config-200"}'
+```
+
+The first response must identify the records as `public-measurement` and include a source URL. The comparison response must state that it does not prove root cause or authorize active diagnostics.
+
 ## Troubleshooting
 
 ### Node cannot import `.ts` files in tests
@@ -259,7 +296,7 @@ Run it from the repository root or change `Path` to an absolute path.
 
 ### OTLP export fails
 
-Confirm the collector is listening on `127.0.0.1:4318`, the HTTP receiver is enabled, and no local firewall blocks the connection.
+Confirm the collector is listening on `127.0.0.1:4318`, the website is listening on `127.0.0.1:3000`, both processes use the same `TELEMETRY_INGEST_TOKEN`, the HTTP receiver is enabled, and no local firewall blocks either connection. If the Collector runs in a container, use a host address reachable from that container instead of `127.0.0.1` for the gateway exporter.
 
 ### An expected identifier refuses
 

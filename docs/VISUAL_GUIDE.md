@@ -2,6 +2,8 @@
 
 The public website includes an interactive nine-stage walkthrough. Click **Run full pipeline** to animate source ingestion, cleaning and freshness, structure-aware chunking, persistent indexing, signal extraction, dual retrieval, reranking, the evidence gate, and deterministic or optional schema-constrained generation. Every stage can be paused and selected directly.
 
+It also includes a separate ten-component **Telemetry** visualization. **Guided replay** automatically advances from a synthetic GPU event through Fluent Bit, the OpenTelemetry Collector, safe gateway, browser inbox, evidence API, Pinecone/BM25 retrieval, evidence gate, and LangSmith. **Live telemetry** opens the real SSE stream, displays each sanitized envelope, and requires an explicit click before analysis. If the host buffers streaming responses, the badge changes to **Live HTTPS fallback** and the page polls the same sanitized ring-buffer contract.
+
 This guide explains the project without requiring source-code familiarity.
 
 ## One-screen mental model
@@ -110,7 +112,7 @@ sequenceDiagram
 
 No semantically similar Xid is substituted. The response has zero citations and zero diagnostic claims.
 
-## Optional telemetry pipeline
+## Implemented telemetry pipeline
 
 ```mermaid
 flowchart LR
@@ -119,11 +121,16 @@ flowchart LR
     P[OTLP /v1/logs]
     O[OpenTelemetry Collector]
     D[Debug exporter]
+    G[Token-gated safe gateway]
+    B[15-minute buffer]
+    S[SSE browser inbox]
+    A[Explicit Analyze action]
 
     K --> F --> P --> O --> D
+    O --> G --> B --> S --> A
 ```
 
-This path demonstrates collection and normalization and intentionally ends at the Collector debug exporter. For the demo, copy a replayed record into the browser analyzer. A production adapter can later read from a log backend or OTLP-derived event stream. The RAG evaluation remains independent so it can run on any laptop without Docker, Fluent Bit, a collector, or a GPU.
+This path now demonstrates both collection/normalization and a safe browser delivery boundary. The Collector still prints its debug copy, while a second exporter sends OTLP JSON to `app/api/telemetry/v1/logs`. The gateway authenticates external writes, rejects oversized bodies/batches, allow-lists metadata, redacts credentials and workload identifiers, and exposes a short-lived sanitized envelope over SSE or the labeled `/recent` HTTPS fallback. The browser never auto-analyzes an arriving event. The RAG evaluation remains independent so it can run on any laptop without Fluent Bit, a Collector, or a GPU.
 
 ## External intelligence and AI observability
 
@@ -162,6 +169,12 @@ Answer:   app/page.tsx
 
 Question: Where is the OTLP replay configured?
 Answer:   observability/
+
+Question: Where is telemetry normalized and sanitized?
+Answer:   core/telemetry.ts
+
+Question: Where are ingest, replay, recent, and SSE routes?
+Answer:   app/api/telemetry/
 
 Question: Where is governed You.com discovery implemented?
 Answer:   core/you.ts → scripts/discover-you-sources.ts

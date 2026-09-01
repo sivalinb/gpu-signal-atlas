@@ -12,6 +12,8 @@ flowchart TB
     E[Evaluation suite]
     F[Fluent Bit replay]
     O[OpenTelemetry Collector]
+    G[Sanitizing telemetry gateway]
+    S[SSE telemetry inbox]
 
     U -->|pastes telemetry| W
     W -->|same-origin POST| A
@@ -20,10 +22,33 @@ flowchart TB
     A -->|grounded result or refusal| W
     E -->|regression expectations| A
     F -. optional OTLP logs .-> O
-    O -. normalized replay .-> U
+    O -. token-gated OTLP/JSON .-> G
+    G -. sanitized event .-> S
+    S -->|explicit Analyze| W
 ```
 
 The deployed application keeps input and rendering in the browser but performs retrieval through a same-origin server route. That route is the only component allowed to use the Pinecone credential. The credential-free command-line path and checked-in vector index remain available for deterministic regression testing and ablations.
+
+## Implemented telemetry-to-browser path
+
+![Implemented live telemetry architecture](assets/live-telemetry-architecture.png)
+
+```mermaid
+flowchart LR
+    K[Synthetic GPU log] --> F[Fluent Bit tail + enrichment]
+    F -->|OTLP/HTTP| O[OpenTelemetry Collector]
+    O --> D[Debug exporter]
+    O -->|OTLP JSON + token| G[Telemetry gateway]
+    G -->|allow-list + redact + bound| B[15-minute ring buffer]
+    B -->|SSE sanitized envelope| I[Browser inbox]
+    I -->|explicit Analyze| A[Evidence API]
+    A --> R[Pinecone + BM25 + RRF]
+    R --> E{Evidence gate}
+    E --> C[Cited card or refusal]
+    A -. redacted spans .-> L[LangSmith]
+```
+
+The public replay route can emit only checked-in synthetic samples. The Collector route requires `TELEMETRY_INGEST_TOKEN`, accepts a maximum 64 KiB JSON body and 20 events per batch, allow-lists low-risk observability attributes, redacts inline credentials and workload identifiers, and never writes telemetry to Pinecone. `GET /api/telemetry/stream` returns only the sanitized envelope over Server-Sent Events and flushes its ready event synchronously. If a hosting edge buffers long-lived responses, the browser visibly switches to bounded polling of `GET /api/telemetry/recent`; both transports expose the same sanitized contract. The in-memory buffer is deliberately ephemeral and best suited to the single-process demo; a multi-instance production deployment should substitute a tenant-isolated queue or short-retention store behind the same contract.
 
 ## Component architecture
 
@@ -236,8 +261,9 @@ The graphite and mint visual system references telemetry terminals, signal trace
 - No input is transmitted to a model provider.
 - No secret is included in the repository.
 - External links are static authoritative documentation URLs.
-- Observability configuration outputs to localhost only.
-- The optional replay ends at the OpenTelemetry Collector debug exporter; the browser analyzer accepts copied or pasted text and is not wired to that collector.
+- The checked-in Collector gateway exporter targets localhost and requires a server-only ingestion token.
+- The Collector fans out to both debug output and the implemented safe gateway; only sanitized envelopes reach the browser inbox.
+- Collection and analysis are decoupled: an arriving event is never diagnosed until the user explicitly selects it.
 - CI requires tests, evaluation, type checking, linting, and a production build.
 
 ## Key design decisions
@@ -250,6 +276,7 @@ The graphite and mint visual system references telemetry terminals, signal trace
 | Template generation | Complete citation traceability | Less conversational flexibility |
 | Hard unknown-ID refusal | Prevents adjacent-identifier hallucination | Cannot answer new identifiers until corpus refresh |
 | Browser-resident corpus | Private, instant demo | Not appropriate for a large enterprise corpus |
+| Ephemeral telemetry ring buffer | Zero-infrastructure visual demo and automatic expiry | Replace with a tenant-isolated event bus/store for multi-instance production |
 
 ## Replacement boundaries
 

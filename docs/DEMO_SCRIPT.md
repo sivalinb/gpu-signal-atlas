@@ -12,7 +12,9 @@ Target duration: 4 minutes 55 seconds. Stop at five minutes even if a secondary 
 
 Open the **Visual demo** section and click **Run full pipeline** during the architecture portion. The animation advances through all nine implemented stages and can be paused or inspected one stage at a time.
 
-## 0:00–0:30 — Problem and project
+Also rehearse **Telemetry → Run end-to-end flow**. The public button uses a labeled synthetic replay, shows the gateway redaction count, and calls the real Pinecone-backed analyzer. Do not imply that the public site accepts arbitrary external logs.
+
+## 0:00–0:25 — Problem and project
 
 “GPU Signal Atlas is a citation-first RAG application for NVIDIA Xid events, DCGM metrics, and GPU observability pipelines. GPU telemetry is full of exact but cryptic identifiers, and the supporting meaning is distributed across vendor catalogs, field references, deployment guides, and internal runbooks.
 
@@ -20,7 +22,7 @@ This project is intentionally not another autonomous incident agent. It retrieve
 
 Show the website title and the Xid 79 sample.
 
-## 0:30–1:20 — Primary Xid 79 flow
+## 0:25–1:05 — Primary Xid 79 flow
 
 “The first replay contains Xid 79, a PCIe replay counter, an H100 model, and driver branch R565. When I click Analyze, the application extracts those identifiers before retrieval.
 
@@ -30,23 +32,25 @@ The output is a signal card—not a root-cause verdict. It shows the official do
 
 Click the first NVIDIA citation.
 
-## 1:20–2:00 — Multi-source ECC example
+## 1:05–2:05 — Live telemetry-to-RAG visualization
 
-Select **Xid 48 + ECC**.
+Scroll to **Live telemetry integration** and click **Run end-to-end flow**.
 
-“This sample combines an Xid with a DCGM ECC counter. The application retrieves both the Xid definition and metric/runbook context. Notice that it asks for volatile and aggregate counters, a time delta, GPU identity, and related recovery events.
+“This is the implemented collection-to-evidence path. A labeled synthetic GPU event is represented as coming from NVIDIA kernel or DCGM telemetry. Fluent Bit tails and enriches it. The OpenTelemetry Collector receives and batches OTLP logs, keeps a debug copy, and can fan out OTLP JSON to the local gateway.
 
-The generator only uses reviewed fields from retrieved records. An official source leads the definition; an internal demonstration runbook can add evidence steps but cannot redefine the vendor event.”
+The gateway is a deliberate safety boundary: external writes require a server-only token; bodies and batches are bounded; metadata is allow-listed; and inline workload identifiers or credentials are redacted. Only the sanitized envelope appears in the short-lived SSE inbox. Collection does not trigger diagnosis automatically—the user selects Analyze. The evidence API then runs Pinecone plus BM25, the evidence gate produces a cited card or refusal, and redacted stage spans can go to LangSmith without the original log.”
 
-## 2:00–3:25 — Visual architecture and Pinecone
+Switch briefly to **Live telemetry**, show either the SSE connection badge or the explicitly labeled HTTPS fallback badge, emit one safe replay, select it, and click **Analyze selected**. Explain that both transports expose the same sanitized gateway contract; the fallback exists for edge hosts that buffer streams.
+
+## 2:05–3:10 — RAG lifecycle and control planes
 
 Scroll to **Interactive visual demo** and click **Run full pipeline**.
 
 “This button exposes all nine stages: allow-listed ingestion, cleaning, identifier-centered chunking, vector promotion into Pinecone, telemetry extraction, dense and sparse retrieval, reranking, evidence gating, and structured generation.
 
-Now scroll to the technology map. Pinecone is the managed dense-vector store for the public application. You.com is configured in this deployment as a governed discovery adapter: it searches only approved public documentation and puts every result in a human review queue—it never writes to Pinecone. LangSmith is configured as the AI-observability adapter: it receives redacted OpenTelemetry spans for extraction, retrieval, evidence gating, and generation, with ranks, latency, and outcomes but no original telemetry. Both adapters remain optional for local installations. Fluent Bit collects and enriches logs; OpenTelemetry transports logs and traces.”
+Now scroll to the technology map. Pinecone is the managed dense-vector store for reviewed documentation—not for GPU logs. You.com is a governed discovery adapter: it searches approved public documentation and puts results in a human review queue; it never writes to Pinecone automatically. LangSmith receives redacted RAG spans with ranks, latency, and outcomes but no original telemetry. Fluent Bit collects and enriches logs; OpenTelemetry transports logs and traces.”
 
-## 3:25–3:55 — Refusal behavior
+## 3:10–3:40 — Refusal behavior
 
 Select **Unknown identifier**.
 
@@ -54,7 +58,7 @@ Select **Unknown identifier**.
 
 This behavior is automated in both unit tests and the evaluation suite.”
 
-## 3:55–4:25 — Evaluation and testing
+## 3:40–4:20 — Evaluation and testing
 
 Scroll to **Evaluation evidence**.
 
@@ -62,9 +66,9 @@ Scroll to **Evaluation evidence**.
 
 The current run records 100 percent Recall@5, 0.931 mean reciprocal rank, 100 percent citation validity, 100 percent field-level claim grounding, and 100 percent refusal precision and recall. These are regression results for the curated corpus, not generalized GPU diagnostic accuracy.
 
-The repository also has 35 unit and regression tests, a separate live Pinecone evaluation, type checking, linting, a production website build, and GitHub Actions CI.”
+The repository also has 46 unit and regression tests, including benchmark provenance and SLO math, OTLP normalization, redaction, buffer bounds, and Collector fan-out; a separate live Pinecone evaluation; type checking; linting; a production website build; and GitHub Actions CI.”
 
-## 4:25–4:55 — AI coding tools, assets, and close
+## 4:20–4:55 — AI coding tools, assets, and close
 
 Show the submission section, GitHub link, and public Google Doc.
 
@@ -74,4 +78,4 @@ The public GitHub repository contains the code and evaluation assets, and the pu
 
 ## If time runs long
 
-Keep the Xid 79 result, the nine-stage visual pipeline, the refusal, the metrics, and the AI coding explanation. Skip opening an individual citation or describing the optional replay in detail.
+Keep the Xid 79 result, the telemetry flow, the refusal, the metrics, and the AI coding explanation. Skip opening an individual citation or inspecting every RAG-lifecycle stage.

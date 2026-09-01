@@ -19,9 +19,9 @@ GPU Signal Atlas satisfies the Week 2 requirement to pick a corpus, ingest and c
 | Retrieval | Pinecone dense candidates plus BM25, RRF, exact-ID/context reranking, top five. | Complete |
 | Cited generation | Deterministic structured signal card and optional schema-constrained LLM mode with post-validation. | Complete |
 | Refusal | Unknown identifiers, unrelated questions, and unsupported same-domain inputs return no diagnostic citations. | Excellent |
-| Evaluation | 31 cases, 35 tests, retrieval/chunking ablations, citation and grounding checks, local and Pinecone latency. | Excellent for the bounded corpus |
+| Evaluation | 31 cases, 46 tests, retrieval/chunking ablations, benchmark provenance/SLO/capacity contracts, telemetry-gateway safety and immediate-SSE-flush tests, citation and grounding checks, local and Pinecone latency. | Excellent for the bounded corpus |
 | Project documentation | Overview, dataset, prompts/instructions, iterations, learnings, technology map, limitations, and setup. | Complete |
-| Video demo | Exact 4:55 script and interactive nine-stage walkthrough. | Ready to record |
+| Video demo | Exact 4:55 script, ten-component live telemetry visualization, and nine-stage RAG walkthrough. | Ready to record |
 | Project assets | Public website, public GitHub repository, public Google Doc, successful CI, and replay configuration. | Complete |
 
 ## Score breakdown
@@ -46,6 +46,7 @@ GPU Signal Atlas satisfies the Week 2 requirement to pick a corpus, ingest and c
 5. Negative examples and zero-citation refusal are evaluated independently from positive retrieval.
 6. The public visual walkthrough makes the complete lifecycle understandable to a reviewer in under five minutes.
 7. The public deployment live-validates governed You.com discovery and redacted LangSmith tracing without weakening the Pinecone promotion or raw-telemetry privacy boundaries.
+8. The implemented Fluent Bit/OpenTelemetry gateway path makes collection, redaction, SSE delivery, explicit analysis, retrieval, and trace export visibly distinct instead of relying on a static architecture claim.
 
 ## Score rationale after technology and GitHub audit
 

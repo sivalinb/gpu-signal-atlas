@@ -20,10 +20,18 @@ processors:
 exporters:
   debug:
     verbosity: detailed
+  otlphttp/gateway:
+    logs_endpoint: http://127.0.0.1:3000/api/telemetry/v1/logs
+    encoding: json
+    headers:
+      x-telemetry-token: ${env:TELEMETRY_INGEST_TOKEN}
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 30s
 
 service:
   pipelines:
     logs:
       receivers: [otlp]
       processors: [resource, batch]
-      exporters: [debug]
+      exporters: [debug, otlphttp/gateway]
