@@ -3,6 +3,7 @@ import {
   normalizeTelemetryPayload,
   TELEMETRY_MAX_BODY_BYTES,
 } from '@/core/telemetry';
+import { recordProviderObservation } from '@/core/provider-observability';
 
 function otlpJson(body: unknown, status = 200): Response {
   return Response.json(body, {
@@ -12,10 +13,14 @@ function otlpJson(body: unknown, status = 200): Response {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const startedAt = performance.now();
   const expectedToken = process.env.TELEMETRY_INGEST_TOKEN?.trim();
   if (!expectedToken) {
     return otlpJson(
-      { error: 'External telemetry ingestion is disabled until TELEMETRY_INGEST_TOKEN is configured.' },
+      {
+        error:
+          'External telemetry ingestion is disabled until TELEMETRY_INGEST_TOKEN is configured.',
+      },
       503,
     );
   }
@@ -40,10 +45,26 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const events = ingestTelemetry(normalizeTelemetryPayload(JSON.parse(text)));
+    recordProviderObservation({
+      provider: 'opentelemetry',
+      operation: 'ingest_logs',
+      durationMs: performance.now() - startedAt,
+      ok: true,
+      itemCount: events.length,
+    });
     return otlpJson({ partialSuccess: {}, accepted: events.length });
   } catch (error) {
+    recordProviderObservation({
+      provider: 'opentelemetry',
+      operation: 'ingest_logs',
+      durationMs: performance.now() - startedAt,
+      ok: false,
+    });
     return otlpJson(
-      { error: error instanceof Error ? error.message : 'Telemetry body is invalid.' },
+      {
+        error:
+          error instanceof Error ? error.message : 'Telemetry body is invalid.',
+      },
       400,
     );
   }

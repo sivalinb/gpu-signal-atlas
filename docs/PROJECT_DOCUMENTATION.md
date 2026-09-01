@@ -128,7 +128,7 @@ Recorded result:
 | p95 local latency | 0.92 ms |
 | p95 Pinecone retrieval latency | 518.05 ms |
 
-The expanded test suite contains 50 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and metadata, OpenAI-compatible and Mistral model contracts, Neo4j Query API mapping, Deepgram secret boundaries, ablations, observability configuration, telemetry redaction and OTLP normalization, immediate SSE delivery, public status redaction, You.com governance, LangSmith redaction/export contracts, public benchmark provenance, SLO evaluation, comparison math, capacity headroom, and report safety boundaries. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
+The expanded test suite contains 51 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and operation-level usage, provider-metric aggregation, OpenAI-compatible and Mistral model contracts, Neo4j Query API mapping, Deepgram secret boundaries, ablations, observability configuration, telemetry redaction and OTLP normalization, immediate SSE delivery, public status redaction, You.com governance, LangSmith redaction/export contracts, public benchmark provenance, SLO evaluation, comparison math, capacity headroom, and report safety boundaries. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
 
 ## Observability integration
 
@@ -139,6 +139,8 @@ The gateway accepts at most 64 KiB and 20 events, allow-lists low-risk observabi
 The project also implements governed provider adapters that are configured in the current public deployment. You.com searches only allow-listed public documentation and emits `pending-review` candidates; it cannot change the corpus or Pinecone automatically. LangSmith accepts redacted OpenTelemetry traces from extraction, retrieval, evidence gating, and generation. Mistral provides optional strict-schema generation and a trained-embedding ablation. Neo4j exposes bounded relationships across signals, reviewed evidence, benchmark runs, models, backends, and technologies. Deepgram provides explicit opt-in speech-to-text and grounded text-to-speech. Permanent credentials remain server-only.
 
 The technology mapping is deliberate: Fluent Bit collects and enriches logs; OpenTelemetry normalizes logs and represents RAG stages as traces; You.com discovers source candidates; Pinecone stores and retrieves reviewed vectors; Neo4j stores explicit relationships; Mistral produces bounded optional output; Deepgram handles opt-in audio; and LangSmith measures the RAG system. The safe public status route exposes configuration booleans only, never a provider secret. Full setup and scale-out guidance is in `docs/YOU_LANGSMITH_INTEGRATION.md` and `docs/MULTIMODAL_EVIDENCE_FABRIC.md`.
+
+The website now also exposes a sanitized provider-observability dashboard. A bounded current-runtime recorder aggregates Pinecone read units and latency, RAG outcomes and stage timing, provider request health, and OpenTelemetry buffer/redaction counts. The public summary route never returns raw telemetry, prompts, model output, traces, or credentials. The interface explicitly distinguishes these application-observed samples from durable provider-console, billing, or Prometheus history; the exact contract and production extension are documented in `docs/PROVIDER_OBSERVABILITY.md`.
 
 ## User interface
 

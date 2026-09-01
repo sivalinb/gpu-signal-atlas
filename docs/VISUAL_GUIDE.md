@@ -161,6 +161,12 @@ flowchart LR
 
 The control planes intentionally carry different data. You.com sees documentation discovery queries and approved public pages, not GPU telemetry. Pinecone stores reviewed documentation vectors, not submitted logs. LangSmith sees redacted stage timing, ranks, identifiers, versions, and outcomes. Mistral receives retrieved evidence for bounded optional generation and trained-embedding comparison; Neo4j stores reviewed relationships without raw telemetry; and Deepgram processes only explicit voice actions. The website reads safe configuration booleans; permanent provider credentials remain server-only.
 
+## Live provider metrics
+
+The **Metrics** navigation item opens a self-observing view of the same component map. The top cards come from a live Pinecone index-statistics check and operation-level query usage. The line chart shows application-observed Pinecone latency, while the stage bars show extraction, retrieval, and evidence-gated generation for the latest request. Provider cards expose only request counts, errors, percentiles, configuration state, and last-seen time. The OpenTelemetry card shows sanitized buffer and redaction counts.
+
+The view intentionally says **Current server runtime · non-durable**. It is a bounded public demo surface, not a copy of Pinecone billing, LangSmith account analytics, or vendor-console histories. See [`PROVIDER_OBSERVABILITY.md`](PROVIDER_OBSERVABILITY.md) for the metric contracts and production time-series extension.
+
 ## Source-code map
 
 ```text

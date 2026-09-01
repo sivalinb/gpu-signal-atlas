@@ -19,6 +19,7 @@ interface PineconeMatch {
 
 interface PineconeQueryResponse {
   matches?: PineconeMatch[];
+  usage?: { readUnits?: number; read_units?: number };
 }
 
 interface PineconeStatsResponse {
@@ -51,7 +52,10 @@ function required(value: string | undefined, name: string): string {
 }
 
 function normalizeHost(host: string): string {
-  return `${/^https:\/\//i.test(host) ? '' : 'https://'}${host}`.replace(/\/+$/, '');
+  return `${/^https:\/\//i.test(host) ? '' : 'https://'}${host}`.replace(
+    /\/+$/,
+    '',
+  );
 }
 
 export function getPineconeConfig(
@@ -59,7 +63,9 @@ export function getPineconeConfig(
 ): PineconeConfig {
   return {
     apiKey: required(environment.PINECONE_API_KEY, 'PINECONE_API_KEY'),
-    host: normalizeHost(required(environment.PINECONE_INDEX_HOST, 'PINECONE_INDEX_HOST')),
+    host: normalizeHost(
+      required(environment.PINECONE_INDEX_HOST, 'PINECONE_INDEX_HOST'),
+    ),
     indexName: required(environment.PINECONE_INDEX_NAME, 'PINECONE_INDEX_NAME'),
     namespace: required(environment.PINECONE_NAMESPACE, 'PINECONE_NAMESPACE'),
   };
@@ -96,7 +102,11 @@ export async function retrieveFromPinecone(
   documents: CorpusDocument[] = defaultCorpus,
   limit = 5,
   fetchImpl: typeof fetch = fetch,
-): Promise<{ retrieval: RetrievalResult[]; vectorIndexVersion: string }> {
+): Promise<{
+  retrieval: RetrievalResult[];
+  vectorIndexVersion: string;
+  readUnits: number;
+}> {
   const vector = embed(query);
   const response = await pineconeFetch(
     config,
@@ -114,12 +124,20 @@ export async function retrieveFromPinecone(
   const payload = (await response.json()) as PineconeQueryResponse;
   const denseScores = new Map<string, number>();
   for (const match of payload.matches ?? []) {
-    if (match.id && Number.isFinite(match.score)) denseScores.set(match.id, match.score ?? 0);
+    if (match.id && Number.isFinite(match.score))
+      denseScores.set(match.id, match.score ?? 0);
   }
-  if (denseScores.size === 0) throw new PineconeRequestError('query returned no matches', 503);
+  if (denseScores.size === 0)
+    throw new PineconeRequestError('query returned no matches', 503);
   return {
-    retrieval: retrieveWithExternalDenseScores(query, denseScores, documents, limit),
+    retrieval: retrieveWithExternalDenseScores(
+      query,
+      denseScores,
+      documents,
+      limit,
+    ),
     vectorIndexVersion: `pinecone:${config.indexName}:${config.namespace}`,
+    readUnits: payload.usage?.readUnits ?? payload.usage?.read_units ?? 0,
   };
 }
 
@@ -160,7 +178,11 @@ export async function upsertCorpusToPinecone(
 export async function describePineconeStats(
   config: PineconeConfig = getPineconeConfig(),
   fetchImpl: typeof fetch = fetch,
-): Promise<{ dimension: number; namespaceVectorCount: number; totalVectorCount: number }> {
+): Promise<{
+  dimension: number;
+  namespaceVectorCount: number;
+  totalVectorCount: number;
+}> {
   const response = await pineconeFetch(
     config,
     '/describe_index_stats',
@@ -171,7 +193,8 @@ export async function describePineconeStats(
   const payload = (await response.json()) as PineconeStatsResponse;
   return {
     dimension: payload.dimension ?? 0,
-    namespaceVectorCount: payload.namespaces?.[config.namespace]?.vectorCount ?? 0,
+    namespaceVectorCount:
+      payload.namespaces?.[config.namespace]?.vectorCount ?? 0,
     totalVectorCount: payload.totalVectorCount ?? 0,
   };
 }

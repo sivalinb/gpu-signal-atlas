@@ -133,6 +133,9 @@ Also verify:
 - clicking **Telemetry → Run end-to-end flow** advances through all ten collection, sanitization, RAG, and AI-observability components;
 - switching to **Live telemetry** reports either **SSE connected** or the labeled **Live HTTPS fallback**, **Emit safe replay** adds a sanitized inbox event, and **Analyze selected** updates the main signal card; and
 - the browser console contains no hydration error.
+- opening **Metrics** loads Pinecone index coverage without exposing an index credential;
+- running one analysis and refreshing **Metrics** adds a Pinecone latency/read-unit sample, RAG stage bars, and an outcome count; and
+- `GET /api/observability/summary` contains aggregate operational fields only—never the submitted telemetry text, prompts, provider keys, or trace payloads.
 
 ## 7. Run a CLI analysis
 

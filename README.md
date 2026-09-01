@@ -37,6 +37,7 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 - Reconnecting Server-Sent Events inbox with a labeled HTTPS short-poll fallback for stream-buffering edge hosts
 - Governed You.com source discovery with domain allow-listing and a mandatory review queue
 - LangSmith OTLP trace export with raw-telemetry redaction and fail-open behavior
+- Live provider-observability dashboard with Pinecone index coverage, query read units/latency, RAG stage timing, provider health, outcomes, and telemetry-redaction counts
 - Optional Mistral strict-schema generation plus a trained-embedding ablation that does not mutate Pinecone
 - Neo4j Aura evidence graph with idempotent synchronization and bounded, read-only public paths
 - Opt-in Deepgram voice transcription and grounded spoken briefings through server-only routes
@@ -105,6 +106,8 @@ Start at the product homepage for the Observe → Retrieve → Explain → Decid
 
 Open **Performance** in the main navigation for the solution-architecture workflow. Compare the bundled public NVIDIA benchmark runs, inspect SLO decisions, visualize how benchmark and telemetry systems align, review a safe MIG/diagnostics workflow, edit a headroom/cost scenario, and export the evidence report. Public measurements and derived scenarios are labeled separately throughout the interface.
 
+Open **Metrics** for the self-observing runtime view. It polls a sanitized server summary every 15 seconds and shows live Pinecone index statistics, application-observed query read units and latency, the latest RAG stage timing, provider request health, RAG outcomes, and the bounded OpenTelemetry safety buffer. The charts are explicitly labeled as current-runtime and non-durable; they do not imitate provider billing or historical control-plane metrics.
+
 ## Evaluation snapshot
 
 The checked-in evaluation contains 31 independent cases across exact identifiers, semantic symptoms, multi-source retrieval, deliberately unsupported inputs, and six adversarial same-domain negatives.
@@ -140,6 +143,7 @@ core/
   neo4j.ts                   evidence-graph synchronization and bounded queries
   deepgram.ts                opt-in speech-to-text and text-to-speech adapters
   telemetry.ts               OTLP normalization, sanitization, bounded buffer
+  provider-observability.ts  bounded provider timings, usage, health, and RAG outcomes
   benchmark.ts               public run provenance, SLOs, comparisons, capacity, reports
   ablation.ts                retrieval and chunking comparison primitives
   samples.ts                 browser replay inputs
@@ -160,6 +164,7 @@ app/api/telemetry/           token-gated ingest, replay, recent, and SSE routes
 app/api/benchmarks/          public run catalog and comparison report routes
 app/api/graph/               bounded, read-only Neo4j relationship route
 app/api/voice/               bounded Deepgram transcription and speech routes
+app/api/observability/       sanitized provider/runtime metrics summary
 examples/gpu-events.log      synthetic, labeled GPU telemetry replay
 docs/                        design, visual, evaluation, testing, and submission documentation
 ```
@@ -179,6 +184,7 @@ docs/                        design, visual, evaluation, testing, and submission
 - Public analysis and voice routes intentionally have no browser challenge; production scale should add platform rate limits, authentication, quotas, and provider-cost controls without blocking the core demo.
 - The public replay endpoint accepts only checked-in synthetic samples. External OTLP writes require `TELEMETRY_INGEST_TOKEN`, have a 64 KiB body limit, and expose only allow-listed metadata after redaction.
 - The telemetry inbox is a short-lived demonstration buffer, not a durable log backend; multi-instance production deployments should replace it with a tenant-isolated event bus or short-retention store.
+- Provider charts retain at most 120 sanitized observations in the current server runtime. They are not durable billing, account-usage, or historical Prometheus metrics.
 - Template generation is used so every sentence can be traced to retrieved corpus fields.
 - Official documents are paraphrased into compact curated records; source URLs remain the authority.
 - Every record exposes its review date, rolling/snapshot source status, source section, and deterministic curated-content fingerprint.
@@ -198,6 +204,7 @@ docs/                        design, visual, evaluation, testing, and submission
 - [`docs/TELEMETRY_LIVE_FLOW.md`](docs/TELEMETRY_LIVE_FLOW.md) — implemented Collector-to-browser gateway, SSE contract, safeguards, and extension points
 - [`docs/LLM_MODE.md`](docs/LLM_MODE.md) — optional model contract and grounding boundary
 - [`docs/YOU_LANGSMITH_INTEGRATION.md`](docs/YOU_LANGSMITH_INTEGRATION.md) — discovery, AI observability, privacy, and scale-out design
+- [`docs/PROVIDER_OBSERVABILITY.md`](docs/PROVIDER_OBSERVABILITY.md) — live metrics, chart semantics, data boundaries, and production extension
 - [`docs/MULTIMODAL_EVIDENCE_FABRIC.md`](docs/MULTIMODAL_EVIDENCE_FABRIC.md) — Mistral, Neo4j, and Deepgram flows, controls, and extension design
 - [`docs/PERFORMANCE_INTELLIGENCE.md`](docs/PERFORMANCE_INTELLIGENCE.md) — public benchmark data, technology mapping, SLOs, correlation, MIG, capacity, APIs, and production extension
 - [`docs/NVIDIA_INTERVIEW_DEMO.md`](docs/NVIDIA_INTERVIEW_DEMO.md) — focused solution-architecture interview walkthrough and follow-up answers

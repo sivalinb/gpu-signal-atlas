@@ -44,6 +44,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { PerformanceWorkbench } from '@/components/performance-workbench';
 import { IntelligenceFabric } from '@/components/intelligence-fabric';
+import { ProviderObservability } from '@/components/provider-observability';
 import { SpokenBriefing, VoiceCapture } from '@/components/voice-controls';
 import { corpus } from '@/core/corpus';
 import { samples } from '@/core/samples';
@@ -967,6 +968,7 @@ export default function Home() {
             <a className="transition hover:text-foreground" href="#intelligence-fabric">Graph & voice</a>
             <a className="transition hover:text-foreground" href="#architecture">Architecture</a>
             <a className="transition hover:text-foreground" href="#integrations">AI observability</a>
+            <a className="transition hover:text-foreground" href="#provider-observability">Metrics</a>
             <a className="transition hover:text-foreground" href="#evaluation">Evaluation</a>
           </nav>
           <Badge variant="outline" className="border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
@@ -1278,6 +1280,8 @@ export default function Home() {
           </Card>
         </div>
       </section>
+
+      <ProviderObservability />
 
       <section id="evaluation" className="relative z-10 py-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
