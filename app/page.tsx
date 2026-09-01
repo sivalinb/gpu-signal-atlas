@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import {
   Activity,
   ArrowUpRight,
@@ -884,51 +885,38 @@ function ProductHomepage() {
 
           <div className="relative">
             <div className="absolute -inset-6 rounded-[2.25rem] bg-primary/5 blur-3xl" />
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-primary/20 bg-card/85 p-4 shadow-2xl shadow-black/35 backdrop-blur sm:p-5">
-              <div className="flex items-center justify-between border-b border-border/60 pb-4">
-                <div>
-                  <p className="font-mono text-[9px] uppercase tracking-[.2em] text-primary">What happens after you paste a signal</p>
-                  <p className="mt-1 text-sm font-medium">One inspectable evidence journey</p>
+            <figure className="relative overflow-hidden rounded-[1.75rem] border border-primary/20 bg-card/85 shadow-2xl shadow-black/40">
+              <Image
+                src="/gpu-signal-atlas-journey.webp"
+                alt="GPU telemetry moving through log, trace, vector evidence, and citation layers into a human-reviewed decision surface"
+                width={1440}
+                height={898}
+                priority
+                sizes="(min-width: 1024px) 56vw, 100vw"
+                className="aspect-[16/10] w-full object-cover"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_58%,oklch(0.11_0.012_245/.94))]" />
+              <figcaption className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[.2em] text-primary">From signal to cited decision support</p>
+                    <p className="mt-1 text-xs text-slate-300">Telemetry stays observable while evidence and uncertainty remain visible.</p>
+                  </div>
+                  <Badge variant="outline" className="hidden border-emerald-400/30 bg-black/50 text-emerald-200 sm:flex">Human-reviewed boundary</Badge>
                 </div>
-                <Badge variant="outline" className="border-emerald-400/25 bg-emerald-400/10 text-emerald-300">Grounded</Badge>
-              </div>
-
-              <div className="mt-4 rounded-xl border border-border/70 bg-black/25 p-4">
-                <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[.18em] text-muted-foreground">
-                  <TerminalSquare className="size-3.5 text-primary" /> Submitted GPU signal
-                </div>
-                <p className="mt-3 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-xs text-slate-300">NVRM: Xid (PCI:0000:81:00): 79, GPU has fallen off the bus</p>
-              </div>
-
-              <div className="my-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {productJourney.map((step, index) => {
-                  const Icon = step.icon;
-                  return (
-                    <div key={step.label} className="relative rounded-xl border border-border/70 bg-background/65 p-3">
-                      <div className="flex items-center justify-between">
-                        <span className="grid size-7 place-items-center rounded-lg bg-primary/10 text-primary"><Icon className="size-3.5" /></span>
-                        <span className="font-mono text-[9px] text-muted-foreground">0{index + 1}</span>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {productJourney.map((step, index) => {
+                    const Icon = step.icon;
+                    return (
+                      <div key={step.label} className="rounded-lg border border-white/10 bg-black/45 p-2 backdrop-blur-sm">
+                        <div className="flex items-center gap-1.5 text-[10px] font-medium text-white"><Icon className="size-3 text-primary" /><span className="hidden sm:inline">0{index + 1}</span> {step.label}</div>
+                        <p className="mt-1 hidden text-[8px] leading-3 text-slate-400 sm:block">{step.detail}</p>
                       </div>
-                      <p className="mt-3 text-xs font-medium">{step.label}</p>
-                      <p className="mt-1 text-[9px] leading-4 text-muted-foreground">{step.detail}</p>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-[1.15fr_.85fr]">
-                <div className="rounded-xl border border-primary/20 bg-primary/[.055] p-4">
-                  <div className="flex items-center gap-2 text-xs font-medium text-primary"><BookOpen className="size-3.5" /> Evidence-backed explanation</div>
-                  <p className="mt-3 text-sm leading-6 text-slate-200">Xid 79 documents that the driver can no longer access the GPU over its PCIe connection.</p>
-                  <p className="mt-3 font-mono text-[9px] text-muted-foreground">2 reviewed citations · strong evidence</p>
+                    );
+                  })}
                 </div>
-                <div className="rounded-xl border border-border/70 bg-background/65 p-4">
-                  <p className="font-mono text-[9px] uppercase tracking-[.16em] text-primary">Collect next</p>
-                  <p className="mt-3 text-xs leading-5 text-muted-foreground">PCIe link state, kernel context, GPU presence, and model/driver compatibility.</p>
-                </div>
-              </div>
-              <p className="mt-4 text-center font-mono text-[9px] uppercase tracking-[.16em] text-muted-foreground">Decision support · no autonomous remediation · refusal when evidence is insufficient</p>
-            </div>
+              </figcaption>
+            </figure>
           </div>
         </div>
 
