@@ -4,7 +4,7 @@ GPU Signal Atlas is an evidence-first GPU observability and performance-intellig
 
 The project is intentionally different from a root-cause or remediation agent. It does not query production systems, execute recovery actions, or claim that a single telemetry event proves a cause. Its portfolio focus is corpus design, hybrid retrieval, reranking, citation hygiene, refusal behavior, and measurable evaluation.
 
-![GPU Signal Atlas evidence journey](public/gpu-signal-atlas-journey.webp)
+![Siva reviewing the GPU Signal Atlas evidence journey](public/gpu-signal-atlas-journey-siva.webp)
 
 The product homepage summarizes the core promise visually: opaque GPU telemetry passes through observable log, trace, retrieval, and evidence layers before it becomes cited human decision support. The illustration is conceptual product communication; the live analyzer, retrieval trace, citations, refusal behavior, and evaluation sections provide the inspectable implementation evidence.
 

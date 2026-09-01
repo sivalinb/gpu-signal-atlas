@@ -8,7 +8,7 @@ This guide explains the project without requiring source-code familiarity.
 
 ## Product homepage visual
 
-![GPU telemetry becoming cited decision support](../public/gpu-signal-atlas-journey.webp)
+![Siva reviewing GPU telemetry becoming cited decision support](../public/gpu-signal-atlas-journey-siva.webp)
 
 The homepage illustration compresses the product story into one image:
 
@@ -183,7 +183,7 @@ Question: Where is the interactive experience?
 Answer:   app/page.tsx
 
 Question: Where is the product homepage artwork?
-Answer:   public/gpu-signal-atlas-journey.webp
+Answer:   public/gpu-signal-atlas-journey-siva.webp
 
 Question: Where is the OTLP replay configured?
 Answer:   observability/

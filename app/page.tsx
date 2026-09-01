@@ -864,8 +864,8 @@ function ProductHomepage() {
             <div className="absolute -inset-6 rounded-[2.25rem] bg-primary/5 blur-3xl" />
             <figure className="relative overflow-hidden rounded-[1.75rem] border border-primary/20 bg-card/85 shadow-2xl shadow-black/40">
               <Image
-                src="/gpu-signal-atlas-journey.webp"
-                alt="GPU telemetry moving through log, trace, vector evidence, and citation layers into a human-reviewed decision surface"
+                src="/gpu-signal-atlas-journey-siva.webp"
+                alt="Siva reviewing GPU telemetry as it moves through log, trace, vector evidence, and citation layers into a human-reviewed decision surface"
                 width={1440}
                 height={898}
                 priority
