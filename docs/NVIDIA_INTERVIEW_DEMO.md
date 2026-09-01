@@ -4,7 +4,9 @@ Target: 8–10 minutes, with optional depth for follow-up questions.
 
 ## Executive framing — 45 seconds
 
-“GPU Signal Atlas is an evidence system for two related decisions: what a GPU signal supports, and whether an inference configuration should be promoted. It combines citation-first RAG for Xid/DCGM telemetry with a benchmark workbench for latency, throughput, topology, health, and capacity. The design goal is explainability: raw inputs, retrieval evidence, metric direction, provenance, SLO checks, and safety boundaries remain inspectable.”
+Start on the homepage illustration and trace the story from the GPU on the left to the human-reviewed decision surface on the right.
+
+“GPU Signal Atlas is an evidence system for two related decisions: what a GPU signal supports, and whether an inference configuration should be promoted. The visual shows opaque GPU telemetry becoming observable traces, reviewed vector evidence, citations, and finally a human-controlled decision. The working product combines citation-first RAG for Xid/DCGM telemetry with a benchmark workbench for latency, throughput, topology, health, and capacity. The design goal is explainability: raw inputs, retrieval evidence, metric direction, provenance, SLO checks, and safety boundaries remain inspectable.”
 
 ## Reliability path — 90 seconds
 

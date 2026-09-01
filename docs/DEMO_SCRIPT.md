@@ -4,7 +4,7 @@ Target duration: 4 minutes 55 seconds. Stop at five minutes even if a secondary 
 
 ## Pre-recording checklist
 
-- Open the public website in a clean browser window and confirm the Xid 79 result loads.
+- Open the public website at `#home` in a clean browser window; confirm the product illustration loads and the Xid 79 result completes.
 - Keep the GitHub repository and public Google Doc available in adjacent tabs.
 - Use 100% browser zoom and record at 1080p when possible.
 - Close notifications and hide bookmarks or tabs containing personal information.
@@ -16,11 +16,15 @@ Also rehearse **Telemetry → Run end-to-end flow**. The public button uses a la
 
 ## 0:00–0:25 — Problem and project
 
-“GPU Signal Atlas is a citation-first RAG application for NVIDIA Xid events, DCGM metrics, and GPU observability pipelines. GPU telemetry is full of exact but cryptic identifiers, and the supporting meaning is distributed across vendor catalogs, field references, deployment guides, and internal runbooks.
+Begin on the product homepage and point to the image from left to right.
+
+“GPU Signal Atlas turns opaque GPU telemetry into cited next steps. This image shows the product promise: cryptic GPU signals move through observable collection, trace, retrieval, and evidence layers before they become human-reviewed decision support.
+
+It is a citation-first RAG application for NVIDIA Xid events, DCGM metrics, and GPU observability pipelines. GPU telemetry is full of exact but cryptic identifiers, and the supporting meaning is distributed across vendor catalogs, field references, deployment guides, and internal runbooks.
 
 This project is intentionally not another autonomous incident agent. It retrieves evidence, explains what a signal means, identifies what evidence is missing, and refuses when its corpus cannot support an answer.”
 
-Show the website title and the Xid 79 sample.
+Scroll to the analyzer and show the Xid 79 sample.
 
 ## 0:25–1:05 — Primary Xid 79 flow
 

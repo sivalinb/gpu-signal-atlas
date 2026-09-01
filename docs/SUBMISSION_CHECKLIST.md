@@ -11,6 +11,7 @@ Verify every link in a private/incognito window before submitting.
 ## Video recording
 
 - Target duration: 4:55; hard limit: 5:00.
+- Begin at `#home`; use the GPU-to-evidence illustration and the 30-second pitch to explain what the product does before scrolling to the analyzer.
 - Demonstrate Xid 79, the ten-component telemetry flow, the nine-stage RAG lifecycle, and Xid 999 refusal.
 - Show the evaluation and ablation results.
 - State that Pinecone stores reviewed documentation vectors and that the API key is server-side.
@@ -30,5 +31,6 @@ Verify every link in a private/incognito window before submitting.
 - Confirm `/api/graph/paths` returns bounded Neo4j relationships and the analysis/voice controls do not render a challenge widget.
 - Confirm `/api/telemetry/replay` returns HTTP 202 with `sanitized: true`, `/api/telemetry/recent` returns no unapproved attributes, and the SSE stream emits a `ready` event.
 - Confirm the video link is viewable without requesting access.
+- Confirm the public homepage image returns successfully and remains legible at the recording resolution.
 - Keep the video at five minutes or less; the video is the only remaining Week 2 deliverable.
 - Submit the Google Doc, video, and GitHub links through the Week 2 form.

@@ -142,7 +142,9 @@ The technology mapping is deliberate: Fluent Bit collects and enriches logs; Ope
 
 ## User interface
 
-The first viewport is a working analysis surface rather than a marketing page. It contains four replay buttons, editable telemetry, a live retrieval trace, grounded/refusal output, evidence steps, limitations, and citations.
+The first viewport is a product homepage that explains the promise before asking a reviewer to understand the implementation. An original visual maps a GPU and noisy telemetry through collection, tracing, vector evidence, and citation layers into a human-reviewed decision surface. The accompanying Observe → Retrieve → Explain → Decide labels, concise pitch, and direct links to the analyzer and walkthrough set expectations without claiming that the illustration is execution evidence.
+
+The working analysis surface follows immediately. It contains four replay buttons, editable telemetry, a live retrieval trace, grounded/refusal output, evidence steps, limitations, and citations.
 
 Below the analyzer, the website includes the nine-stage corpus/RAG walkthrough and a separate ten-component telemetry visualization with guided and live modes. The live mode exposes the active transport (SSE or labeled HTTPS fallback), sanitized inbox events, redaction counts, component technology, intermediate artifacts, explicit analysis, safety controls, evaluation metrics, and local commands.
 
@@ -184,6 +186,7 @@ The performance workbench adds five solution-architecture views: public benchmar
 - Five-minute demo script
 - Public Google Doc with Week 2 requirement mapping and expert assessment
 - Interactive start-to-finish visual pipeline walkthrough
+- Original product-homepage illustration and simple interviewer/instructor pitch scripts
 - Implemented Fluent Bit/OpenTelemetry → safe gateway → SSE inbox → explicit RAG analysis flow
 - Persistent vector-index build and verification scripts
 - Implemented ingestion and freshness workflow

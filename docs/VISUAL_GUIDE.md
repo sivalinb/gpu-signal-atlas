@@ -6,6 +6,21 @@ It also includes a separate ten-component **Telemetry** visualization. **Guided 
 
 This guide explains the project without requiring source-code familiarity.
 
+## Product homepage visual
+
+![GPU telemetry becoming cited decision support](../public/gpu-signal-atlas-journey.webp)
+
+The homepage illustration compresses the product story into one image:
+
+| Visual region | Product meaning | Implemented evidence |
+|---|---|---|
+| GPU and amber signal field | Opaque Xid, DCGM, kernel, and workload telemetry | Sample replays, exact identifier extraction, and the bounded telemetry gateway |
+| Green and blue transparent layers | Collection, normalization, and trace context | Fluent Bit, OpenTelemetry Collector, sanitized browser delivery, and redacted spans |
+| Vector constellation and evidence panels | Hybrid retrieval and reviewed knowledge | Pinecone dense candidates, BM25, RRF, reranking, corpus provenance, and Neo4j relationships |
+| Emerald decision surface with a human operator | Cited explanation and human-controlled next steps | Evidence card, citations, missing-evidence guidance, refusal, and no automated remediation |
+
+The artwork is a conceptual entry point, not proof that a diagnosis occurred. The working analyzer and the interactive flows below expose the actual inputs, intermediate artifacts, evidence, and refusal boundary.
+
 ## One-screen mental model
 
 ```mermaid
@@ -166,6 +181,9 @@ Answer:   scripts/evaluate.ts
 
 Question: Where is the interactive experience?
 Answer:   app/page.tsx
+
+Question: Where is the product homepage artwork?
+Answer:   public/gpu-signal-atlas-journey.webp
 
 Question: Where is the OTLP replay configured?
 Answer:   observability/

@@ -4,6 +4,10 @@ GPU Signal Atlas is an evidence-first GPU observability and performance-intellig
 
 The project is intentionally different from a root-cause or remediation agent. It does not query production systems, execute recovery actions, or claim that a single telemetry event proves a cause. Its portfolio focus is corpus design, hybrid retrieval, reranking, citation hygiene, refusal behavior, and measurable evaluation.
 
+![GPU Signal Atlas evidence journey](public/gpu-signal-atlas-journey.webp)
+
+The product homepage summarizes the core promise visually: opaque GPU telemetry passes through observable log, trace, retrieval, and evidence layers before it becomes cited human decision support. The illustration is conceptual product communication; the live analyzer, retrieval trace, citations, refusal behavior, and evaluation sections provide the inspectable implementation evidence.
+
 ## One-line definition
 
 GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM metric anomalies from reviewed official-documentation snapshots and demonstration runbooks in a web application, targeting at least 90% citation validity, Recall@5 above 85%, and p95 local retrieval latency below five seconds.
@@ -97,7 +101,7 @@ npm run analyze -- "Xid 79 DCGM_FI_DEV_PCIE_REPLAY_COUNTER=184 H100 R565"
 
 See [`docs/LOCAL_TESTING.md`](docs/LOCAL_TESTING.md) for the complete verification procedure and optional observability replay.
 
-Run the interactive **Visual demo** section on the public site to watch ingestion, cleaning, chunking, indexing, extraction, retrieval, reranking, evidence gating, and generation advance one stage at a time. Then run **Telemetry → Run end-to-end flow** to see a synthetic GPU signal pass through Fluent Bit, OpenTelemetry, the sanitizer, browser inbox, analyzer, Pinecone/BM25 retrieval, evidence gate, and redacted LangSmith trace. Live mode uses SSE directly and clearly reports an HTTPS polling fallback if the hosting edge buffers streams.
+Start at the product homepage for the Observe → Retrieve → Explain → Decide mental model. Then run the interactive **Visual demo** section to watch ingestion, cleaning, chunking, indexing, extraction, retrieval, reranking, evidence gating, and generation advance one stage at a time. Run **Telemetry → Run end-to-end flow** to see a synthetic GPU signal pass through Fluent Bit, OpenTelemetry, the sanitizer, browser inbox, analyzer, Pinecone/BM25 retrieval, evidence gate, and redacted LangSmith trace. Live mode uses SSE directly and clearly reports an HTTPS polling fallback if the hosting edge buffers streams.
 
 Open **Performance** in the main navigation for the solution-architecture workflow. Compare the bundled public NVIDIA benchmark runs, inspect SLO decisions, visualize how benchmark and telemetry systems align, review a safe MIG/diagnostics workflow, edit a headroom/cost scenario, and export the evidence report. Public measurements and derived scenarios are labeled separately throughout the interface.
 

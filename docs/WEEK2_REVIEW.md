@@ -8,6 +8,8 @@ GPU Signal Atlas implements every technical layer named in the Week 2 handout: a
 
 The final submission is not yet complete because the handout separately requires a live video of five minutes or less. The script and demo surface are ready, but the recording and its public link remain an external deliverable.
 
+The new product homepage, original GPU-to-evidence illustration, and audience-specific pitch scripts improve reviewer comprehension and recording readiness. They do not increase the technical score because the communication/documentation category was already at its maximum and the missing video remains a separate submission gate.
+
 ## Scope choice
 
 The project uses the handout's **bring-your-own use case** option and a custom code-heavy TypeScript/React implementation. The handout explicitly permits other frameworks, so the absence of LangChain or LangGraph is not a gap.
@@ -36,6 +38,7 @@ Neo4j is an implemented bonus evidence graph. The submission does not claim the 
 | Evaluation | 31 independent cases, 50 tests, retrieval/chunking ablations, 100% Recall@5, 0.931 MRR, 100% citation validity/grounding, and 100% refusal precision/recall on the bounded set. | Excellent for the reviewed corpus |
 | Google Doc | Overview, dataset, prompts/instructions, iterations, learnings, architecture, evaluation, limitations, setup, and requirement mapping. | Complete and updated |
 | Live demo | Public website demonstrates analysis, refusal, telemetry flow, performance intelligence, privacy boundaries, graph context, and voice interaction. | Complete |
+| Product communication | Homepage pitch, original GPU-to-evidence visual, interviewer script, instructor script, and 30-second elevator version explain the system before the technical walkthrough. | Complete |
 | AI coding-tool explanation | Repository and document explain Codex's role and the validation gates used to accept changes. | Complete |
 | Project assets | Public GitHub repository contains code, tests, configs, evaluation, and documentation. | Complete |
 | Video, five minutes or less | Recording-ready script exists; final recording/public link does not yet exist. | **Pending** |
@@ -67,6 +70,16 @@ Neo4j is an implemented bonus evidence graph. The submission does not claim the 
 
 The score is a reviewer-authored assessment because the handout specifies deliverables and framework decisions but does not publish a numeric grading rubric.
 
+## Submission gate scorecard
+
+| Required Week 2 deliverable | Current status | Evidence |
+|---|---|---|
+| Project documentation | Complete | Public Google Doc includes overview, dataset, prompts/instructions, iterations, learnings, architecture, evaluation, limitations, pitch scripts, and requirement mapping. |
+| Project assets | Complete | Public GitHub contains application source, tests, evaluation, workflow/configuration assets, and documentation. |
+| Video demo, five minutes or less | Pending | A timed 4:55 script and recording-ready public product are complete; the recording and public video link still must be supplied. |
+
+**Deliverable completion: 2 of 3 submitted artifacts complete; 1 recording artifact pending.** This status is deliberately separate from the 98/100 technical-quality assessment.
+
 ## Expert feedback
 
 ### What would impress a reviewer
@@ -90,4 +103,4 @@ The score is a reviewer-authored assessment because the handout specifies delive
 
 ## Final recommendation
 
-Submit the project after recording the five-minute video. In the recording, spend most of the time on Xid 79, hybrid retrieval, the refusal example, the visual end-to-end flow, and the evaluation evidence. Treat the Mistral/Neo4j/Deepgram additions as concise product differentiation; do not let them obscure the core Week 2 RAG decisions.
+Submit the project after recording the five-minute video. Open with the homepage visual and 30-second pitch, then spend most of the time on Xid 79, hybrid retrieval, the refusal example, the visual end-to-end flow, and the evaluation evidence. Treat the Mistral/Neo4j/Deepgram additions as concise product differentiation; do not let them obscure the core Week 2 RAG decisions.
