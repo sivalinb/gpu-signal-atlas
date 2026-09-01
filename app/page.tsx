@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -848,6 +848,107 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
   );
 }
 
+const productJourney = [
+  { icon: Activity, label: 'Observe', detail: 'Xid · DCGM · kernel · OTLP' },
+  { icon: Database, label: 'Retrieve', detail: 'Pinecone + BM25' },
+  { icon: FileSearch, label: 'Explain', detail: 'Cited evidence card' },
+  { icon: Gauge, label: 'Decide', detail: 'Next evidence, not guesses' },
+];
+
+function ProductHomepage() {
+  return (
+    <section id="home" className="relative z-10 border-b border-border/70 bg-[radial-gradient(circle_at_14%_18%,oklch(0.82_0.16_165/.13),transparent_31%),radial-gradient(circle_at_83%_15%,oklch(0.7_0.14_210/.11),transparent_29%),linear-gradient(180deg,oklch(0.16_0.018_245),oklch(0.145_0.015_250))]">
+      <div className="mx-auto max-w-7xl px-5 py-14 lg:px-8 lg:py-20">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,.88fr)_minmax(520px,1.12fr)] lg:items-center">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="border border-primary/25 bg-primary/10 text-primary">GPU incident intelligence</Badge>
+              <span className="font-mono text-[10px] uppercase tracking-[.19em] text-muted-foreground">Evidence before inference</span>
+            </div>
+            <h1 className="mt-6 max-w-3xl font-heading text-5xl font-semibold tracking-[-0.052em] sm:text-6xl lg:text-[70px] lg:leading-[.98]">
+              Turn opaque GPU telemetry into <span className="text-primary">cited next steps.</span>
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+              GPU Signal Atlas helps platform engineers move from a cryptic NVIDIA Xid event or DCGM metric to reviewed evidence, an explainable signal card, and the next data to collect—without presenting retrieval as a root-cause verdict.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <a href="#analyze" className={buttonVariants({ size: 'lg', className: 'bg-primary text-primary-foreground hover:bg-primary/90' })}><Sparkles className="size-4" /> Try a live signal</a>
+              <a href="#walkthrough" className={buttonVariants({ size: 'lg', variant: 'outline' })}><Play className="size-4" /> Watch the system flow</a>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
+              {['Exact identifier preservation', 'Retriever-backed citations', 'Tested refusal path'].map((item) => (
+                <span key={item} className="flex items-center gap-2"><Check className="size-3.5 text-primary" /> {item}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -inset-6 rounded-[2.25rem] bg-primary/5 blur-3xl" />
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-primary/20 bg-card/85 p-4 shadow-2xl shadow-black/35 backdrop-blur sm:p-5">
+              <div className="flex items-center justify-between border-b border-border/60 pb-4">
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[.2em] text-primary">What happens after you paste a signal</p>
+                  <p className="mt-1 text-sm font-medium">One inspectable evidence journey</p>
+                </div>
+                <Badge variant="outline" className="border-emerald-400/25 bg-emerald-400/10 text-emerald-300">Grounded</Badge>
+              </div>
+
+              <div className="mt-4 rounded-xl border border-border/70 bg-black/25 p-4">
+                <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[.18em] text-muted-foreground">
+                  <TerminalSquare className="size-3.5 text-primary" /> Submitted GPU signal
+                </div>
+                <p className="mt-3 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-xs text-slate-300">NVRM: Xid (PCI:0000:81:00): 79, GPU has fallen off the bus</p>
+              </div>
+
+              <div className="my-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {productJourney.map((step, index) => {
+                  const Icon = step.icon;
+                  return (
+                    <div key={step.label} className="relative rounded-xl border border-border/70 bg-background/65 p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="grid size-7 place-items-center rounded-lg bg-primary/10 text-primary"><Icon className="size-3.5" /></span>
+                        <span className="font-mono text-[9px] text-muted-foreground">0{index + 1}</span>
+                      </div>
+                      <p className="mt-3 text-xs font-medium">{step.label}</p>
+                      <p className="mt-1 text-[9px] leading-4 text-muted-foreground">{step.detail}</p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-[1.15fr_.85fr]">
+                <div className="rounded-xl border border-primary/20 bg-primary/[.055] p-4">
+                  <div className="flex items-center gap-2 text-xs font-medium text-primary"><BookOpen className="size-3.5" /> Evidence-backed explanation</div>
+                  <p className="mt-3 text-sm leading-6 text-slate-200">Xid 79 documents that the driver can no longer access the GPU over its PCIe connection.</p>
+                  <p className="mt-3 font-mono text-[9px] text-muted-foreground">2 reviewed citations · strong evidence</p>
+                </div>
+                <div className="rounded-xl border border-border/70 bg-background/65 p-4">
+                  <p className="font-mono text-[9px] uppercase tracking-[.16em] text-primary">Collect next</p>
+                  <p className="mt-3 text-xs leading-5 text-muted-foreground">PCIe link state, kernel context, GPU presence, and model/driver compatibility.</p>
+                </div>
+              </div>
+              <p className="mt-4 text-center font-mono text-[9px] uppercase tracking-[.16em] text-muted-foreground">Decision support · no autonomous remediation · refusal when evidence is insufficient</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 grid gap-3 border-t border-border/60 pt-6 sm:grid-cols-3">
+          {[
+            ['01', 'Paste or replay', 'Start with one NVIDIA kernel event, DCGM snapshot, or sanitized telemetry envelope.'],
+            ['02', 'Follow the evidence', 'Inspect extraction, hybrid retrieval, reranking, citations, and the refusal boundary.'],
+            ['03', 'Make a safer decision', 'Use documented meaning and next-evidence guidance while preserving operational uncertainty.'],
+          ].map(([number, title, detail]) => (
+            <div key={number} className="flex gap-3 rounded-xl border border-transparent p-3 transition hover:border-border/70 hover:bg-card/40">
+              <span className="font-mono text-xs text-primary">{number}</span>
+              <div><p className="text-sm font-medium">{title}</p><p className="mt-1 text-xs leading-5 text-muted-foreground">{detail}</p></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const [input, setInput] = useState<string>(samples[0].text);
   const [analysis, setAnalysis] = useState<SignalAnalysis | null>(null);
@@ -884,7 +985,7 @@ export default function Home() {
       <div className="pointer-events-none fixed inset-0 opacity-25 [background-image:linear-gradient(to_right,oklch(0.82_0.16_165/.08)_1px,transparent_1px),linear-gradient(to_bottom,oklch(0.82_0.16_165/.06)_1px,transparent_1px)] [background-size:64px_64px]" />
       <header className="relative z-20 border-b border-border/70 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 lg:px-8">
-          <a href="#analyze" className="flex items-center gap-3">
+          <a href="#home" className="flex items-center gap-3">
             <span className="grid size-9 place-items-center rounded-xl border border-primary/30 bg-primary/10 text-primary">
               <Radar className="size-5" />
             </span>
@@ -910,6 +1011,8 @@ export default function Home() {
         </div>
       </header>
 
+      <ProductHomepage />
+
       <section id="analyze" className="relative z-10 mx-auto max-w-7xl px-5 py-8 lg:px-8 lg:py-10">
         <div className="mb-7 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div className="max-w-3xl space-y-4">
@@ -917,9 +1020,9 @@ export default function Home() {
               <Badge className="bg-primary/15 text-primary">Citation-first GPU RAG</Badge>
               <span className="font-mono text-xs text-muted-foreground">Xid · DCGM · Kubernetes · OTLP</span>
             </div>
-            <h1 className="font-heading text-4xl font-semibold tracking-[-0.045em] sm:text-5xl lg:text-[58px] lg:leading-[1.02]">
-              Explain the signal.<br /><span className="text-primary">Preserve the uncertainty.</span>
-            </h1>
+            <h2 className="font-heading text-4xl font-semibold tracking-[-0.045em] sm:text-5xl lg:text-[58px] lg:leading-[1.02]">
+              Inspect one signal.<br /><span className="text-primary">See every evidence decision.</span>
+            </h2>
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">
               Paste an NVIDIA kernel event or DCGM metric snapshot. Hybrid retrieval turns exact identifiers and symptoms into an evidence-backed signal card—without pretending one event proves a root cause.
             </p>
