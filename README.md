@@ -203,7 +203,7 @@ docs/                        design, visual, evaluation, testing, and submission
 - [`docs/RUNBOOKS.md`](docs/RUNBOOKS.md) — demonstration evidence-collection runbooks
 - [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) — five-minute video walkthrough
 - [`docs/PROJECT_DOCUMENTATION.md`](docs/PROJECT_DOCUMENTATION.md) — submission-ready project narrative
-- [`docs/WEEK2_REVIEW.md`](docs/WEEK2_REVIEW.md) — expert requirement mapping and 96/100 scorecard
+- [`docs/WEEK2_REVIEW.md`](docs/WEEK2_REVIEW.md) — expert requirement mapping and 98/100 technical scorecard
 - [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) — public links, recording sequence, and final handoff checks
 
 ## License

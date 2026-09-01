@@ -5,6 +5,7 @@ Target duration: 4 minutes 55 seconds. Stop at five minutes even if a secondary 
 ## Pre-recording checklist
 
 - Open the public website in a clean browser window and confirm the Xid 79 result loads.
+- Complete the Cloudflare Turnstile check before each protected analysis or voice action; its tokens are single use.
 - Keep the GitHub repository and public Google Doc available in adjacent tabs.
 - Use 100% browser zoom and record at 1080p when possible.
 - Close notifications and hide bookmarks or tabs containing personal information.
@@ -32,7 +33,7 @@ The output is a signal card—not a root-cause verdict. It shows the official do
 
 Click the first NVIDIA citation.
 
-## 1:05–2:05 — Live telemetry-to-RAG visualization
+## 1:05–1:50 — Live telemetry-to-RAG visualization
 
 Scroll to **Live telemetry integration** and click **Run end-to-end flow**.
 
@@ -42,7 +43,7 @@ The gateway is a deliberate safety boundary: external writes require a server-on
 
 Switch briefly to **Live telemetry**, show either the SSE connection badge or the explicitly labeled HTTPS fallback badge, emit one safe replay, select it, and click **Analyze selected**. Explain that both transports expose the same sanitized gateway contract; the fallback exists for edge hosts that buffer streams.
 
-## 2:05–3:10 — RAG lifecycle and control planes
+## 1:50–2:40 — RAG lifecycle and control planes
 
 Scroll to **Interactive visual demo** and click **Run full pipeline**.
 
@@ -50,7 +51,17 @@ Scroll to **Interactive visual demo** and click **Run full pipeline**.
 
 Now scroll to the technology map. Pinecone is the managed dense-vector store for reviewed documentation—not for GPU logs. You.com is a governed discovery adapter: it searches approved public documentation and puts results in a human review queue; it never writes to Pinecone automatically. LangSmith receives redacted RAG spans with ranks, latency, and outcomes but no original telemetry. Fluent Bit collects and enriches logs; OpenTelemetry transports logs and traces.”
 
-## 3:10–3:40 — Refusal behavior
+## 2:40–3:20 — Multimodal evidence fabric
+
+Scroll to **Graph & voice**.
+
+“These integrations have deliberately separate responsibilities. Turnstile protects public AI and voice requests through server-side verification. Mistral optionally generates the same grounded schema and provides a trained-embedding comparison. Neo4j shows explicit relationships across signals, reviewed evidence, benchmark runs, models, backends, and technologies; it does not replace Pinecone semantic retrieval. Deepgram turns an opt-in spoken GPU question into editable input and can read the grounded result as an executive briefing.
+
+No permanent credential reaches the browser, Neo4j does not receive raw logs, and Mistral receives extracted identifiers plus retrieved evidence rather than the original telemetry.”
+
+Refresh the Neo4j paths. If the recording is comfortably on time, show the voice controls without completing a long recording.
+
+## 3:20–3:45 — Refusal behavior
 
 Select **Unknown identifier**.
 
@@ -58,7 +69,7 @@ Select **Unknown identifier**.
 
 This behavior is automated in both unit tests and the evaluation suite.”
 
-## 3:40–4:20 — Evaluation and testing
+## 3:45–4:25 — Evaluation and testing
 
 Scroll to **Evaluation evidence**.
 
@@ -66,9 +77,9 @@ Scroll to **Evaluation evidence**.
 
 The current run records 100 percent Recall@5, 0.931 mean reciprocal rank, 100 percent citation validity, 100 percent field-level claim grounding, and 100 percent refusal precision and recall. These are regression results for the curated corpus, not generalized GPU diagnostic accuracy.
 
-The repository also has 46 unit and regression tests, including benchmark provenance and SLO math, OTLP normalization, redaction, buffer bounds, and Collector fan-out; a separate live Pinecone evaluation; type checking; linting; a production website build; and GitHub Actions CI.”
+The repository also has 52 unit and regression tests, including retrieval, refusal, Mistral schema contracts, Turnstile validation, Neo4j mapping, Deepgram privacy boundaries, benchmark provenance and SLO math, OTLP normalization, redaction, buffer bounds, and Collector fan-out. The same release gate also runs evaluation, ablations, source freshness, index integrity, type checking, linting, and a production build.”
 
-## 4:20–4:55 — AI coding tools, assets, and close
+## 4:25–4:55 — AI coding tools, assets, and close
 
 Show the submission section, GitHub link, and public Google Doc.
 
@@ -78,4 +89,4 @@ The public GitHub repository contains the code and evaluation assets, and the pu
 
 ## If time runs long
 
-Keep the Xid 79 result, the telemetry flow, the refusal, the metrics, and the AI coding explanation. Skip opening an individual citation or inspecting every RAG-lifecycle stage.
+Keep the Xid 79 result, refusal, metrics, and AI coding explanation. Shorten the telemetry animation and show only the Neo4j status card if time is tight; skip voice playback and individual citations.

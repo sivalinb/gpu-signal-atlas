@@ -112,6 +112,27 @@ Latency varies by machine and network. Both paths remain well inside the five-se
 
 The recorded run shows 100% Recall@5 and 0.931 MRR for BM25 and hybrid-plus-rerank, while the vector-only baseline reaches 91.7% and 0.753. Structure-aware records reach 100% and 0.931 versus 91.7% and 0.896 for fixed windows.
 
+### Trained-embedding comparison
+
+`npm run ablate:mistral` embeds the 17 reviewed records and 22 answerable evaluation queries in one `mistral-embed` batch, ranks them in memory, and compares the result with the deterministic feature-hash representation. It never writes to the production Pinecone namespace.
+
+Live recorded result:
+
+```text
+Model: mistral-embed
+Dimensions: 1024
+Cases: 22
+Recall@5: 100.0%
+MRR: 1.000
+Total tokens: 1863
+```
+
+The trained result is promising but does not by itself authorize a production migration. A controlled change would create a dimension-compatible staging index/namespace, repeat retrieval/refusal/citation evaluation, measure latency and cost, and promote only after review.
+
+### Live structured-generation contract
+
+A live synthetic Xid 79 check against `mistral-small-latest` returned `schema-constrained-llm`, reproduced a retrieved evidence title, and cited only `nvidia-xid-79`, `runbook-xid79`, and `dcgm-pcie-replay`. Mistral uses its supported strict-schema subset with evidence-derived enums; application-side cardinality, citation, and claim validation remains authoritative.
+
 ## What the tests verify
 
 - tokenizer preserves exact telemetry identifiers;
@@ -127,6 +148,11 @@ The recorded run shows 100% Recall@5 and 0.931 MRR for BM25 and hybrid-plus-rera
 - Pinecone requests preserve the namespace, stable IDs, 256-dimensional vectors, and reviewed metadata;
 - the Pinecone path reports its backend and namespace in diagnostics;
 - the complete evaluation set meets retrieval and refusal targets.
+- Mistral embeddings preserve response order and the live ablation remains read-only;
+- Mistral structured generation uses the provider-specific schema subset plus local grounding limits;
+- Turnstile verifies action/hostname and rejects expired or replayed tokens;
+- Neo4j uses the HTTPS Query API and returns bounded relationship records; and
+- Deepgram adapters keep authorization server-side for both speech directions.
 
 ## Failure analysis
 
@@ -151,3 +177,4 @@ These failures demonstrate why refusal behavior must be evaluated independently 
 5. Have a GPU SME grade factual entailment and action safety.
 6. Add real de-identified incident evidence with hardware and driver diversity.
 7. Measure corpus-update regressions across version snapshots.
+8. Run a blinded GPU-SME grading pass and a matched-query Neo4j/GraphRAG-versus-vector experiment before making broader claims.

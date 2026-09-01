@@ -21,15 +21,15 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 
 ## Week 2 expert assessment
 
-Overall score: **96/100 — submission-ready**.
+Technical score: **98/100 — excellent; final submission is ready after the required five-minute video is recorded**.
 
 | Area | Score | Reviewer feedback |
 |---|---:|---|
 | Use case and measurable targets | 10/10 | Specific user, corpus, surface, faithfulness target, retrieval target, and latency ceiling. |
 | Corpus, ingestion, and freshness | 14/15 | Reviewed provenance and promotion gates are implemented; the corpus is intentionally small. |
-| Chunking, embedding, and vector storage | 14/15 | Structure-aware ablation and live Pinecone storage are strong; the feature-hash embedding is a reproducible baseline rather than a trained model. |
+| Chunking, embedding, and vector storage | 15/15 | Structure-aware ablation, live Pinecone storage, the persistent offline baseline, and a live `mistral-embed` comparison are implemented. |
 | Retrieval, citations, and refusal safety | 20/20 | Hybrid retrieval, reranking, citation allow-listing, claim grounding, and zero-citation refusal are explicit and tested. |
-| Evaluation and experimentation | 18/20 | Thirty-one cases and retrieval/chunking ablations are reproducible; a larger blinded set and GPU SME review remain future work. |
+| Evaluation and experimentation | 19/20 | Thirty-one cases, retrieval/chunking ablations, and the trained-embedding comparison are reproducible; a larger blinded set and GPU SME review remain future work. |
 | Public demo and reproducibility | 10/10 | Public website, GitHub, CI, local instructions, and visual walkthrough are complete. |
 | Documentation and observability differentiation | 10/10 | Technology mapping, Fluent Bit/OpenTelemetry boundaries, extension model, prompts, iterations, and learnings are clear. |
 
@@ -92,7 +92,7 @@ Representative design instructions included:
 6. Refuse unknown identifiers with zero citations.
 7. Test successful retrieval and refusal behavior independently.
 
-The evaluated website does not call a generative model, so no hidden prompt or API output is presented as real evidence. An optional server-side mode requests a strict JSON schema and then rejects unknown citations, unsupported fields, and claims that are not reproduced from cited evidence.
+Deterministic generation remains the default. The optional Mistral mode is live and server-side: it receives extracted identifiers and retrieved evidence rather than the original raw telemetry, requests a provider-compatible strict JSON schema with evidence-derived enums, and then rejects unknown citations, unsupported fields, excess cardinality, or claims not reproduced from cited evidence.
 
 ## How AI coding tools were used
 
@@ -136,9 +136,9 @@ The repository contains a Fluent Bit tail/parser configuration, resource enrichm
 
 The gateway accepts at most 64 KiB and 20 events, allow-lists low-risk observability metadata, redacts inline credentials and workload identifiers, and keeps at most 50 sanitized events for 15 minutes. A reconnecting Server-Sent Events route carries only those envelopes to the browser and flushes its ready event immediately. When a hosting edge buffers streams, the UI explicitly labels and uses a 1.5-second HTTPS poll of the same sanitized buffer. The public replay button accepts only checked-in synthetic samples; arbitrary external writes require `TELEMETRY_INGEST_TOKEN`. Collection never triggers analysis automatically. The operator explicitly selects an inbox event, after which only that sanitized snapshot reaches the Pinecone-backed evidence service.
 
-The project now also implements two optional-by-design external control planes that are configured in the current public deployment. You.com searches only allow-listed public documentation and emits `pending-review` candidates with provenance and fingerprints; it cannot change the corpus or Pinecone automatically. LangSmith accepts redacted OpenTelemetry traces from extraction, retrieval, evidence gating, and generation. These spans include identifiers, ranks, latency, versions, result status, and citation count, but not the original telemetry string. Both integrations are server-side, key-activated, and fail safely when disabled or unavailable.
+The project also implements governed provider adapters that are configured in the current public deployment. You.com searches only allow-listed public documentation and emits `pending-review` candidates; it cannot change the corpus or Pinecone automatically. LangSmith accepts redacted OpenTelemetry traces from extraction, retrieval, evidence gating, and generation. Cloudflare Turnstile verifies single-use public AI/voice actions on the server. Mistral provides optional strict-schema generation and a trained-embedding ablation. Neo4j exposes bounded relationships across signals, reviewed evidence, benchmark runs, models, backends, and technologies. Deepgram provides explicit opt-in speech-to-text and grounded text-to-speech. Permanent credentials remain server-only.
 
-The technology mapping is deliberate: Fluent Bit collects and enriches logs; OpenTelemetry normalizes logs and represents RAG stages as traces; You.com discovers source candidates; Pinecone stores and retrieves reviewed vectors; LangSmith measures the RAG system. The safe public status route exposes configuration booleans only and confirms that no provider key reaches the browser. Full setup and scale-out guidance is in `docs/YOU_LANGSMITH_INTEGRATION.md`.
+The technology mapping is deliberate: Fluent Bit collects and enriches logs; OpenTelemetry normalizes logs and represents RAG stages as traces; You.com discovers source candidates; Pinecone stores and retrieves reviewed vectors; Neo4j stores explicit relationships; Mistral produces bounded optional output; Deepgram handles opt-in audio; Turnstile reduces anonymous abuse; and LangSmith measures the RAG system. The safe public status route exposes configuration booleans and the intentionally public Turnstile site key only, never a provider secret. Full setup and scale-out guidance is in `docs/YOU_LANGSMITH_INTEGRATION.md` and `docs/MULTIMODAL_EVIDENCE_FABRIC.md`.
 
 ## User interface
 
@@ -156,14 +156,18 @@ The performance workbench adds five solution-architecture views: public benchmar
 - Retrieval confidence should not be described as diagnostic probability.
 - Structured generation makes citation validation straightforward.
 - A small reproducible baseline is more defensible than an unverified claim about live model accuracy.
+- Pinecone semantic retrieval and Neo4j relationship traversal solve different evidence questions and should not be presented as interchangeable databases.
+- Provider-side structured output still needs an application-side grounding validator.
 
 ## Limitations
 
 - Small, manually curated corpus
 - Synthetic telemetry fixtures
-- Local feature-hash embedding rather than a trained semantic model
-- Template generator rather than an LLM
+- Production retrieval intentionally retains the reproducible feature-hash embedding; the trained Mistral comparison is an evaluated ablation rather than a promoted namespace
+- Deterministic template generation is the default; optional Mistral generation adds provider latency and cost
 - Ephemeral single-process telemetry buffer rather than a durable, tenant-isolated event bus
+- Neo4j relationship visualization is not yet a GraphRAG answer path with a matched-query comparison
+- Turnstile is abuse control, not authentication, authorization, tenancy, or cost governance
 - No production action or remediation
 - No generalized GPU diagnostic-accuracy claim
 
@@ -185,10 +189,11 @@ The performance workbench adds five solution-architecture views: public benchmar
 - Implemented ingestion and freshness workflow
 - Optional schema-constrained LLM mode
 - Retrieval and chunking ablation report
+- Trained-embedding ablation, protected Mistral mode, Neo4j evidence graph, and opt-in Deepgram voice workflow
 
 ## Final submission checklist
 
 - Public website: `https://gpu-signal-atlas.siva-babu.chatgpt.site`
 - Public repository: `https://github.com/sivalinb/gpu-signal-atlas`
 - Public Google Doc: `https://docs.google.com/document/d/1bksyAMQVZFTTbXAq5TY1KnvXqq1rBO-trVjV1gjTezI/edit`
-- Video: record the 4:55 sequence in `docs/DEMO_SCRIPT.md`, confirm the link is viewable, and submit all three assets through the Week 2 form.
+- Video: record the updated sequence in `docs/DEMO_SCRIPT.md`, keep it below five minutes, confirm the link is public, and submit all three assets through the Week 2 form.

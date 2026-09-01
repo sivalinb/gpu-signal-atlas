@@ -2,62 +2,93 @@
 
 ## Verdict
 
-**Score: 96/100 — submission-ready.**
+**Technical score: 98/100 - excellent and submission-ready after the video is recorded.**
 
-GPU Signal Atlas satisfies the Week 2 requirement to pick a corpus, ingest and clean it, chunk it, embed it, store it, retrieve from it, and generate cited output. It also demonstrates the assignment's emphasized failure points: chunking decisions, retrieval quality, evaluation, latency, and a tested “I don't know” path.
+GPU Signal Atlas implements every technical layer named in the Week 2 handout: a specific corpus, ingestion and cleaning, freshness controls, chunking, embeddings, vector storage, hybrid retrieval, reranking, cited generation, refusal, and evaluation. The public application and repository substantially exceed the baseline project.
 
-## Requirement mapping
+The final submission is not yet complete because the handout separately requires a live video of five minutes or less. The script and demo surface are ready, but the recording and its public link remain an external deliverable.
 
-| Week 2 requirement | Evidence | Assessment |
+## Scope choice
+
+The project uses the handout's **bring-your-own use case** option and a custom code-heavy TypeScript/React implementation. The handout explicitly permits other frameworks, so the absence of LangChain or LangGraph is not a gap.
+
+Neo4j is an implemented bonus evidence graph. The submission does not claim the suggested "GraphRAG for Organizational Knowledge" use case, so that optional track's separate 10-query GraphRAG-versus-vector comparison is not a core acceptance condition.
+
+## Handout framework mapping
+
+| Required field | GPU Signal Atlas decision | Status |
 |---|---|---|
-| One-line use case with measurable success | README and project documentation specify user, corpus, surface, citation validity, Recall@5, and latency targets. | Complete |
-| Corpus | 17 reviewed records covering NVIDIA Xids, DCGM fields, GPU Operator, Fluent Bit, OpenTelemetry, and runbooks. | Complete; bounded demo scale |
-| Ingestion and cleaning | Allow-listed fetch/local input, HTML cleaning, fingerprints, review candidates, and provenance. | Complete |
-| Freshness | Seven-day official-source SLA, 30-day internal-runbook SLA, CI gate, and reviewed promotion. | Complete |
-| Chunking and embedding | Identifier-centered records, fixed-window comparison, deterministic 256-dimensional embedding. | Complete; trained embedding is future work |
-| Vector storage | Pinecone serverless index with versioned namespace and stable IDs; checked-in offline baseline. | Complete |
-| Retrieval | Pinecone dense candidates plus BM25, RRF, exact-ID/context reranking, top five. | Complete |
-| Cited generation | Deterministic structured signal card and optional schema-constrained LLM mode with post-validation. | Complete |
-| Refusal | Unknown identifiers, unrelated questions, and unsupported same-domain inputs return no diagnostic citations. | Excellent |
-| Evaluation | 31 cases, 52 tests, retrieval/chunking ablations, benchmark provenance/SLO/capacity contracts, provider privacy and contract tests, telemetry-gateway safety and immediate-SSE-flush tests, citation and grounding checks, local and Pinecone latency. | Excellent for the bounded corpus |
-| Project documentation | Overview, dataset, prompts/instructions, iterations, learnings, technology map, limitations, and setup. | Complete |
-| Video demo | Exact 4:55 script, ten-component live telemetry visualization, and nine-stage RAG walkthrough. | Ready to record |
-| Project assets | Public website, public GitHub repository, public Google Doc, successful CI, and replay configuration. | Complete |
+| One-line use case | Helps GPU platform engineers explain NVIDIA Xid/DCGM signals from a reviewed observability corpus in a public web application, targeting at least 90% citation validity, Recall@5 above 85%, and p95 retrieval below five seconds. | Complete |
+| Corpus | 17 reviewed English structure-aware records from NVIDIA Xid/DCGM/GPU Operator, Fluent Bit, OpenTelemetry, and labeled internal demonstration runbooks. | Complete; deliberately bounded |
+| Ingestion + cleaning | Allow-listed HTTPS or local HTML input, removal of page chrome/scripts/forms, preservation of headings/tables/code/identifiers, source metadata, fingerprints, and a human review candidate. | Complete |
+| Ingestion + freshness | Seven-day official-source and 30-day internal-runbook review SLAs, content fingerprints, CI freshness gate, staging namespace, regression checks, and explicit promotion/rollback. | Complete |
+| Chunking + embedding | Identifier-centered structured records compared with fixed 90-token windows; deterministic 256d feature hashing for the reproducible Pinecone path plus a live 1024d `mistral-embed` ablation. | Complete |
+| Retrieve | Pinecone dense candidates + BM25 sparse ranking + reciprocal-rank fusion + exact-ID/model/driver boosts; final top five. | Complete |
+
+## Assignment-quality mapping
+
+| Week 2 emphasis or deliverable | Evidence | Judge assessment |
+|---|---|---|
+| Match chunking and embedding decisions | Structure-aware and fixed-window ablations are checked in; trained and deterministic embedding paths are compared without mutating production. | Excellent |
+| Hybrid retrieval | Pinecone dense and BM25 sparse candidates retain independent ranks, then use RRF and bounded reranking. | Excellent |
+| "I don't know" path | Unknown identifiers, unrelated questions, and six same-domain hard negatives refuse with zero diagnostic citations. | Excellent |
+| Cited generation | Deterministic output is default; optional Mistral strict-schema generation uses evidence-derived enums plus post-generation grounding validation. | Excellent |
+| Evaluation | 31 independent cases, 52 tests, retrieval/chunking ablations, 100% Recall@5, 0.931 MRR, 100% citation validity/grounding, and 100% refusal precision/recall on the bounded set. | Excellent for the reviewed corpus |
+| Google Doc | Overview, dataset, prompts/instructions, iterations, learnings, architecture, evaluation, limitations, setup, and requirement mapping. | Complete and updated |
+| Live demo | Public website demonstrates analysis, refusal, telemetry flow, performance intelligence, security, graph context, and voice interaction. | Complete |
+| AI coding-tool explanation | Repository and document explain Codex's role and the validation gates used to accept changes. | Complete |
+| Project assets | Public GitHub repository contains code, tests, configs, evaluation, and documentation. | Complete |
+| Video, five minutes or less | Recording-ready script exists; final recording/public link does not yet exist. | **Pending** |
+
+## Verified implementation evidence
+
+- Pinecone production retrieval is server-only and uses a versioned reviewed-corpus namespace.
+- The checked-in precomputed index preserves credential-free evaluation and rollback evidence.
+- `mistral-embed` live ablation: 22 answerable cases, 1024 dimensions, Recall@5 100%, MRR 1.000, 1,863 tokens.
+- Live Mistral strict-schema Xid 79 generation passed the schema, evidence-enum, citation, and local grounding checks.
+- Neo4j synchronization created 17 Evidence records, 32 Signal identifiers, three BenchmarkRun records, and supporting technology/model/backend relationships.
+- The public graph endpoint returns a maximum of 40 read-only relationship paths and stores no raw telemetry.
+- Deepgram live validation completed both synthetic text-to-speech and speech-to-text; the website requires explicit microphone and playback actions.
+- Cloudflare Turnstile is enforced on public analysis and voice routes with server-side action/hostname validation; an unverified analysis returns HTTP 403.
+- The public integration endpoint reports every provider configured and `secretsExposedToBrowser=false`.
+- Lint, type checking, 52 tests, freshness, index integrity, and the production build pass locally against the exact published tree.
 
 ## Score breakdown
 
-| Area | Score |
-|---|---:|
-| Use case and measurable targets | 10/10 |
-| Corpus, ingestion, and freshness | 14/15 |
-| Chunking, embedding, and vector storage | 14/15 |
-| Retrieval, citations, and refusal safety | 20/20 |
-| Evaluation and experimentation | 18/20 |
-| Public application and reproducibility | 10/10 |
-| Documentation and observability differentiation | 10/10 |
-| **Total** | **96/100** |
+| Area | Score | Rationale |
+|---|---:|---|
+| Use case and measurable targets | 10/10 | Specific user, corpus, surface, faithfulness/retrieval targets, and latency ceiling. |
+| Corpus, ingestion, and freshness | 14/15 | Strong provenance and lifecycle; corpus scale remains intentionally small. |
+| Chunking, embedding, and vector storage | 15/15 | Structure-aware ablation, Pinecone, persistent baseline, and trained-embedding comparison are implemented. |
+| Retrieval, citations, and refusal safety | 20/20 | Hybrid retrieval, reranking, evidence gating, post-validation, and zero-citation refusal are explicit and tested. |
+| Evaluation and experimentation | 19/20 | Reproducible suite and ablations are strong; blinded GPU-SME grading and a larger independent set remain absent. |
+| Public application and reproducibility | 10/10 | Public product, local setup, safe configuration boundaries, and release-equivalent checks are complete. |
+| Documentation and observability differentiation | 10/10 | Required narrative plus unusually strong technology, privacy, and extension mapping. |
+| **Technical total** | **98/100** | **Excellent Week 2 implementation.** |
 
-## Strongest qualities
+The score is a reviewer-authored assessment because the handout specifies deliverables and framework decisions but does not publish a numeric grading rubric.
 
-1. Exact Xids and DCGM field names remain first-class signals rather than being blurred by semantic similarity.
-2. The application distinguishes a documented signal from proven root cause and makes the evidence boundary visible.
-3. Pinecone is used appropriately for reviewed-document vectors while Fluent Bit and OpenTelemetry remain telemetry transport components.
-4. Retrieval and chunking decisions are supported by ablations instead of architecture claims alone.
-5. Negative examples and zero-citation refusal are evaluated independently from positive retrieval.
-6. The public visual walkthrough makes the complete lifecycle understandable to a reviewer in under five minutes.
-7. The public deployment live-validates governed You.com discovery and redacted LangSmith tracing without weakening the Pinecone promotion or raw-telemetry privacy boundaries.
-8. The implemented Fluent Bit/OpenTelemetry gateway path makes collection, redaction, SSE delivery, explicit analysis, retrieval, and trace export visibly distinct instead of relying on a static architecture claim.
+## Expert feedback
 
-## Score rationale after technology and GitHub audit
+### What would impress a reviewer
 
-The score remains 96/100 rather than increasing simply because additional services are active. The new production evidence increases confidence in the implementation and documentation scores, but it does not remove the four points reserved for corpus breadth, trained-embedding comparison, and independently authored or subject-matter-reviewed evaluation. GitHub accuracy is judged from committed source, reproducible checks, successful CI, secret scanning, and live endpoint behavior—not from screenshots or architecture claims alone.
+1. Exact GPU identifiers are preserved through parsing, tokenization, retrieval, and citations.
+2. Retrieval scores are never presented as probability of root cause.
+3. The refusal path is tested as a product behavior, not added as disclaimer text.
+4. Pinecone, Neo4j, telemetry backends, and benchmark storage have distinct responsibilities.
+5. Mistral output is constrained twice: by provider schema/evidence enums and by local claim validation.
+6. The application shows the actual component flow rather than relying on architecture slides.
+7. Security and privacy boundaries remain visible even in the public voice and graph demo.
 
-## Remaining risks and recommended next steps
+### What still limits production claims
 
-1. Expand beyond 17 curated records and evaluate at least 100 independently authored queries.
-2. Benchmark the deterministic feature-hash embedding against an approved sentence-embedding model using the same labels.
-3. Add blinded GPU subject-matter review for factual entailment, applicability, and action safety.
-4. Test anonymized real incident snapshots across more GPU models and driver branches.
-5. Run a separate live-provider evaluation before describing the optional LLM mode as production-ready.
+1. The 17-record corpus and 31-case evaluation are excellent regression fixtures but too small for generalized GPU diagnostic accuracy.
+2. The evaluation labels have not been independently blinded or graded by an NVIDIA/GPU domain expert.
+3. Demonstration telemetry is synthetic; broader model, driver, MIG, NVLink, and workload diversity should be tested with governed incident replays.
+4. The Mistral embedding result is an in-memory ablation; production Pinecone intentionally remains on the reproducible 256d representation until a controlled namespace migration is approved.
+5. Neo4j currently visualizes reviewed relationships; a true GraphRAG answer path and matched-query comparison would be a valuable next experiment, not something the current project should overclaim.
+6. Turnstile is abuse control, not user authentication, authorization, tenancy, or provider-cost governance.
 
-These are production-hardening recommendations, not Week 2 submission blockers.
+## Final recommendation
+
+Submit the project after recording the five-minute video. In the recording, spend most of the time on Xid 79, hybrid retrieval, the refusal example, the visual end-to-end flow, and the evaluation evidence. Treat the Mistral/Neo4j/Deepgram additions as concise product differentiation; do not let them obscure the core Week 2 RAG decisions.

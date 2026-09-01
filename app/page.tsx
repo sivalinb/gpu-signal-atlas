@@ -98,9 +98,9 @@ const retrievalAblation = [
 const week2Score = [
   ['Use case & targets', '10/10'],
   ['Corpus lifecycle', '14/15'],
-  ['Chunking & vectors', '14/15'],
+  ['Chunking & vectors', '15/15'],
   ['Retrieval & safety', '20/20'],
-  ['Evaluation', '18/20'],
+  ['Evaluation', '19/20'],
   ['Demo & reproducibility', '10/10'],
   ['Documentation', '10/10'],
 ];
@@ -108,11 +108,12 @@ const week2Score = [
 const recordingPlan = [
   ['0:00–0:25', 'Problem', 'Frame the evidence-before-inference goal.'],
   ['0:25–1:05', 'Live analysis', 'Run Xid 79 and inspect Pinecone-backed evidence.'],
-  ['1:05–2:05', 'Telemetry flow', 'Animate Fluent Bit → OTel → gateway → SSE → RAG → LangSmith.'],
-  ['2:05–3:10', 'RAG lifecycle', 'Run all nine corpus and retrieval stages and show the control planes.'],
-  ['3:10–3:40', 'Refusal', 'Run Xid 999 and show zero diagnostic citations.'],
-  ['3:40–4:20', 'Evaluation', 'Show retrieval, refusal, ablation, and 52 passing tests.'],
-  ['4:20–4:55', 'Build story', 'Explain AI coding usage, GitHub, and the key learning.'],
+  ['1:05–1:50', 'Telemetry flow', 'Animate Fluent Bit → OTel → gateway → SSE → RAG → LangSmith.'],
+  ['1:50–2:40', 'RAG lifecycle', 'Run the nine corpus/retrieval stages and show the control planes.'],
+  ['2:40–3:20', 'Graph & voice', 'Map Turnstile, Mistral, Neo4j, and Deepgram responsibilities.'],
+  ['3:20–3:45', 'Refusal', 'Run Xid 999 and show zero diagnostic citations.'],
+  ['3:45–4:25', 'Evaluation', 'Show retrieval, refusal, ablations, and 52 passing tests.'],
+  ['4:25–4:55', 'Build story', 'Explain AI coding usage, GitHub, and the key learning.'],
 ];
 
 const flow = [
@@ -1336,8 +1337,8 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-primary/25 bg-primary/[0.06] px-6 py-4 text-center">
               <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Expert review</p>
-              <p className="mt-1 font-mono text-4xl text-primary">96<span className="text-lg text-muted-foreground">/100</span></p>
-              <p className="mt-1 text-xs text-emerald-300">Submission-ready</p>
+              <p className="mt-1 font-mono text-4xl text-primary">98<span className="text-lg text-muted-foreground">/100</span></p>
+              <p className="mt-1 text-xs text-emerald-300">Technical review · video pending</p>
             </div>
           </div>
 
@@ -1354,7 +1355,7 @@ export default function Home() {
                     <span className="font-mono text-primary">{score}</span>
                   </div>
                 ))}
-                <p className="pt-2 text-xs leading-5 text-muted-foreground">Remaining evidence risk: the corpus is small and the deterministic feature-hash embedding should be benchmarked against a trained sentence embedding before production use.</p>
+                <p className="pt-2 text-xs leading-5 text-muted-foreground">Remaining evidence risk: the corpus and evaluation set are small. The trained-embedding result is an ablation until a controlled Pinecone namespace migration and blinded GPU-SME review are complete.</p>
               </CardContent>
             </Card>
 
