@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { analyzeTelemetry, extractSignals } from '../core/engine.ts';
+import { getIntegrationStatus } from '../core/integrations.ts';
 import {
   buildLangSmithOtelPayload,
   exportLangSmithTrace,
@@ -29,11 +30,15 @@ test('You.com results become review candidates and are never auto-promoted', asy
     assert.equal(new Headers(init?.headers).get('X-API-Key'), 'you-secret');
     const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
     assert.deepEqual(body.include_domains, ['docs.nvidia.com', 'docs.fluentbit.io', 'opentelemetry.io', 'github.com']);
+    assert.deepEqual(body.extraction, {
+      extraction_mode: 'full_page',
+      full_page: { extraction_formats: ['markdown'] },
+    });
     return Response.json({
       results: {
         web: [
-          { title: 'NVIDIA Xid Errors', url: 'https://docs.nvidia.com/deploy/xid-errors/', contents: '# Xid 79' },
-          { title: 'Unapproved', url: 'https://example.com/advice', contents: 'ignore this' },
+          { title: 'NVIDIA Xid Errors', url: 'https://docs.nvidia.com/deploy/xid-errors/', contents: { markdown: '# Xid 79' } },
+          { title: 'Unapproved', url: 'https://example.com/advice', contents: { markdown: 'ignore this' } },
         ],
       },
     });
@@ -47,6 +52,24 @@ test('You.com results become review candidates and are never auto-promoted', asy
   assert.equal(candidates[0].provider, 'you-search');
   assert.equal(candidates[0].reviewStatus, 'pending-review');
   assert.ok(candidates[0].contentHash.length > 0);
+});
+
+test('public integration status reports configuration without returning secrets', () => {
+  const status = getIntegrationStatus({
+    PINECONE_API_KEY: 'pinecone-secret',
+    PINECONE_INDEX_HOST: 'index.example.pinecone.io',
+    PINECONE_INDEX_NAME: 'gpu-signal-atlas-docs',
+    PINECONE_NAMESPACE: 'corpus-test',
+    YOU_API_KEY: 'you-secret',
+    LANGSMITH_API_KEY: 'langsmith-secret',
+  });
+  assert.deepEqual(status, {
+    pineconeConfigured: true,
+    youConfigured: true,
+    langsmithConfigured: true,
+    secretsExposedToBrowser: false,
+  });
+  assert.doesNotMatch(JSON.stringify(status), /pinecone-secret|you-secret|langsmith-secret/);
 });
 
 test('LangSmith trace payload contains retrieval outcomes but no raw telemetry', () => {

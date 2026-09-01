@@ -45,6 +45,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { corpus } from '@/core/corpus';
 import { samples } from '@/core/samples';
+import type { IntegrationStatus } from '@/core/integrations';
 import type { SignalAnalysis } from '@/core/types';
 
 interface AnalysisErrorPayload {
@@ -64,6 +65,12 @@ async function requestSignalAnalysis(telemetry: string, signal?: AbortSignal): P
     throw new Error(payload.error ?? 'Analysis is temporarily unavailable.');
   }
   return (await response.json()) as SignalAnalysis;
+}
+
+async function requestIntegrationStatus(signal?: AbortSignal): Promise<IntegrationStatus> {
+  const response = await fetch('/api/integrations', { cache: 'no-store', signal });
+  if (!response.ok) throw new Error('Integration status is unavailable.');
+  return (await response.json()) as IntegrationStatus;
 }
 
 const evaluationMetrics = [
@@ -492,6 +499,7 @@ export default function Home() {
   const [analysis, setAnalysis] = useState<SignalAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [integrationStatus, setIntegrationStatus] = useState<IntegrationStatus | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -502,6 +510,14 @@ export default function Home() {
         setAnalysisError(error instanceof Error ? error.message : 'Analysis is temporarily unavailable.');
       })
       .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    requestIntegrationStatus(controller.signal)
+      .then(setIntegrationStatus)
+      .catch(() => setIntegrationStatus(null));
     return () => controller.abort();
   }, []);
 
@@ -719,7 +735,10 @@ export default function Home() {
             </div>
             <div className="rounded-2xl border border-primary/20 bg-primary/[0.055] p-4 text-xs leading-5 text-muted-foreground">
               <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">Deployment truth</p>
-              <p className="mt-2"><span className="text-foreground">Pinecone is active.</span> You.com discovery and LangSmith trace export are implemented, tested, and optional; server-side API keys activate them without exposing secrets to the browser.</p>
+              <p className="mt-2">
+                <span className="text-foreground">{integrationStatus?.pineconeConfigured ? 'Pinecone is active.' : 'Pinecone configuration is unavailable.'}</span>{' '}
+                You.com discovery is <span className="text-foreground">{integrationStatus?.youConfigured ? 'configured' : 'optional'}</span>; LangSmith trace export is <span className="text-foreground">{integrationStatus?.langsmithConfigured ? 'configured' : 'optional'}</span>. No provider key is returned to the browser.
+              </p>
             </div>
           </div>
 
@@ -729,7 +748,7 @@ export default function Home() {
                 icon: FileSearch,
                 eyebrow: 'Corpus intelligence',
                 title: 'Discover → review → promote',
-                status: 'Optional adapter implemented',
+                status: integrationStatus?.youConfigured ? 'Configured · discovery ready' : 'Optional adapter implemented',
                 steps: ['Approved public domains', 'You.com Search + page content', 'Pending-review candidates', 'Human approval + regression tests', 'Pinecone versioned namespace'],
                 boundary: 'No pasted telemetry. No automatic index writes.',
               },
@@ -737,7 +756,7 @@ export default function Home() {
                 icon: Database,
                 eyebrow: 'Runtime evidence',
                 title: 'Retrieve → gate → cite',
-                status: 'Production path active',
+                status: integrationStatus?.pineconeConfigured ? 'Production path active' : 'Configuration required',
                 steps: ['Submitted telemetry snapshot', 'Exact signal extraction', 'Pinecone candidates + BM25', 'RRF and evidence boundary', 'Grounded card or refusal'],
                 boundary: 'Only reviewed corpus records can support a citation.',
               },
@@ -745,7 +764,7 @@ export default function Home() {
                 icon: Activity,
                 eyebrow: 'AI observability',
                 title: 'Trace → evaluate → improve',
-                status: 'Optional export implemented',
+                status: integrationStatus?.langsmithConfigured ? 'Configured · trace export enabled' : 'Optional export implemented',
                 steps: ['Redacted OpenTelemetry spans', 'Extraction/retrieval/gate timing', 'LangSmith project traces', 'Datasets and evaluators', 'Regression and drift review'],
                 boundary: 'Identifiers, ranks, timing, outcomes—never raw telemetry.',
               },

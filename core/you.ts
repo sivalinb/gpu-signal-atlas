@@ -29,8 +29,11 @@ interface YouSearchResult {
   description?: string;
   snippets?: string[];
   page_age?: string;
-  contents?: string;
-  full_page?: string;
+  contents?: {
+    markdown?: string;
+    html?: string;
+    highlights?: string[];
+  };
 }
 
 interface YouSearchResponse {
@@ -75,8 +78,11 @@ export async function discoverYouSources(
       query,
       count: 10,
       include_domains: [...YOU_ALLOWED_DOMAINS],
-      livecrawl: 'always',
-      livecrawl_formats: ['markdown'],
+      extraction: {
+        extraction_mode: 'full_page',
+        full_page: { extraction_formats: ['markdown'] },
+      },
+      crawl_timeout: 10,
     }),
     signal: AbortSignal.timeout(10_000),
   });
@@ -87,7 +93,12 @@ export async function discoverYouSources(
   return (payload.results?.web ?? [])
     .filter((item): item is YouSearchResult & { url: string } => Boolean(item.url && isAllowedDiscoveryUrl(item.url)))
     .map((item) => {
-      const content = item.contents ?? item.full_page ?? item.snippets?.join('\n') ?? item.description ?? '';
+      const content =
+        item.contents?.markdown ??
+        item.contents?.highlights?.join('\n') ??
+        item.snippets?.join('\n') ??
+        item.description ??
+        '';
       return {
         title: item.title?.trim() || new URL(item.url).hostname,
         url: new URL(item.url).toString(),

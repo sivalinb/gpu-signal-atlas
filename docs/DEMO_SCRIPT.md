@@ -62,7 +62,7 @@ Scroll to **Evaluation evidence**.
 
 The current run records 100 percent Recall@5, 0.931 mean reciprocal rank, 100 percent citation validity, 100 percent field-level claim grounding, and 100 percent refusal precision and recall. These are regression results for the curated corpus, not generalized GPU diagnostic accuracy.
 
-The repository also has 34 unit and regression tests, a separate live Pinecone evaluation, type checking, linting, a production website build, and GitHub Actions CI.”
+The repository also has 35 unit and regression tests, a separate live Pinecone evaluation, type checking, linting, a production website build, and GitHub Actions CI.”
 
 ## 4:25–4:55 — AI coding tools, assets, and close
 

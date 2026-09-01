@@ -128,7 +128,7 @@ Recorded result:
 | p95 local latency | 2.31 ms |
 | p95 Pinecone retrieval latency | 229.16 ms |
 
-The expanded test suite contains 34 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and metadata, model contracts, ablations, observability configuration, You.com governance, and LangSmith redaction/export contracts. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
+The expanded test suite contains 35 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and metadata, model contracts, ablations, observability configuration, public status redaction, You.com governance, and LangSmith redaction/export contracts. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
 
 ## Observability integration
 
