@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "datasetVersion": "gpu-signal-atlas-week4-golden-v1",
+  "datasetSha256": "e9aa12ed6c48e5dfef7cb4932109134ba1c66498047e24959896180a7c821399",
+  "cases": 48,
+  "distribution": {
+    "happyPath": 24,
+    "edgeCase": 14,
+    "knownFailure": 7,
+    "adversarial": 3
+  },
+  "baseline": {
+    "cases": 48,
+    "passed": 39,
+    "passRate": 0.8125,
+    "retrieval": {
+      "recallAt5": 1.0,
+      "mrr": 0.9571
+    },
+    "quality": {
+      "citationValidity": 1.0,
+      "claimFaithfulness": 1.0,
+      "taskContract": 1.0,
+      "guardrailPassRate": 0.9375
+    },
+    "refusal": {
+      "precision": 0.625,
+      "recall": 0.7692,
+      "f1": 0.6897
+    },
+    "performance": {
+      "p50LatencyMs": 2.537,
+      "p95LatencyMs": 2.877,
+      "meanLatencyMs": 2.568,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0
+    },
+    "scenarioScores": {
+      "happy_path": {
+        "cases": 24,
+        "passed": 24,
+        "passRate": 1.0
+      },
+      "edge_case": {
+        "cases": 14,
+        "passed": 14,
+        "passRate": 1.0
+      },
+      "known_failure": {
+        "cases": 7,
+        "passed": 1,
+        "passRate": 0.1429
+      },
+      "adversarial": {
+        "cases": 3,
+        "passed": 0,
+        "passRate": 0.0
+      }
+    },
+    "failureClusters": [
+      {
+        "reason": "refusal_boundary",
+        "count": 9
+      },
+      {
+        "reason": "adversarial_guardrail",
+        "count": 3
+      }
+    ]
+  },
+  "improved": {
+    "cases": 48,
+    "passed": 48,
+    "passRate": 1.0,
+    "retrieval": {
+      "recallAt5": 1.0,
+      "mrr": 0.9571
+    },
+    "quality": {
+      "citationValidity": 1.0,
+      "claimFaithfulness": 1.0,
+      "taskContract": 1.0,
+      "guardrailPassRate": 1.0
+    },
+    "refusal": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "performance": {
+      "p50LatencyMs": 2.9,
+      "p95LatencyMs": 3.018,
+      "meanLatencyMs": 2.904,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0
+    },
+    "scenarioScores": {
+      "happy_path": {
+        "cases": 24,
+        "passed": 24,
+        "passRate": 1.0
+      },
+      "edge_case": {
+        "cases": 14,
+        "passed": 14,
+        "passRate": 1.0
+      },
+      "known_failure": {
+        "cases": 7,
+        "passed": 7,
+        "passRate": 1.0
+      },
+      "adversarial": {
+        "cases": 3,
+        "passed": 3,
+        "passRate": 1.0
+      }
+    },
+    "failureClusters": []
+  },
+  "metrics": [
+    {
+      "name": "Pass rate",
+      "baseline": 0.8125,
+      "improved": 1.0,
+      "delta": 0.1875,
+      "unit": "ratio"
+    },
+    {
+      "name": "Recall@5",
+      "baseline": 1.0,
+      "improved": 1.0,
+      "delta": 0.0,
+      "unit": "ratio"
+    },
+    {
+      "name": "MRR",
+      "baseline": 0.9571,
+      "improved": 0.9571,
+      "delta": 0.0,
+      "unit": "ratio"
+    },
+    {
+      "name": "Citation validity",
+      "baseline": 1.0,
+      "improved": 1.0,
+      "delta": 0.0,
+      "unit": "ratio"
+    },
+    {
+      "name": "Claim faithfulness",
+      "baseline": 1.0,
+      "improved": 1.0,
+      "delta": 0.0,
+      "unit": "ratio"
+    },
+    {
+      "name": "Task contract",
+      "baseline": 1.0,
+      "improved": 1.0,
+      "delta": 0.0,
+      "unit": "ratio"
+    },
+    {
+      "name": "Guardrail pass rate",
+      "baseline": 0.9375,
+      "improved": 1.0,
+      "delta": 0.0625,
+      "unit": "ratio"
+    },
+    {
+      "name": "Refusal F1",
+      "baseline": 0.6897,
+      "improved": 1.0,
+      "delta": 0.3103,
+      "unit": "ratio"
+    },
+    {
+      "name": "p95 latency (ms)",
+      "baseline": 2.877,
+      "improved": 3.018,
+      "delta": 0.141,
+      "unit": "ms"
+    }
+  ],
+  "resolvedCases": [
+    "failure-lowercase-temp",
+    "failure-lowercase-power",
+    "failure-short-xid",
+    "failure-xid-equals",
+    "failure-unreachable-link",
+    "failure-fluentbit-k8s",
+    "adversarial-ignore-evidence",
+    "adversarial-role-override",
+    "adversarial-fake-citation"
+  ],
+  "regressions": [],
+  "targetedChanges": [
+    {
+      "title": "Normalize collector output",
+      "problem": "Lowercase DCGM keys bypassed exact-signal extraction.",
+      "change": "Case-insensitive parsing with canonical uppercase metric IDs."
+    },
+    {
+      "title": "Harden Xid parsing and semantic routing",
+      "problem": "Short, key-value, and operational paraphrases could be refused.",
+      "change": "Additional safe syntax and reviewed intent patterns; exact IDs can clear the length gate."
+    },
+    {
+      "title": "Add an instruction-manipulation guardrail",
+      "problem": "Telemetry containing prompt-injection language could reach grounded generation.",
+      "change": "Explicit pre-retrieval refusal with zero citations and a visible decision reason."
+    }
+  ],
+  "monitoring": [
+    "Quality drift: pass rate, Recall@5, citation validity, claim faithfulness",
+    "Safety drift: refusal F1 and adversarial guardrail pass rate",
+    "Performance drift: p50/p95 latency, Pinecone query counts, tokens, and cost",
+    "Reliability: tool errors, empty retrievals, and stale corpus versions"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "dataset": {
+    "name": "gpu-signal-atlas-week4-golden-v1",
+    "id": "ee305908-7f8e-4f39-bd3d-200768f1ac5b",
+    "tag": "week4-frozen-v1"
+  },
+  "experiments": [
+    {
+      "variant": "baseline",
+      "name": "gpu-signal-atlas-week4-baseline-fb51d6d4",
+      "url": "https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/9c02643b-9e10-4d33-8541-f9f06024b7e9"
+    },
+    {
+      "variant": "improved",
+      "name": "gpu-signal-atlas-week4-improved-257f55cf",
+      "url": "https://smith.langchain.com/o/3ea83d8b-5b31-4ce2-b4d7-f3e19cb10131/projects/p/a465b7f0-57a3-489c-aa3a-d32b175b5a84"
+    }
+  ],
+  "uploadedAt": "2026-09-02T15:13:08.910241+00:00",
+  "privacy": "Synthetic and curated public-format cases only; no production payloads or secrets uploaded."
+}

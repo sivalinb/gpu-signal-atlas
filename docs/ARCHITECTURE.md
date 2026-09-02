@@ -9,7 +9,7 @@ flowchart TB
     A[Server-only analysis API]
     C[Curated evidence corpus]
     P[Pinecone versioned namespace]
-    E[Evaluation suite]
+    E[Python evaluation system]
     F[Fluent Bit replay]
     O[OpenTelemetry Collector]
     G[Sanitizing telemetry gateway]
@@ -28,6 +28,8 @@ flowchart TB
 ```
 
 The deployed application keeps input and rendering in the browser but performs retrieval through a same-origin server route. That route is the only component allowed to use the Pinecone credential. The credential-free command-line path and checked-in vector index remain available for deterministic regression testing and ablations.
+
+The Week 4 evaluation plane is intentionally separate from the production request path. A Python harness validates a frozen 48-case JSONL dataset, invokes the TypeScript evidence agent as the system under test, applies deterministic evaluators, clusters failures, writes JSON/CSV/XLSX/report artifacts, and uploads dataset-linked baseline and improved experiments to LangSmith. Pinecone remains the hosted retrieval plane; LangSmith is the experiment and trace plane, not a vector database.
 
 ## Implemented telemetry-to-browser path
 
@@ -190,12 +192,14 @@ Scores are ranking features, not probabilities. The UI reports a categorical evi
 
 ```mermaid
 flowchart TD
-    A[Input] --> B{At least 8 characters?}
-    B -->|No| R[Refuse]
-    B -->|Yes| C[Extract exact signals]
+    A[Input] --> Z{Instruction manipulation pattern?}
+    Z -->|Yes| R[Refuse with zero citations]
+    Z -->|No| C[Extract exact signals]
     C --> D{Unknown Xid or DCGM field?}
     D -->|Yes| R
-    D -->|No| E[Hybrid retrieval]
+    D -->|No| B{Too short and no exact signal?}
+    B -->|Yes| R
+    B -->|No| E[Hybrid retrieval]
     E --> F{Exact supported signal or explicit supported semantic intent?}
     F -->|No| R
     F -->|Yes| G[Generate from top evidence]

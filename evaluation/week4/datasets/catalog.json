@@ -1,0 +1,46 @@
+{
+  "datasets": [
+    {
+      "id": "golden-v1",
+      "name": "Week 4 Golden Dataset",
+      "cases": 48,
+      "purpose": "Frozen baseline/post-change comparison"
+    },
+    {
+      "id": "adversarial",
+      "name": "Adversarial",
+      "cases": 3,
+      "purpose": "Prompt-injection and evidence-manipulation controls"
+    },
+    {
+      "id": "edge_case",
+      "name": "Edge Case",
+      "cases": 14,
+      "purpose": "Format noise, hard negatives, and compatibility limits"
+    },
+    {
+      "id": "happy_path",
+      "name": "Happy Path",
+      "cases": 24,
+      "purpose": "Expected GPU and telemetry workflows"
+    },
+    {
+      "id": "known_failure",
+      "name": "Known Failure",
+      "cases": 7,
+      "purpose": "Regression cases derived from measured weaknesses"
+    }
+  ],
+  "relatedProductDatasets": [
+    {
+      "name": "Reviewed NVIDIA/DCGM evidence corpus",
+      "records": 17,
+      "location": "core/corpus.ts"
+    },
+    {
+      "name": "Public GPU performance benchmark records",
+      "records": 6,
+      "location": "core/benchmark.ts"
+    }
+  ]
+}

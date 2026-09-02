@@ -22,7 +22,7 @@ export interface AnalysisRetrievalOptions {
 }
 
 const semanticIntents: Array<{ id: string; pattern: RegExp }> = [
-  { id: 'nvidia-xid-79', pattern: /fallen off (?:the )?bus|driver (?:can(?:not|'t)|cannot) access (?:the )?gpu|gpu .*disappeared.*host/i },
+  { id: 'nvidia-xid-79', pattern: /fallen off (?:the )?bus|driver (?:can(?:not|'t)|cannot) access (?:the )?gpu|gpu .*disappeared.*host|(?:device|gpu).*(?:became )?unreachable|(?:device|gpu).*vanished.*(?:node|inventory)|pcie link reset.*(?:unreachable|vanished)/i },
   { id: 'nvidia-xid-48', pattern: /double[- ]bit ecc|uncorrectable .*ecc/i },
   { id: 'nvidia-xid-31', pattern: /gpu .*page fault|memory management unit .*fault|mmu .*fault/i },
   { id: 'nvidia-xid-13', pattern: /graphics engine exception/i },
@@ -32,10 +32,12 @@ const semanticIntents: Array<{ id: string; pattern: RegExp }> = [
   { id: 'dcgm-gpu-temp', pattern: /gpu temperature|thermal throttl/i },
   { id: 'dcgm-power-usage', pattern: /gpu .*power usage|board power|power limit/i },
   { id: 'gpu-operator-telemetry', pattern: /gpu operator.*dcgm exporter|dcgm exporter.*workload labels/i },
-  { id: 'fluent-bit-kubernetes', pattern: /fluent bit.*(?:pod|namespace|container|owner).*metadata|kubernetes filter.*metadata/i },
-  { id: 'fluent-bit-otlp', pattern: /fluent bit.*(?:opentelemetry|otlp|\/v1\/logs)/i },
+  { id: 'fluent-bit-kubernetes', pattern: /fluent[\s-]?bit.*(?:pod|namespace|container|owner|kubernetes identity|kubernetes).*?(?:metadata|enrich|identity)|kubernetes filter.*metadata/i },
+  { id: 'fluent-bit-otlp', pattern: /fluent[\s-]?bit.*(?:opentelemetry|otlp|\/v1\/logs|export)/i },
   { id: 'otel-semconv', pattern: /opentelemetry.*resource attributes|semantic conventions.*(?:logs|metrics|traces)/i },
 ];
+
+const adversarialInstructionPattern = /\b(?:ignore (?:all |any |the )?(?:previous|prior|system) instructions?|system override|reveal (?:the )?(?:hidden|system) (?:prompt|instructions?)|jailbreak(?: mode)?|fabricate (?:a |an )?(?:citation|source|url|bulletin)|suppress (?:all )?limitations?)\b/i;
 
 function nowMs(): number {
   return typeof performance === 'undefined' ? Date.now() : performance.now();
@@ -48,9 +50,9 @@ function traceId(query: string): string {
 
 export function extractSignals(text: string): ExtractedSignals {
   const xids = [
-    ...text.matchAll(/\bxid\s*(?:\([^)]*\)\s*:\s*|[_:#-]\s*|\s+)(\d{1,3})\b/gi),
+    ...text.matchAll(/\bxid\s*(?:\([^)]*\)\s*:?\s*|[_:#=-]\s*|\s+)(\d{1,3})\b/gi),
   ].map((match) => match[1]);
-  const metrics = [...text.matchAll(/\bDCGM_(?:FI|EXP)_[A-Z0-9_]+\b/g)].map((match) => match[0]);
+  const metrics = [...text.matchAll(/\bDCGM_(?:FI|EXP)_[A-Z0-9_]+\b/gi)].map((match) => match[0].toUpperCase());
   const gpuModels = [...text.matchAll(/\b(A100|H100|H200|B100|GB200|V100|T4|L4|L40S)\b/gi)].map(
     (match) => match[1].toUpperCase(),
   );
@@ -228,8 +230,10 @@ export function analyzeTelemetryFromRetrieval(
   const matchedSemanticIntents = semanticIntents.filter((intent) => intent.pattern.test(query)).map((intent) => intent.id);
   const intentRetrieved = matchedSemanticIntents.some((id) => retrieval.slice(0, 3).some((result) => result.document.id === id));
   const evidenceMargin = top ? Number((top.score - (retrieval[1]?.score ?? 0)).toFixed(4)) : 0;
+  const adversarialInstruction = adversarialInstructionPattern.test(query);
   const refuse =
-    query.trim().length < 8 ||
+    adversarialInstruction ||
+    (query.trim().length < 8 && !hasExact) ||
     unknown.length > 0 ||
     (!hasExact && (!intentRetrieved || !top));
 
@@ -246,7 +250,9 @@ export function analyzeTelemetryFromRetrieval(
   });
 
   if (refuse) {
-    const reason = unknown.length
+    const reason = adversarialInstruction
+      ? 'The submitted text contains an instruction-manipulation pattern, so it was not treated as telemetry evidence.'
+      : unknown.length
       ? `The reviewed corpus does not contain an authoritative entry for ${unknown.join(', ')}.`
       : 'The input does not contain enough supported GPU telemetry context for a grounded answer.';
     return {
@@ -265,9 +271,10 @@ export function analyzeTelemetryFromRetrieval(
       citations: [],
       retrieval,
       diagnostics: diagnostics([
+        ...(adversarialInstruction ? ['adversarial instruction pattern'] : []),
         ...(unknown.length ? ['unknown exact identifier'] : []),
         ...(!hasExact && !intentRetrieved ? ['no supported semantic intent matched retrieved evidence'] : []),
-        ...(query.trim().length < 8 ? ['input too short'] : []),
+        ...(query.trim().length < 8 && !hasExact ? ['input too short without a supported exact identifier'] : []),
       ]),
     };
   }

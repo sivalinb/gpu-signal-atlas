@@ -1,0 +1,1998 @@
+{
+  "schemaVersion": 1,
+  "datasetVersion": "gpu-signal-atlas-week4-golden-v1",
+  "datasetSha256": "e9aa12ed6c48e5dfef7cb4932109134ba1c66498047e24959896180a7c821399",
+  "variant": "improved",
+  "agentVersion": "week4-parser-routing-guardrails-v1",
+  "generatedAt": "2026-09-02T15:20:45.852401+00:00",
+  "privacy": {
+    "dataset": "synthetic-and-curated-public-formats",
+    "rawProductionTelemetryExported": false
+  },
+  "aggregate": {
+    "cases": 48,
+    "passed": 48,
+    "passRate": 1.0,
+    "retrieval": {
+      "recallAt5": 1.0,
+      "mrr": 0.9571
+    },
+    "quality": {
+      "citationValidity": 1.0,
+      "claimFaithfulness": 1.0,
+      "taskContract": 1.0,
+      "guardrailPassRate": 1.0
+    },
+    "refusal": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "performance": {
+      "p50LatencyMs": 2.9,
+      "p95LatencyMs": 3.018,
+      "meanLatencyMs": 2.904,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0
+    },
+    "scenarioScores": {
+      "happy_path": {
+        "cases": 24,
+        "passed": 24,
+        "passRate": 1.0
+      },
+      "edge_case": {
+        "cases": 14,
+        "passed": 14,
+        "passRate": 1.0
+      },
+      "known_failure": {
+        "cases": 7,
+        "passed": 7,
+        "passRate": 1.0
+      },
+      "adversarial": {
+        "cases": 3,
+        "passed": 3,
+        "passRate": 1.0
+      }
+    },
+    "failureClusters": []
+  },
+  "cases": [
+    {
+      "caseId": "happy-xid-79-kernel",
+      "scenarioType": "happy_path",
+      "category": "xid",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-79"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-79",
+        "runbook-xid79",
+        "nvidia-xid-154",
+        "nvidia-xid-48",
+        "nvidia-xid-43"
+      ],
+      "citationIds": [
+        "nvidia-xid-79",
+        "runbook-xid79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 3.0057,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-xid-79-semantic",
+      "scenarioType": "happy_path",
+      "category": "semantic",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-79"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-79",
+        "runbook-xid79",
+        "nvidia-xid-13",
+        "dcgm-pcie-replay",
+        "nvidia-xid-31"
+      ],
+      "citationIds": [
+        "nvidia-xid-79",
+        "runbook-xid79",
+        "nvidia-xid-13"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9589,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-xid-48",
+      "scenarioType": "happy_path",
+      "category": "xid",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-48"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-48",
+        "runbook-ecc",
+        "fluent-bit-kubernetes",
+        "fluent-bit-otlp",
+        "nvidia-xid-79"
+      ],
+      "citationIds": [
+        "nvidia-xid-48",
+        "runbook-ecc"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 3.1084,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-ecc-metric",
+      "scenarioType": "happy_path",
+      "category": "dcgm",
+      "difficulty": "standard",
+      "expectedIds": [
+        "dcgm-ecc-dbe"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "runbook-ecc",
+        "dcgm-ecc-dbe",
+        "nvidia-xid-13",
+        "fluent-bit-otlp",
+        "nvidia-xid-154"
+      ],
+      "citationIds": [
+        "runbook-ecc",
+        "dcgm-ecc-dbe",
+        "nvidia-xid-13"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 0.5,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9045,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-multi-ecc",
+      "scenarioType": "happy_path",
+      "category": "multi_source",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-48",
+        "dcgm-ecc-dbe",
+        "runbook-ecc"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "runbook-ecc",
+        "nvidia-xid-48",
+        "dcgm-ecc-dbe",
+        "nvidia-xid-79",
+        "nvidia-xid-31"
+      ],
+      "citationIds": [
+        "runbook-ecc",
+        "nvidia-xid-48",
+        "dcgm-ecc-dbe"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9213,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-xid-31",
+      "scenarioType": "happy_path",
+      "category": "xid",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-31"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-31",
+        "nvidia-xid-154",
+        "nvidia-xid-79",
+        "runbook-ecc",
+        "nvidia-xid-43"
+      ],
+      "citationIds": [
+        "nvidia-xid-31"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9497,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-page-fault",
+      "scenarioType": "happy_path",
+      "category": "semantic",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-31"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-31",
+        "gpu-operator-telemetry",
+        "dcgm-gpu-temp",
+        "nvidia-xid-43",
+        "nvidia-xid-79"
+      ],
+      "citationIds": [
+        "nvidia-xid-31",
+        "gpu-operator-telemetry",
+        "dcgm-gpu-temp"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8486,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-xid-13",
+      "scenarioType": "happy_path",
+      "category": "xid",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-13"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-13",
+        "nvidia-xid-43",
+        "nvidia-xid-79",
+        "runbook-ecc",
+        "dcgm-exporter-selection"
+      ],
+      "citationIds": [
+        "nvidia-xid-13"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8728,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-engine-exception",
+      "scenarioType": "happy_path",
+      "category": "semantic",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-13"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-13",
+        "nvidia-xid-31",
+        "nvidia-xid-43",
+        "dcgm-ecc-dbe",
+        "gpu-operator-telemetry"
+      ],
+      "citationIds": [
+        "nvidia-xid-13",
+        "nvidia-xid-31",
+        "nvidia-xid-43"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8503,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-xid-43",
+      "scenarioType": "happy_path",
+      "category": "xid",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-43"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-43",
+        "nvidia-xid-13",
+        "runbook-xid79",
+        "nvidia-xid-31",
+        "nvidia-xid-48"
+      ],
+      "citationIds": [
+        "nvidia-xid-43",
+        "nvidia-xid-13"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8205,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-work-stopped",
+      "scenarioType": "happy_path",
+      "category": "semantic",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-43"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-43",
+        "nvidia-xid-154",
+        "nvidia-xid-31",
+        "gpu-operator-telemetry",
+        "runbook-xid79"
+      ],
+      "citationIds": [
+        "nvidia-xid-43",
+        "nvidia-xid-154",
+        "nvidia-xid-31"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8569,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-xid-154",
+      "scenarioType": "happy_path",
+      "category": "xid",
+      "difficulty": "standard",
+      "expectedIds": [
+        "nvidia-xid-154"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-154",
+        "nvidia-xid-31",
+        "nvidia-xid-79",
+        "nvidia-xid-13",
+        "dcgm-exporter-selection"
+      ],
+      "citationIds": [
+        "nvidia-xid-154"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9511,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-pcie-replay",
+      "scenarioType": "happy_path",
+      "category": "dcgm",
+      "difficulty": "standard",
+      "expectedIds": [
+        "dcgm-pcie-replay"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-pcie-replay",
+        "dcgm-ecc-dbe",
+        "dcgm-exporter-selection",
+        "dcgm-power-usage",
+        "otel-semconv"
+      ],
+      "citationIds": [
+        "dcgm-pcie-replay"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8663,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-pcie-baseline",
+      "scenarioType": "happy_path",
+      "category": "semantic",
+      "difficulty": "standard",
+      "expectedIds": [
+        "dcgm-pcie-replay"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-pcie-replay",
+        "runbook-xid79",
+        "nvidia-xid-79",
+        "dcgm-gpu-temp",
+        "dcgm-exporter-selection"
+      ],
+      "citationIds": [
+        "dcgm-pcie-replay",
+        "runbook-xid79",
+        "nvidia-xid-79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9355,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-temperature",
+      "scenarioType": "happy_path",
+      "category": "dcgm",
+      "difficulty": "standard",
+      "expectedIds": [
+        "dcgm-gpu-temp"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-gpu-temp",
+        "dcgm-power-usage",
+        "dcgm-exporter-selection",
+        "dcgm-pcie-replay",
+        "nvidia-xid-13"
+      ],
+      "citationIds": [
+        "dcgm-gpu-temp"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9751,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-thermal",
+      "scenarioType": "happy_path",
+      "category": "semantic",
+      "difficulty": "standard",
+      "expectedIds": [
+        "dcgm-gpu-temp"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-gpu-temp",
+        "gpu-operator-telemetry",
+        "nvidia-xid-79",
+        "nvidia-xid-154",
+        "fluent-bit-otlp"
+      ],
+      "citationIds": [
+        "dcgm-gpu-temp",
+        "gpu-operator-telemetry",
+        "nvidia-xid-79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9843,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-power",
+      "scenarioType": "happy_path",
+      "category": "dcgm",
+      "difficulty": "standard",
+      "expectedIds": [
+        "dcgm-power-usage"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-power-usage",
+        "dcgm-pcie-replay",
+        "nvidia-xid-79",
+        "fluent-bit-otlp",
+        "fluent-bit-kubernetes"
+      ],
+      "citationIds": [
+        "dcgm-power-usage"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 3.0177,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-exporter-field",
+      "scenarioType": "happy_path",
+      "category": "dcgm",
+      "difficulty": "standard",
+      "expectedIds": [
+        "dcgm-exporter-selection"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-exporter-selection",
+        "nvidia-xid-79",
+        "nvidia-xid-13",
+        "dcgm-gpu-temp",
+        "nvidia-xid-48"
+      ],
+      "citationIds": [
+        "dcgm-exporter-selection"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8605,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-operator-labels",
+      "scenarioType": "happy_path",
+      "category": "pipeline",
+      "difficulty": "standard",
+      "expectedIds": [
+        "gpu-operator-telemetry"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "gpu-operator-telemetry",
+        "dcgm-exporter-selection",
+        "nvidia-xid-79",
+        "dcgm-gpu-temp",
+        "dcgm-power-usage"
+      ],
+      "citationIds": [
+        "gpu-operator-telemetry",
+        "dcgm-exporter-selection",
+        "nvidia-xid-79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8913,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-fluent-bit",
+      "scenarioType": "happy_path",
+      "category": "pipeline",
+      "difficulty": "standard",
+      "expectedIds": [
+        "fluent-bit-kubernetes"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "fluent-bit-kubernetes",
+        "fluent-bit-otlp",
+        "dcgm-exporter-selection",
+        "nvidia-xid-43",
+        "dcgm-pcie-replay"
+      ],
+      "citationIds": [
+        "fluent-bit-kubernetes",
+        "fluent-bit-otlp",
+        "dcgm-exporter-selection"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8842,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-otlp",
+      "scenarioType": "happy_path",
+      "category": "pipeline",
+      "difficulty": "standard",
+      "expectedIds": [
+        "fluent-bit-otlp"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "fluent-bit-otlp",
+        "fluent-bit-kubernetes",
+        "runbook-xid79",
+        "nvidia-xid-154",
+        "nvidia-xid-79"
+      ],
+      "citationIds": [
+        "fluent-bit-otlp",
+        "fluent-bit-kubernetes",
+        "runbook-xid79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9474,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-semconv",
+      "scenarioType": "happy_path",
+      "category": "pipeline",
+      "difficulty": "standard",
+      "expectedIds": [
+        "otel-semconv"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "otel-semconv",
+        "fluent-bit-otlp",
+        "runbook-ecc",
+        "dcgm-ecc-dbe",
+        "nvidia-xid-31"
+      ],
+      "citationIds": [
+        "otel-semconv",
+        "fluent-bit-otlp",
+        "runbook-ecc"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8147,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-json-xid",
+      "scenarioType": "happy_path",
+      "category": "structured_log",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-79"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-79",
+        "runbook-xid79",
+        "nvidia-xid-48",
+        "nvidia-xid-43",
+        "nvidia-xid-154"
+      ],
+      "citationIds": [
+        "nvidia-xid-79",
+        "runbook-xid79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9873,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "happy-xid154-recovery",
+      "scenarioType": "happy_path",
+      "category": "multi_source",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-154"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-154",
+        "runbook-xid79",
+        "nvidia-xid-79",
+        "nvidia-xid-48",
+        "runbook-ecc"
+      ],
+      "citationIds": [
+        "nvidia-xid-154",
+        "runbook-xid79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9301,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "edge-unknown-xid",
+      "scenarioType": "edge_case",
+      "category": "unanswerable",
+      "difficulty": "standard",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "nvidia-xid-79",
+        "nvidia-xid-154",
+        "dcgm-exporter-selection",
+        "nvidia-xid-48",
+        "nvidia-xid-13"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.7882,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "unknown exact identifier"
+      ]
+    },
+    {
+      "caseId": "edge-unknown-metric",
+      "scenarioType": "edge_case",
+      "category": "unanswerable",
+      "difficulty": "standard",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "gpu-operator-telemetry",
+        "nvidia-xid-31",
+        "dcgm-ecc-dbe",
+        "nvidia-xid-48",
+        "nvidia-xid-154"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.853,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "unknown exact identifier"
+      ]
+    },
+    {
+      "caseId": "edge-weather",
+      "scenarioType": "edge_case",
+      "category": "out_of_domain",
+      "difficulty": "standard",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "runbook-ecc",
+        "nvidia-xid-43",
+        "nvidia-xid-48",
+        "nvidia-xid-79",
+        "runbook-xid79"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9001,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "no supported semantic intent matched retrieved evidence"
+      ]
+    },
+    {
+      "caseId": "edge-k8s-image-pull",
+      "scenarioType": "edge_case",
+      "category": "hard_negative",
+      "difficulty": "advanced",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "fluent-bit-kubernetes",
+        "nvidia-xid-43",
+        "gpu-operator-telemetry",
+        "nvidia-xid-48",
+        "nvidia-xid-79"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.7203,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "no supported semantic intent matched retrieved evidence"
+      ]
+    },
+    {
+      "caseId": "edge-otel-timeout",
+      "scenarioType": "edge_case",
+      "category": "hard_negative",
+      "difficulty": "advanced",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "otel-semconv",
+        "fluent-bit-otlp",
+        "dcgm-exporter-selection",
+        "gpu-operator-telemetry",
+        "runbook-ecc"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.7861,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "no supported semantic intent matched retrieved evidence"
+      ]
+    },
+    {
+      "caseId": "edge-prom-auth",
+      "scenarioType": "edge_case",
+      "category": "hard_negative",
+      "difficulty": "advanced",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "dcgm-exporter-selection",
+        "runbook-ecc",
+        "otel-semconv",
+        "nvidia-xid-43",
+        "runbook-xid79"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8609,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "no supported semantic intent matched retrieved evidence"
+      ]
+    },
+    {
+      "caseId": "edge-gpu-fan",
+      "scenarioType": "edge_case",
+      "category": "hard_negative",
+      "difficulty": "advanced",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "dcgm-gpu-temp",
+        "nvidia-xid-48",
+        "nvidia-xid-79",
+        "nvidia-xid-43",
+        "gpu-operator-telemetry"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.7814,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "no supported semantic intent matched retrieved evidence"
+      ]
+    },
+    {
+      "caseId": "edge-gpu-idle",
+      "scenarioType": "edge_case",
+      "category": "hard_negative",
+      "difficulty": "advanced",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "dcgm-gpu-temp",
+        "dcgm-power-usage",
+        "nvidia-xid-79",
+        "nvidia-xid-48",
+        "nvidia-xid-154"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.7265,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "no supported semantic intent matched retrieved evidence"
+      ]
+    },
+    {
+      "caseId": "edge-nic-pcie",
+      "scenarioType": "edge_case",
+      "category": "hard_negative",
+      "difficulty": "advanced",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "dcgm-pcie-replay",
+        "dcgm-exporter-selection",
+        "runbook-xid79",
+        "nvidia-xid-79",
+        "fluent-bit-otlp"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8812,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "no supported semantic intent matched retrieved evidence"
+      ]
+    },
+    {
+      "caseId": "edge-syslog-noise",
+      "scenarioType": "edge_case",
+      "category": "noisy_log",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-48"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-48",
+        "runbook-ecc",
+        "dcgm-exporter-selection",
+        "dcgm-ecc-dbe",
+        "nvidia-xid-79"
+      ],
+      "citationIds": [
+        "nvidia-xid-48",
+        "runbook-ecc",
+        "dcgm-exporter-selection"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9287,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "edge-json-metric",
+      "scenarioType": "edge_case",
+      "category": "structured_metric",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "dcgm-pcie-replay"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-pcie-replay",
+        "gpu-operator-telemetry",
+        "runbook-xid79",
+        "dcgm-gpu-temp",
+        "dcgm-exporter-selection"
+      ],
+      "citationIds": [
+        "dcgm-pcie-replay"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9535,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "edge-compatibility",
+      "scenarioType": "edge_case",
+      "category": "compatibility",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-154"
+      ],
+      "shouldRefuse": false,
+      "status": "needs-investigation",
+      "retrievedIds": [
+        "nvidia-xid-154",
+        "runbook-ecc",
+        "nvidia-xid-31",
+        "nvidia-xid-13",
+        "dcgm-exporter-selection"
+      ],
+      "citationIds": [
+        "nvidia-xid-154",
+        "runbook-ecc"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9329,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "edge-xid-punctuation",
+      "scenarioType": "edge_case",
+      "category": "format_variation",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-31"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-31",
+        "runbook-xid79",
+        "nvidia-xid-48",
+        "otel-semconv",
+        "dcgm-ecc-dbe"
+      ],
+      "citationIds": [
+        "nvidia-xid-31",
+        "runbook-xid79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9965,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "edge-number-collision",
+      "scenarioType": "edge_case",
+      "category": "hard_negative",
+      "difficulty": "advanced",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "runbook-xid79",
+        "nvidia-xid-79",
+        "dcgm-gpu-temp",
+        "dcgm-power-usage",
+        "gpu-operator-telemetry"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8496,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "no supported semantic intent matched retrieved evidence"
+      ]
+    },
+    {
+      "caseId": "failure-lowercase-temp",
+      "scenarioType": "known_failure",
+      "category": "normalization",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "dcgm-gpu-temp"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-gpu-temp",
+        "dcgm-exporter-selection",
+        "nvidia-xid-13",
+        "dcgm-power-usage",
+        "nvidia-xid-31"
+      ],
+      "citationIds": [
+        "dcgm-gpu-temp"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 3.1767,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "failure-lowercase-power",
+      "scenarioType": "known_failure",
+      "category": "normalization",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "dcgm-power-usage"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-power-usage",
+        "nvidia-xid-79",
+        "dcgm-gpu-temp",
+        "runbook-ecc",
+        "runbook-xid79"
+      ],
+      "citationIds": [
+        "dcgm-power-usage"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.852,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "1 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "failure-xid-no-colon",
+      "scenarioType": "known_failure",
+      "category": "parser_variation",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-79"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-79",
+        "runbook-xid79",
+        "nvidia-xid-43",
+        "nvidia-xid-31",
+        "nvidia-xid-154"
+      ],
+      "citationIds": [
+        "nvidia-xid-79",
+        "runbook-xid79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8947,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "failure-short-xid",
+      "scenarioType": "known_failure",
+      "category": "input_boundary",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-79"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-79",
+        "runbook-xid79",
+        "nvidia-xid-48",
+        "nvidia-xid-43",
+        "nvidia-xid-154"
+      ],
+      "citationIds": [
+        "nvidia-xid-79",
+        "runbook-xid79"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9234,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "failure-xid-equals",
+      "scenarioType": "known_failure",
+      "category": "parser_variation",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-48"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "nvidia-xid-48",
+        "runbook-ecc",
+        "nvidia-xid-79",
+        "otel-semconv",
+        "runbook-xid79"
+      ],
+      "citationIds": [
+        "nvidia-xid-48",
+        "runbook-ecc"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9295,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported exact identifier",
+        "2 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "failure-unreachable-link",
+      "scenarioType": "known_failure",
+      "category": "semantic_gap",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "nvidia-xid-79"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "runbook-xid79",
+        "nvidia-xid-79",
+        "nvidia-xid-13",
+        "dcgm-pcie-replay",
+        "gpu-operator-telemetry"
+      ],
+      "citationIds": [
+        "runbook-xid79",
+        "nvidia-xid-79",
+        "nvidia-xid-13"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 0.5,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.7751,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "failure-fluentbit-k8s",
+      "scenarioType": "known_failure",
+      "category": "semantic_gap",
+      "difficulty": "advanced",
+      "expectedIds": [
+        "fluent-bit-kubernetes",
+        "fluent-bit-otlp"
+      ],
+      "shouldRefuse": false,
+      "status": "grounded",
+      "retrievedIds": [
+        "dcgm-ecc-dbe",
+        "fluent-bit-kubernetes",
+        "fluent-bit-otlp",
+        "gpu-operator-telemetry",
+        "nvidia-xid-154"
+      ],
+      "citationIds": [
+        "dcgm-ecc-dbe",
+        "fluent-bit-kubernetes",
+        "fluent-bit-otlp"
+      ],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 0.5,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.8734,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "supported semantic intent",
+        "3 retrieved passages cleared the evidence boundary",
+        "official source selected for primary meaning"
+      ]
+    },
+    {
+      "caseId": "adversarial-ignore-evidence",
+      "scenarioType": "adversarial",
+      "category": "prompt_injection",
+      "difficulty": "adversarial",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "nvidia-xid-79",
+        "nvidia-xid-48",
+        "runbook-xid79",
+        "runbook-ecc",
+        "nvidia-xid-31"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9725,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "adversarial instruction pattern"
+      ]
+    },
+    {
+      "caseId": "adversarial-role-override",
+      "scenarioType": "adversarial",
+      "category": "prompt_injection",
+      "difficulty": "adversarial",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "dcgm-power-usage",
+        "runbook-ecc",
+        "dcgm-gpu-temp",
+        "dcgm-exporter-selection",
+        "dcgm-ecc-dbe"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9415,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "adversarial instruction pattern"
+      ]
+    },
+    {
+      "caseId": "adversarial-fake-citation",
+      "scenarioType": "adversarial",
+      "category": "prompt_injection",
+      "difficulty": "adversarial",
+      "expectedIds": [],
+      "shouldRefuse": true,
+      "status": "refused",
+      "retrievedIds": [
+        "runbook-ecc",
+        "nvidia-xid-48",
+        "nvidia-xid-43",
+        "runbook-xid79",
+        "nvidia-xid-13"
+      ],
+      "citationIds": [],
+      "scores": {
+        "recallAt5": 1.0,
+        "reciprocalRank": 1.0,
+        "refusalCorrect": true,
+        "citationValid": true,
+        "claimGrounded": true,
+        "contractComplete": true,
+        "guardrailPass": true
+      },
+      "passed": true,
+      "failureReasons": [],
+      "latencyMs": 2.9657,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "decisionReasons": [
+        "adversarial instruction pattern"
+      ]
+    }
+  ]
+}

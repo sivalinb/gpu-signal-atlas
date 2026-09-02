@@ -13,10 +13,19 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - run: npm ci
+      - run: python -m venv .venv-week4
+      - run: .venv-week4/bin/python -m pip install -r requirements-week4.txt
       - run: npm run index:check
       - run: npm run freshness
       - run: npm test
+      - run: npm run week4:validate
+      - run: npm run week4:test
+      - run: npm run week4:run
+      - run: npm run week4:compare
       - run: npm run evaluate
       - run: npm run ablate
       - run: npm run typecheck

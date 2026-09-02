@@ -39,3 +39,8 @@ next-env.d.ts
 /outputs/
 /work/
 *.tsbuildinfo
+
+# Week 4 Python evaluation environment
+/.venv-week4/
+__pycache__/
+*.py[cod]

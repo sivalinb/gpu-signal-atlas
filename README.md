@@ -28,7 +28,7 @@ GPU Signal Atlas helps GPU platform engineers explain NVIDIA Xid events and DCGM
 - Hard refusal for unknown identifiers, unrelated questions, and unsupported same-domain telemetry
 - Compatibility notes for unsupported GPU/driver combinations
 - Four interactive browser replays, including a refusal example
-- Thirty-one-case retrieval, claim-grounding, and refusal evaluation
+- Forty-eight-case Python evaluation product with frozen dataset slices, paired baseline/improved results, deterministic judges, failure clustering, LangSmith experiments, and CSV/XLSX evidence
 - Retrieval and chunking ablations covering BM25, vector, RRF, reranking, fixed windows, and structure-aware records
 - Allow-listed ingestion, HTML cleaning, source fingerprinting, and freshness-SLA gates
 - Node test suite, type checking, production build, and GitHub Actions CI
@@ -82,6 +82,9 @@ cd gpu-signal-atlas
 npm install
 npm test
 npm run evaluate
+npm run week4:validate
+npm run week4:test
+npm run week4:run
 npm run ablate
 npm run pinecone:sync
 npm run evaluate:pinecone
@@ -106,24 +109,26 @@ Start at the product homepage for the Observe → Retrieve → Explain → Decid
 
 Open **Performance** in the main navigation for the solution-architecture workflow. Compare the bundled public NVIDIA benchmark runs, inspect SLO decisions, visualize how benchmark and telemetry systems align, review a safe MIG/diagnostics workflow, edit a headroom/cost scenario, and export the evidence report. Public measurements and derived scenarios are labeled separately throughout the interface.
 
+Open **Eval lab** for the Week 4 product-quality view. Toggle the frozen baseline and improved LangSmith experiments, inspect the 24/14/7/3 dataset distribution, follow the Python evaluation pipeline, and map each failure cluster to the targeted code change and measured result.
+
 Open **Metrics** for the self-observing runtime view. It polls a sanitized server summary every 15 seconds and shows live Pinecone index statistics, application-observed query read units and latency, the latest RAG stage timing, provider request health, RAG outcomes, and the bounded OpenTelemetry safety buffer. The charts are explicitly labeled as current-runtime and non-durable; they do not imitate provider billing or historical control-plane metrics.
 
-## Evaluation snapshot
+## Week 4 controlled evaluation snapshot
 
-The checked-in evaluation contains 31 independent cases across exact identifiers, semantic symptoms, multi-source retrieval, deliberately unsupported inputs, and six adversarial same-domain negatives.
+The frozen `gpu-signal-atlas-week4-golden-v1` dataset contains 48 human-reviewed expectations: 24 happy paths, 14 edge cases, 7 known-failure regressions, and 3 adversarial prompts. The identical dataset was run before and after three targeted changes. All nine baseline failures were resolved with zero regressions.
 
-| Metric | Result | Target |
+| Metric | Baseline | Improved |
 |---|---:|---:|
-| Recall@5 | 100.0% | ≥85% |
-| Mean reciprocal rank | 0.931 | ≥0.80 |
-| Citation validity | 100.0% | ≥90% |
-| Claim grounding | 100.0% | 100% |
-| Refusal precision | 100.0% | ≥90% |
-| Refusal recall | 100.0% | ≥90% |
-| Local p95 retrieval latency | 0.92 ms | <5 s |
-| Pinecone p95 end-to-end retrieval latency | 518.05 ms | <5 s |
+| End-to-end pass rate | 81.2% | 100.0% |
+| Recall@5 | 100.0% | 100.0% |
+| Mean reciprocal rank | 0.957 | 0.957 |
+| Citation validity | 100.0% | 100.0% |
+| Claim faithfulness | 100.0% | 100.0% |
+| Refusal F1 | 69.0% | 100.0% |
+| Adversarial guardrail | 93.8% | 100.0% |
+| Regressions | — | 0 |
 
-These results validate the checked-in deterministic corpus and queries. They are regression evidence, not generalized GPU-diagnostic accuracy. Full methodology is in [`docs/EVALUATION_REPORT.md`](docs/EVALUATION_REPORT.md).
+The additional managed-index run passed 48/48 cases with 100% Recall@5, used 48 Pinecone read units, and measured 987.6 ms p95 end-to-end retrieval latency. These results validate the checked-in deterministic corpus and frozen queries. They are regression evidence, not generalized GPU-diagnostic accuracy. Full Week 4 methodology is in [`docs/WEEK4_EVALUATION_REPORT.md`](docs/WEEK4_EVALUATION_REPORT.md); the original 31-case retrieval benchmark remains in [`docs/EVALUATION_REPORT.md`](docs/EVALUATION_REPORT.md).
 
 ## Repository map
 
@@ -149,6 +154,7 @@ core/
   samples.ts                 browser replay inputs
   types.ts                   public data contracts
 evaluation/cases.ts          independent query expectations
+evaluation/week4/            frozen 48-case dataset, scenario slices, results, CSV/XLSX, and Python harness
 tests/engine.test.ts         unit, retrieval, safety, and regression tests
 scripts/analyze.ts           command-line analysis
 scripts/evaluate.ts          reproducible evaluation runner
@@ -199,6 +205,8 @@ docs/                        design, visual, evaluation, testing, and submission
 - [`docs/VISUAL_GUIDE.md`](docs/VISUAL_GUIDE.md) — illustrated end-to-end flow and code map
 - [`docs/DATASET_AND_PROMPTS.md`](docs/DATASET_AND_PROMPTS.md) — corpus, freshness, chunking, generation instructions, and iterations
 - [`docs/EVALUATION_REPORT.md`](docs/EVALUATION_REPORT.md) — query set, metrics, results, and failure analysis
+- [`docs/WEEK4_EVALUATION_REPORT.md`](docs/WEEK4_EVALUATION_REPORT.md) — frozen baseline/post experiment, failure clusters, measured deltas, and monitoring plan
+- [`docs/WEEK4_LOCAL_TESTING.md`](docs/WEEK4_LOCAL_TESTING.md) — Python environment, dataset validation, experiment replay, and LangSmith upload
 - [`docs/ABLATION_REPORT.md`](docs/ABLATION_REPORT.md) — retrieval and chunking comparisons
 - [`docs/INGESTION_AND_FRESHNESS.md`](docs/INGESTION_AND_FRESHNESS.md) — source refresh and human-review workflow
 - [`docs/TELEMETRY_LIVE_FLOW.md`](docs/TELEMETRY_LIVE_FLOW.md) — implemented Collector-to-browser gateway, SSE contract, safeguards, and extension points

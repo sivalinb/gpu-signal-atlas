@@ -45,6 +45,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { PerformanceWorkbench } from '@/components/performance-workbench';
 import { IntelligenceFabric } from '@/components/intelligence-fabric';
 import { ProviderObservability } from '@/components/provider-observability';
+import { Week4EvaluationLab } from '@/components/week4-evaluation-lab';
 import { SpokenBriefing, VoiceCapture } from '@/components/voice-controls';
 import { corpus } from '@/core/corpus';
 import { samples } from '@/core/samples';
@@ -81,8 +82,8 @@ async function requestIntegrationStatus(signal?: AbortSignal): Promise<Integrati
 }
 
 const evaluationMetrics = [
-  ['Recall@5', '100%', '31 labeled cases'],
-  ['MRR', '0.931', 'rank quality'],
+  ['Recall@5', '100%', '48 labeled cases'],
+  ['MRR', '0.957', 'rank quality'],
   ['Citations', '100%', 'retriever-backed'],
   ['Refusals', '100%', 'precision & recall'],
 ];
@@ -969,7 +970,7 @@ export default function Home() {
             <a className="transition hover:text-foreground" href="#architecture">Architecture</a>
             <a className="transition hover:text-foreground" href="#integrations">AI observability</a>
             <a className="transition hover:text-foreground" href="#provider-observability">Metrics</a>
-            <a className="transition hover:text-foreground" href="#evaluation">Evaluation</a>
+            <a className="transition hover:text-foreground" href="#week4-evaluation">Eval lab</a>
           </nav>
           <Badge variant="outline" className="border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
             <span className="size-1.5 rounded-full bg-emerald-300" /> Pinecone-backed corpus
@@ -996,7 +997,7 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-2 lg:w-[360px]">
             {[
               [corpus.length.toString(), 'chunks'],
-              ['31', 'evals'],
+              ['48', 'evals'],
               ['0', 'browser secrets'],
             ].map(([value, label]) => (
               <div key={label} className="rounded-xl border border-border/70 bg-card/70 px-3 py-4 text-center backdrop-blur">
@@ -1283,12 +1284,14 @@ export default function Home() {
 
       <ProviderObservability />
 
+      <Week4EvaluationLab />
+
       <section id="evaluation" className="relative z-10 py-16">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <div className="mb-9 max-w-3xl">
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">Evaluation evidence</p>
             <h2 className="mt-2 font-heading text-3xl font-semibold tracking-tight">Retrieval quality is a test, not a screenshot.</h2>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">The checked-in suite covers exact identifiers, semantic symptoms, multi-source questions, and unsupported inputs. Metrics below are reproducible locally with one command.</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">The frozen suite covers exact identifiers, semantic symptoms, multi-source questions, unsupported inputs, known regressions, and adversarial prompts. Metrics below are reproducible locally from the Python evaluation harness.</p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {evaluationMetrics.map(([label, value, note]) => (
@@ -1342,7 +1345,7 @@ export default function Home() {
             <Card className="border border-border/70 bg-card/70">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Gauge className="size-4 text-primary" /> Query mix</CardTitle>
-                <CardDescription>Thirty-one independent expectations, including adversarial same-domain negatives.</CardDescription>
+                <CardDescription>The original 31-case retrieval slice remains visible for continuity; the Week 4 lab above expands the controlled product evaluation to 48 cases.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {[
