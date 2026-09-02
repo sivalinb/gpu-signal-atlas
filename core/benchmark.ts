@@ -41,6 +41,13 @@ export interface CapacityInput {
   gpuHourlyCostUsd: number;
 }
 
+export interface BenchmarkCampaignContract {
+  status: 'public-reference-incomplete' | 'target-stack-complete';
+  known: Record<string, string>;
+  requiredBeforePromotion: string[];
+  exactCommandTemplate: string;
+}
+
 export const benchmarkProvenance: BenchmarkProvenance = {
   title: 'NVIDIA GenAI-Perf Analyze example summary report',
   publisher: 'NVIDIA Triton Inference Server / Perf Analyzer',
@@ -52,6 +59,27 @@ export const benchmarkProvenance: BenchmarkProvenance = {
   evidenceClass: 'public-measurement',
   caveat:
     'These three values reproduce the public documentation example. The GPU model, server configuration, confidence interval, and repetition count are not reported, so they are demonstration data—not a hardware purchasing claim.',
+};
+
+export const benchmarkCampaignContract: BenchmarkCampaignContract = {
+  status: 'public-reference-incomplete',
+  known: {
+    'Model': 'GPT-2 (revision not reported)',
+    'Serving path': 'Triton + vLLM',
+    'Input shape': '201 input tokens; output length not reported',
+    'Load shape': 'Concurrency 1; request-rate mode not reported',
+    'Evidence source': 'NVIDIA GenAI-Perf documentation example',
+  },
+  requiredBeforePromotion: [
+    'GPU SKU, GPU count, topology, and MIG profile',
+    'Model revision, precision or quantization, tensor and pipeline parallelism',
+    'Serving backend, container, CUDA, driver, firmware, and configuration versions',
+    'Input/output token distributions, concurrency or request-rate sweep, and dataset fingerprint',
+    'Warmup policy, repetitions, cold/warm separation, variance, and confidence interval',
+    'Exact command, power/thermal conditions, failure count, timeout count, and raw artifact URI',
+  ],
+  exactCommandTemplate:
+    'genai-perf profile -m <model> --endpoint-type <endpoint> --concurrency <sweep> --synthetic-input-tokens-mean <n> --output-tokens-mean <n> --measurement-interval <ms>',
 };
 
 export const publicBenchmarkRuns: BenchmarkRun[] = [
@@ -184,6 +212,7 @@ export function buildDecisionReport(baselineId: string, candidateId: string, slo
     reportType: 'GPU Signal Atlas benchmark evidence report',
     evidenceClass: benchmarkProvenance.evidenceClass,
     provenance: benchmarkProvenance,
+    campaignContract: benchmarkCampaignContract,
     comparison,
     recommendation: comparison.slo.pass
       ? 'Candidate satisfies the configured demonstration SLO. Validate with repeated runs on the target stack before promotion.'

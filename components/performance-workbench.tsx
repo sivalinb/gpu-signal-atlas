@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+  benchmarkCampaignContract,
   benchmarkProvenance,
   buildDecisionReport,
   compareRuns,
@@ -141,6 +142,20 @@ export function PerformanceWorkbench() {
               </div>
             </CardHeader>
             <CardContent className="pt-5">
+              <div className="mb-5 grid gap-4 rounded-xl border border-amber-300/20 bg-amber-300/[0.035] p-4 lg:grid-cols-[.85fr_1.15fr]">
+                <div>
+                  <div className="flex items-center gap-2"><ShieldAlert className="size-4 text-amber-300" /><p className="text-sm font-medium text-amber-100">Reproducibility gate · public reference incomplete</p></div>
+                  <div className="mt-3 space-y-2">
+                    {Object.entries(benchmarkCampaignContract.known).map(([key, value]) => <p key={key} className="text-xs leading-5 text-muted-foreground"><span className="text-slate-200">{key}:</span> {value}</p>)}
+                  </div>
+                </div>
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[.16em] text-amber-200">Required before an NVIDIA stack decision</p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {benchmarkCampaignContract.requiredBeforePromotion.map((item) => <p key={item} className="flex gap-2 text-[11px] leading-5 text-muted-foreground"><CircleAlert className="mt-1 size-3 shrink-0 text-amber-300" />{item}</p>)}
+                  </div>
+                </div>
+              </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                 <MetricCard label="TTFT p99" value={comparison.candidate.ttftP99Ms.toFixed(2)} unit="ms" delta={comparison.deltas.ttftPct} lower />
                 <MetricCard label="ITL p99" value={comparison.candidate.interTokenLatencyP99Ms.toFixed(2)} unit="ms" delta={comparison.deltas.itlPct} lower />

@@ -41,13 +41,16 @@ The project focuses on the retrieval layer that prevents that error. It is not a
 
 ## Dataset used
 
-The checked-in corpus contains 17 reviewed, structure-aware records covering:
+The checked-in corpus contains 27 reviewed, structure-aware records covering:
 
 - NVIDIA Xids 13, 31, 43, 48, 79, and 154;
 - DCGM PCIe replay, temperature, power, ECC, exporter selection, Xid count, and health signals;
 - NVIDIA GPU Operator telemetry deployment;
 - Fluent Bit Kubernetes enrichment and OTLP output;
 - OpenTelemetry semantic conventions; and
+- NVLink and NVSwitch errors, Fabric Manager, and NCCL troubleshooting;
+- row remapping, retired pages, framebuffer pressure, and clock-event reasons;
+- MIG Manager, Kubernetes device allocation, and GPU Operator driver readiness; and
 - two demonstration evidence-collection runbooks.
 
 Official entries link directly to NVIDIA, Fluent Bit, or OpenTelemetry documentation. Internal runbooks are labeled separately.
@@ -113,7 +116,7 @@ OpenAI Codex supported repository inspection, TypeScript and React implementatio
 
 ## Evaluation
 
-Thirty-one independent cases cover exact identifiers, semantic symptoms, multi-source questions, unsupported inputs, and six adversarial same-domain negatives. A separate ablation runner compares BM25, vector-only, RRF, contextual reranking, fixed windows, and structure-aware records.
+The primary frozen set contains 100 owner-reviewed cases across exact identifiers, semantic symptoms, multi-source questions, unsupported inputs, and adversarial negatives. A separate 16-case post-change holdout covers the newly added signal families and preserves its first-run 15/16 result. Independent blinded GPU-domain review is still pending. A separate ablation runner compares BM25, vector-only, RRF, contextual reranking, fixed windows, and structure-aware records.
 
 Recorded result:
 
@@ -128,7 +131,7 @@ Recorded result:
 | p95 local latency | 0.92 ms |
 | p95 Pinecone retrieval latency | 518.05 ms |
 
-The expanded test suite contains 51 passing tests covering retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and operation-level usage, provider-metric aggregation, OpenAI-compatible and Mistral model contracts, Neo4j Query API mapping, Deepgram secret boundaries, ablations, observability configuration, telemetry redaction and OTLP normalization, immediate SSE delivery, public status redaction, You.com governance, LangSmith redaction/export contracts, public benchmark provenance, SLO evaluation, comparison math, capacity headroom, and report safety boundaries. The live 31-case Pinecone evaluation also records zero failures. These results validate the reviewed regression set only.
+The automated suite covers retrieval, refusal, ingestion, freshness, index integrity, Pinecone requests and operation-level usage, provider-metric aggregation, OpenAI-compatible and Mistral model contracts, Neo4j Query API mapping, Deepgram secret boundaries, ablations, observability configuration, telemetry redaction and OTLP normalization, immediate SSE delivery, public status redaction, You.com governance, LangSmith redaction/export contracts, benchmark provenance, SLO evaluation, comparison math, capacity headroom, and report safety boundaries. The 100-case Pinecone evaluation records zero failures; the separate holdout records one residual safety miss. These results validate bounded reviewed datasets only.
 
 ## Observability integration
 

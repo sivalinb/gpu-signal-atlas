@@ -65,3 +65,12 @@ curl -s http://localhost:3000/api/observability/summary
 ```
 
 The aggregation and payload boundary are covered by `tests/provider-observability.test.ts`.
+# Accuracy boundary
+
+The public dashboard separates three measurement classes:
+
+- **Current runtime:** up to 120 in-memory samples; a restart resets the window.
+- **Frozen release gate:** versioned 100-case local and Pinecone artifacts with p50/p95/p99 latency, read units, corpus/index identifiers, and quality metrics.
+- **Production history:** 5-minute, 1-hour, and 24-hour trends are explicitly marked not connected until a durable Prometheus/ClickHouse-style backend exists.
+
+LangSmith trace export is optional. If quota or transport prevents export, the analysis remains complete and the UI reports `trace export unavailable; result complete`; provider errors remain visible in the operational panel.

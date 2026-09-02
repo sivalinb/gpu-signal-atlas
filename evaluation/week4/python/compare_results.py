@@ -121,7 +121,7 @@ def write_csv(path: Path, baseline: dict[str, Any], improved: dict[str, Any]) ->
     before = {item["caseId"]: item for item in baseline["cases"]}
     after = {item["caseId"]: item for item in improved["cases"]}
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(["case_id", "scenario", "category", "baseline_pass", "improved_pass", "resolved", "baseline_failures", "improved_failures", "baseline_latency_ms", "improved_latency_ms"])
         for case_id, item in before.items():
             changed = after[case_id]
@@ -214,7 +214,7 @@ The improved agent also ran the identical {managed['cases']} cases against the c
 
 ## Executive result
 
-GPU Signal Atlas was evaluated on the same frozen, human-reviewed {comparison['cases']}-case dataset before and after targeted changes. The pass rate improved from **{pct(comparison['baseline']['passRate'])}** to **{pct(comparison['improved']['passRate'])}**. All **{len(comparison['resolvedCases'])}** baseline failures were resolved and the controlled rerun introduced **{len(comparison['regressions'])} regressions**.
+GPU Signal Atlas was evaluated on the same frozen, owner-reviewed {comparison['cases']}-case dataset before and after targeted changes. The pass rate improved from **{pct(comparison['baseline']['passRate'])}** to **{pct(comparison['improved']['passRate'])}**. All **{len(comparison['resolvedCases'])}** baseline failures were resolved and the controlled rerun introduced **{len(comparison['regressions'])} regressions**. A separate post-change holdout preserves its first-run 15/16 result; independent NVIDIA-domain label review remains pending.
 
 This evaluation tests the evidence agent's retrieval, refusal, citation, output-contract, security, and latency behavior. It does not claim that a single GPU event proves root cause.
 
@@ -225,6 +225,8 @@ This evaluation tests the evidence agent's retrieval, refusal, citation, output-
 - {comparison['distribution'].get('happy_path', 0)} happy-path cases, {comparison['distribution'].get('edge_case', 0)} edge cases, {comparison['distribution'].get('known_failure', 0)} known-failure regressions, and {comparison['distribution'].get('adversarial', 0)} adversarial cases
 - Inputs use synthetic or curated public telemetry formats; no production payload is uploaded
 - Expected evidence IDs and refusal labels are stored outside the operational corpus
+- Labels were reviewed by the project owner; blinded review by an independent GPU-domain expert has not yet occurred
+- A separate 16-case post-change holdout covers the newly added NVLink/NVSwitch, NCCL, MIG, memory-health, Kubernetes, and driver-readiness families
 
 ## Controlled comparison
 

@@ -54,6 +54,15 @@ class DatasetTests(unittest.TestCase):
         )
         self.assertTrue(all(case.labeler == "human-reviewed" for case in cases))
 
+    def test_post_change_holdout_covers_new_signal_families(self) -> None:
+        cases = load_cases(REPO_ROOT / "evaluation/week4/holdout-v1.jsonl")
+        self.assertEqual(len(cases), 16)
+        self.assertEqual(
+            dict(Counter(case.scenario_type for case in cases)),
+            {"happy_path": 8, "edge_case": 4, "known_failure": 2, "adversarial": 2},
+        )
+        self.assertTrue(all(case.source_type == "post-change-holdout" for case in cases))
+
     def test_primary_evidence_and_signal_extraction_are_enforced(self) -> None:
         case = next(case for case in load_cases(REPO_ROOT / "evaluation/week4/golden-v2.jsonl") if case.id == "v2-failure-xid-event-key")
         result = score_case(

@@ -86,7 +86,7 @@ npm run evaluate:pinecone
 
 Expected conditions:
 
-- 17 records in the configured namespace;
+- 27 records in the configured namespace;
 - Recall@5 `100.0%`;
 - MRR `0.931`;
 - citation validity `100.0%`;
@@ -327,4 +327,4 @@ Check that `core/corpus.ts` contains the exact normalized identifier. Add a corp
 
 ### Pinecone retrieval is unavailable
 
-Confirm `.env.local` contains all four variables, the index is Ready, its dimension is 256, and the configured namespace contains 17 vectors. Run `npm run pinecone:sync` before starting the website.
+Confirm `.env.local` contains all four variables, the index is Ready, its dimension is 256, and the configured namespace contains 27 vectors. Run `npm run pinecone:sync` before starting the website.

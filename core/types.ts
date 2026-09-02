@@ -53,6 +53,8 @@ export interface Citation {
   authority: Authority;
   score: number;
   provenance: SourceProvenance;
+  excerpt: string;
+  selectionReason: string;
 }
 
 export interface SignalAnalysis {

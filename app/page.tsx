@@ -83,7 +83,7 @@ async function requestIntegrationStatus(signal?: AbortSignal): Promise<Integrati
 
 const evaluationMetrics = [
   ['Recall@5', '100%', '100 labeled cases'],
-  ['MRR', '0.951', '31-case rank quality'],
+  ['MRR', '0.987', '100-case rank quality'],
   ['Citations', '100%', 'retriever-backed'],
   ['Refusals', '100%', 'precision & recall'],
 ];
@@ -166,8 +166,8 @@ const walkthroughSteps = [
     title: 'Reviewed vectors are promoted to Pinecone',
     technology: '256d feature hash · Pinecone serverless · versioned namespace',
     explanation: 'The sync workflow upserts one normalized vector per reviewed corpus record. Stable IDs, review metadata, and a versioned namespace keep promotion and rollback auditable.',
-    input: '17 reviewed records',
-    output: '17 vectors in corpus-2026-08-31',
+    input: `${corpus.length} reviewed records`,
+    output: `${corpus.length} vectors · versioned managed namespace`,
   },
   {
     icon: Activity,
@@ -755,7 +755,9 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
           <span className="truncate" title={analysis.diagnostics.vectorIndexVersion}>index {analysis.diagnostics.vectorIndexVersion}</span>
           <span>{analysis.diagnostics.retrievalBackend}</span>
           <span>{analysis.diagnostics.generationMode}</span>
-          <span>LangSmith {analysis.diagnostics.observabilityExport ?? 'disabled'}</span>
+          <span title="Trace export is optional; the local analysis remains complete if export is unavailable">
+            LangSmith {analysis.diagnostics.observabilityExport === 'failed' ? 'export unavailable · result complete' : analysis.diagnostics.observabilityExport ?? 'disabled'}
+          </span>
         </div>
 
         <div>
@@ -810,12 +812,14 @@ function ResultPanel({ analysis }: { analysis: SignalAnalysis }) {
                 href={citation.url}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-center justify-between gap-3 rounded-lg border border-white/8 bg-white/[0.025] px-3 py-3 transition hover:border-primary/30 hover:bg-primary/5"
+                className="group flex items-start justify-between gap-3 rounded-lg border border-white/8 bg-white/[0.025] px-3 py-3 transition hover:border-primary/30 hover:bg-primary/5"
               >
                 <span className="min-w-0">
                   <span className="mr-2 font-mono text-xs text-primary">[{index + 1}]</span>
                   <span className="text-sm text-slate-200">{citation.title}</span>
                   <span className="ml-2 hidden text-xs text-slate-500 sm:inline">{citation.source}</span>
+                  <span className="mt-2 block pl-6 text-xs leading-5 text-slate-400">{citation.excerpt}</span>
+                  <span className="mt-1 block pl-6 text-[10px] leading-4 text-primary/70">Why selected: {citation.selectionReason}</span>
                   <span className="mt-1 block truncate pl-6 font-mono text-[9px] text-slate-600">reviewed {citation.provenance.retrievedAt} · {citation.provenance.curatedContentHash}</span>
                 </span>
                 <ExternalLink className="size-3.5 shrink-0 text-slate-500 transition group-hover:text-primary" />
@@ -854,6 +858,7 @@ function ProductHomepage() {
             <div className="mt-7 flex flex-wrap gap-3">
               <a href="#analyze" className={buttonVariants({ size: 'lg', className: 'bg-primary text-primary-foreground hover:bg-primary/90' })}><Sparkles className="size-4" /> Try a live signal</a>
               <a href="#walkthrough" className={buttonVariants({ size: 'lg', variant: 'outline' })}><Play className="size-4" /> Watch the system flow</a>
+              <a href="#interview-tour" className={buttonVariants({ size: 'lg', variant: 'ghost' })}><Gauge className="size-4" /> 5-minute interview tour</a>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
               {['Exact identifier preservation', 'Retriever-backed citations', 'Tested refusal path'].map((item) => (
@@ -910,6 +915,17 @@ function ProductHomepage() {
               <div><p className="text-sm font-medium">{title}</p><p className="mt-1 text-xs leading-5 text-muted-foreground">{detail}</p></div>
             </div>
           ))}
+        </div>
+        <div id="interview-tour" className="mt-6 rounded-2xl border border-primary/20 bg-primary/[0.035] p-5">
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><p className="font-mono text-[9px] uppercase tracking-[.18em] text-primary">NVIDIA interview mode · five minutes</p><p className="mt-2 text-sm text-slate-300">Follow one bounded story from incident signal to performance and release evidence.</p></div><Badge variant="outline" className="self-start border-primary/25 text-primary">4 proof points</Badge></div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-4">
+            {[
+              ['01 · Diagnose', '#analyze', 'Run Xid 79 and inspect cited evidence.'],
+              ['02 · Explain', '#walkthrough', 'Show ingestion, hybrid retrieval, and refusal.'],
+              ['03 · Benchmark', '#performance-lab', 'Open the campaign contract and SLO gate.'],
+              ['04 · Prove', '#week4-evaluation', 'Close on 100 cases, confidence interval, and limits.'],
+            ].map(([title, href, detail]) => <a key={title} href={href} className="rounded-xl border border-border/70 bg-black/15 p-3 transition hover:border-primary/30 hover:bg-primary/5"><p className="text-xs font-medium text-primary">{title}</p><p className="mt-2 text-[11px] leading-5 text-muted-foreground">{detail}</p></a>)}
+          </div>
         </div>
       </div>
     </section>
@@ -997,7 +1013,7 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-2 lg:w-[360px]">
             {[
               [corpus.length.toString(), 'chunks'],
-              ['48', 'evals'],
+              ['100', 'evals'],
               ['0', 'browser secrets'],
             ].map(([value, label]) => (
               <div key={label} className="rounded-xl border border-border/70 bg-card/70 px-3 py-4 text-center backdrop-blur">
@@ -1345,7 +1361,7 @@ export default function Home() {
             <Card className="border border-border/70 bg-card/70">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2"><Gauge className="size-4 text-primary" /> Query mix</CardTitle>
-                <CardDescription>The original 31-case retrieval slice remains visible for continuity; the Week 4 lab above expands the controlled product evaluation to 48 cases.</CardDescription>
+                <CardDescription>The original 31-case retrieval slice remains visible for continuity; the Week 4 lab above expands the controlled product evaluation to 100 primary cases plus a separate 16-case post-change holdout.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {[

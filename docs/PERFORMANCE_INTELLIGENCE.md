@@ -23,6 +23,8 @@ Source: [NVIDIA GenAI-Perf Analyze example summary report](https://github.com/tr
 
 Important limitation: the documentation example does not report the GPU model, full server configuration, repetitions, or confidence interval. The website therefore labels these records as **public demonstration measurements**, never as H100/H200/B200 performance or a purchasing benchmark.
 
+The public Performance Lab now exposes that incompleteness as a reproducibility gate. Promotion requires GPU SKU and count, topology and MIG profile, model revision, precision/quantization, tensor/pipeline parallelism, backend and container versions, CUDA/driver/firmware, input/output token distributions, concurrency or request-rate sweep, warmup, repetitions, variance/confidence interval, exact command, errors/timeouts, power/thermal conditions, and an immutable raw-artifact URI.
+
 ## Evidence classes
 
 | Class | Meaning | Used for |

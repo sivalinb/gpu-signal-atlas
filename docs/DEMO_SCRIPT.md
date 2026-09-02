@@ -76,11 +76,11 @@ This behavior is automated in both unit tests and the evaluation suite.”
 
 Scroll to **Evaluation evidence**.
 
-“The checked-in evaluation has 31 independent expectations across exact identifiers, semantic symptoms, multi-source retrieval, unanswerable questions, and six adversarial same-domain negatives.
+“The primary evaluation has 100 owner-reviewed expectations across exact identifiers, semantic symptoms, multi-source retrieval, unanswerable questions, and adversarial negatives. Independent GPU-domain review is a pending release gate. A separate 16-case post-change holdout scored 15/16 on its first run, and that miss remains visible.
 
 The current run records 100 percent Recall@5, 0.931 mean reciprocal rank, 100 percent citation validity, 100 percent field-level claim grounding, and 100 percent refusal precision and recall. These are regression results for the curated corpus, not generalized GPU diagnostic accuracy.
 
-The repository also has 50 unit and regression tests, including retrieval, refusal, Mistral schema contracts, Neo4j mapping, Deepgram privacy boundaries, benchmark provenance and SLO math, OTLP normalization, redaction, buffer bounds, and Collector fan-out. The same release gate also runs evaluation, ablations, source freshness, index integrity, type checking, linting, and a production build.”
+The repository also has automated unit and regression tests for retrieval, refusal, Mistral schema contracts, Neo4j mapping, Deepgram privacy boundaries, benchmark provenance and SLO math, OTLP normalization, redaction, buffer bounds, and Collector fan-out. The same release gate also runs primary and holdout evaluation, ablations, source freshness, index integrity, type checking, linting, and a production build.”
 
 ## 4:25–4:55 — AI coding tools, assets, and close
 

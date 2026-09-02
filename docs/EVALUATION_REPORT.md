@@ -114,7 +114,7 @@ The recorded run shows 100% Recall@5 and 0.931 MRR for BM25 and hybrid-plus-rera
 
 ### Trained-embedding comparison
 
-`npm run ablate:mistral` embeds the 17 reviewed records and 22 answerable evaluation queries in one `mistral-embed` batch, ranks them in memory, and compares the result with the deterministic feature-hash representation. It never writes to the production Pinecone namespace.
+`npm run ablate:mistral` embeds the reviewed corpus records and answerable retrieval queries in one `mistral-embed` batch, ranks them in memory, and compares the result with the deterministic feature-hash representation. It never writes to the production Pinecone namespace. Exact counts in this legacy Week 2 report predate the 27-record corpus and 100-case Week 4 suite.
 
 Live recorded result:
 

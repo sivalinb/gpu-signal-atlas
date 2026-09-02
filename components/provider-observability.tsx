@@ -22,6 +22,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import type { ProviderObservabilitySummary } from '@/core/provider-observability';
+import releaseEvaluation from '@/evaluation/week4/results/v2-pinecone-improved.json';
 
 const formatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
@@ -245,6 +246,8 @@ export function ProviderObservability() {
           100,
       )
     : 0;
+  const releaseLatencies = releaseEvaluation.cases.map((item) => item.latencyMs).sort((a, b) => a - b);
+  const releaseP99 = releaseLatencies[Math.max(0, Math.ceil(releaseLatencies.length * 0.99) - 1)] ?? 0;
 
   return (
     <section
@@ -438,6 +441,9 @@ export function ProviderObservability() {
                       </p>
                     </div>
                   </div>
+                  <p className={`mt-3 border-t border-border/60 pt-3 text-[10px] leading-4 ${provider.errors ? 'text-amber-200' : 'text-muted-foreground'}`}>
+                    {!provider.configured ? 'Not configured' : provider.errors ? (provider.key === 'langsmith' ? 'Trace export unavailable; local analysis remains complete' : 'Provider request errors observed') : provider.requests ? 'Requests successful in this runtime' : 'Configured; awaiting a request'}
+                  </p>
                 </div>
               ))}
               {!summary && (
@@ -508,6 +514,15 @@ export function ProviderObservability() {
             </Card>
           </div>
         </div>
+
+        <Card className="mt-5 border border-primary/20 bg-primary/[0.025]">
+          <CardHeader><CardTitle className="flex items-center gap-2"><ChartNoAxesCombined className="size-4 text-primary" /> Measurement windows and durability</CardTitle><CardDescription>Live runtime observations and frozen release evidence are deliberately separated.</CardDescription></CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-border/70 bg-black/15 p-4"><p className="font-mono text-[9px] uppercase tracking-wider text-primary">Current runtime</p><p className="mt-2 text-sm">p50 {formatLatency(summary?.rag.p50Ms ?? 0)} · p95 {formatLatency(summary?.rag.p95Ms ?? 0)}</p><p className="mt-2 text-[11px] leading-5 text-muted-foreground">Up to 120 in-memory samples. Restarts reset the window.</p></div>
+            <div className="rounded-xl border border-border/70 bg-black/15 p-4"><p className="font-mono text-[9px] uppercase tracking-wider text-primary">Frozen release gate</p><p className="mt-2 text-sm">Pinecone p50 {Math.round(releaseEvaluation.aggregate.performance.p50LatencyMs)} ms · p95 {Math.round(releaseEvaluation.aggregate.performance.p95LatencyMs)} ms · p99 {Math.round(releaseP99)} ms</p><p className="mt-2 text-[11px] leading-5 text-muted-foreground">100 versioned cases · {releaseEvaluation.aggregate.performance.pineconeReadUnits} read units · corpus/index version recorded per case.</p></div>
+            <div className="rounded-xl border border-amber-300/20 bg-amber-300/[0.025] p-4"><p className="font-mono text-[9px] uppercase tracking-wider text-amber-200">Production history</p><p className="mt-2 text-sm">5m / 1h / 24h · not connected</p><p className="mt-2 text-[11px] leading-5 text-muted-foreground">Requires a durable Prometheus/ClickHouse backend for cold/warm, cache-hit, cost, timeout, and drift trends. This page does not fabricate those series.</p></div>
+          </CardContent>
+        </Card>
 
         <p className="mt-5 text-[11px] leading-5 text-muted-foreground">
           Scope: these charts are application-observed operational signals

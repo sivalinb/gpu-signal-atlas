@@ -9,7 +9,7 @@ import type {
 import { cosine, documentText, embed, fnv1a, tokenize } from './vector.ts';
 
 const RRF_K = 60;
-export const CORPUS_VERSION = '2026-08-29-review-2';
+export const CORPUS_VERSION = '2026-09-02-review-3';
 
 export { cosine, embed, tokenize } from './vector.ts';
 
@@ -36,6 +36,16 @@ const semanticIntents: Array<{ id: string; pattern: RegExp }> = [
   { id: 'fluent-bit-kubernetes', pattern: /fluent[\s-]?bit.*(?:pod|namespace|container|owner|kubernetes identity|kubernetes).*?(?:metadata|enrich|identity)|kubernetes filter.*metadata/i },
   { id: 'fluent-bit-otlp', pattern: /fluent[\s-]?bit.*(?:opentelemetry|otlp|\/v1\/logs|export)/i },
   { id: 'otel-semconv', pattern: /opentelemetry.*resource attributes|semantic conventions.*(?:logs|metrics|traces|signals|service\.name|host\.name)/i },
+  { id: 'nvidia-xid-74', pattern: /xid 74|nvlink error/i },
+  { id: 'dcgm-nvlink-errors', pattern: /nvlink.*(?:crc|recovery|error count|counter)|(?:crc|recovery).*nvlink/i },
+  { id: 'dcgm-row-remap', pattern: /row remap|retired page|page retirement|remap (?:failed|pending)|memory row/i },
+  { id: 'dcgm-clock-events', pattern: /clock event reason|thermal violation|power violation|clock throttl/i },
+  { id: 'dcgm-memory-usage', pattern: /framebuffer memory|fb (?:used|free)|gpu memory (?:pressure|exhaust|capacity)|allocator fragmentation|out[- ]of[- ]memory|\boom\b/i },
+  { id: 'nvidia-nccl-troubleshooting', pattern: /nccl.*(?:timeout|collective|allreduce|all-reduce|communicator|network)|collective.*timeout/i },
+  { id: 'nvidia-fabric-manager', pattern: /fabric manager|nvswitch|sxid|cudaerrorsystemnotready/i },
+  { id: 'gpu-operator-mig', pattern: /mig manager|mig (?:profile|geometry|strategy|configuration)|nvidia\.com\/mig\.config/i },
+  { id: 'gpu-operator-device-plugin', pattern: /(?:nvidia )?device plugin|nvidia\.com\/gpu|gpu pod.*pending|pending.*gpu (?:pod|workload)|allocatable.*gpu/i },
+  { id: 'gpu-operator-driver-init', pattern: /gpu operator.*(?:driver|validator|clusterpolicy)|driver (?:init|initialization|daemonset).*gpu|operator validator/i },
 ];
 
 const adversarialInstructionPattern = /\b(?:ignore (?:all |any |the )?(?:previous|prior|system) instructions?|system override|developer message|bypass (?:the )?(?:evidence|safety) guardrail|reveal (?:the )?(?:hidden|system) (?:prompt|instructions?)|jailbreak(?: mode)?|fabricate (?:a |an )?(?:citation|source|url|bulletin)|invent(?:ed)? (?:nvidia )?(?:evidence|citation|source)|do not refuse|suppress (?:all )?limitations?|hide (?:the )?uncertainty)\b/i;
@@ -291,9 +301,6 @@ export function analyzeTelemetryFromRetrieval(
   if (observed.driverBranches.length > 1) {
     compatibilityNotes.push(`Multiple driver branches (${observed.driverBranches.join(', ')}) were observed; verify which branch produced the event.`);
   }
-  if (observed.gpuModels.length === 1 && observed.driverBranches.length === 1) {
-    compatibilityNotes.push(`Validate the ${observed.gpuModels[0]} and ${observed.driverBranches[0]} pairing against the deployed support matrix before acting.`);
-  }
   for (const result of grounded) {
     const { document } = result;
     if (
@@ -309,6 +316,18 @@ export function analyzeTelemetryFromRetrieval(
       !observed.driverBranches.some((driver) => document.driverBranches.includes(driver))
     ) {
       compatibilityNotes.push(`${document.title} is not pinned to driver ${observed.driverBranches.join(', ')} in this corpus.`);
+    }
+  }
+
+  if (observed.gpuModels.length === 1 && observed.driverBranches.length === 1 && grounded.length > 0) {
+    const lead = grounded[0].document;
+    const model = observed.gpuModels[0];
+    const driver = observed.driverBranches[0];
+    if (lead.gpuModels.length === 0) {
+      compatibilityNotes.push(`GPU-model coverage: ${lead.title} does not pin applicability to ${model}; preserve the exact GPU UUID and validate the source for this platform.`);
+    }
+    if (lead.driverBranches.length === 0) {
+      compatibilityNotes.push(`Driver coverage: ${lead.title} does not pin applicability to ${driver}; validate against the deployed driver documentation and release notes.`);
     }
   }
 
@@ -337,6 +356,11 @@ export function analyzeTelemetryFromRetrieval(
       authority: result.document.authority,
       score: result.score,
       provenance: result.document.provenance,
+      excerpt: result.document.documentedMeaning,
+      selectionReason:
+        result.document.id === official.document.id
+          ? `Primary evidence: ${result.exactMatches.length > 0 ? `exact match on ${result.exactMatches.join(', ')}` : 'reviewed semantic intent'} from an ${result.document.authority} source.`
+          : `Supporting evidence cleared the bounded retrieval threshold; sparse rank ${result.sparseRank}, dense rank ${result.denseRank}.`,
     })),
     retrieval,
     diagnostics: diagnostics([

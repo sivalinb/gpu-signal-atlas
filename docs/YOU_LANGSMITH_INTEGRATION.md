@@ -123,7 +123,7 @@ The production status route intentionally reveals only booleans:
 curl https://gpu-signal-atlas.siva-babu.chatgpt.site/api/integrations
 ```
 
-The reviewed public deployment reports `pineconeConfigured`, `youConfigured`, and `langsmithConfigured` as `true`, with `secretsExposedToBrowser` as `false`. A live Xid 79 analysis reports `retrievalBackend: pinecone` and `observabilityExport: exported`. A live You.com discovery check returned an allow-listed NVIDIA documentation candidate as `pending-review` with `autoPromoted: false`.
+The reviewed public deployment reports `pineconeConfigured`, `youConfigured`, and `langsmithConfigured` as `true`, with `secretsExposedToBrowser` as `false`. A live Xid 79 analysis reports `retrievalBackend: pinecone`. LangSmith export status is reported independently: this account currently reaches its trace quota, so the UI shows `trace export unavailable; result complete` while retaining the local checked-in evaluation artifact. A You.com discovery result remains `pending-review` with `autoPromoted: false` and cannot change the corpus automatically.
 
 For Collector-based trace fan-out:
 

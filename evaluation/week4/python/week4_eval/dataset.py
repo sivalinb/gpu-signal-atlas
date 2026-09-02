@@ -19,6 +19,11 @@ DATASET_CONFIGS = {
         "count": 100,
         "distribution": {"happy_path": 50, "edge_case": 30, "known_failure": 15, "adversarial": 5},
     },
+    "holdout-v1.jsonl": {
+        "version": "gpu-signal-atlas-week4-post-change-holdout-v1-16",
+        "count": 16,
+        "distribution": {"happy_path": 8, "edge_case": 4, "known_failure": 2, "adversarial": 2},
+    },
 }
 EXPECTED_DISTRIBUTION = DATASET_CONFIGS["golden-v1.jsonl"]["distribution"]
 

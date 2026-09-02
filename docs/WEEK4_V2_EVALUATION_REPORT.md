@@ -2,7 +2,7 @@
 
 ## Executive result
 
-GPU Signal Atlas was evaluated on the same frozen, human-reviewed 100-case dataset before and after targeted changes. The pass rate improved from **75.0%** to **100.0%**. All **25** baseline failures were resolved and the controlled rerun introduced **0 regressions**.
+GPU Signal Atlas was evaluated on the same frozen, owner-reviewed 100-case dataset before and after targeted changes. The pass rate improved from **75.0%** to **100.0%**. All **25** baseline failures were resolved and the controlled rerun introduced **0 regressions**. A separate post-change holdout preserves its first-run 15/16 result; independent NVIDIA-domain label review remains pending.
 
 This evaluation tests the evidence agent's retrieval, refusal, citation, output-contract, security, and latency behavior. It does not claim that a single GPU event proves root cause.
 
@@ -13,6 +13,8 @@ This evaluation tests the evidence agent's retrieval, refusal, citation, output-
 - 50 happy-path cases, 30 edge cases, 15 known-failure regressions, and 5 adversarial cases
 - Inputs use synthetic or curated public telemetry formats; no production payload is uploaded
 - Expected evidence IDs and refusal labels are stored outside the operational corpus
+- Labels were reviewed by the project owner; blinded review by an independent GPU-domain expert has not yet occurred
+- A separate 16-case post-change holdout covers the newly added NVLink/NVSwitch, NCCL, MIG, memory-health, Kubernetes, and driver-readiness families
 
 ## Controlled comparison
 
@@ -29,13 +31,13 @@ This evaluation tests the evidence agent's retrieval, refusal, citation, output-
 | Task contract | 100.0% | 100.0% | +0.0 pp |
 | Guardrail pass rate | 98.0% | 100.0% | +2.0 pp |
 | Refusal F1 | 74.5% | 100.0% | +25.5 pp |
-| p95 latency (ms) | 3.344 | 3.728 | +0.384 |
+| p95 latency (ms) | 3.344 | 4.058 | +0.714 |
 
 Latency is local process time and should be read separately from hosted Pinecone network latency. The deterministic generation path uses zero LLM tokens and has zero model cost; optional LLM mode is evaluated independently.
 
 ## Managed Pinecone production-path check
 
-The improved agent also ran the identical 100 cases against the configured Pinecone namespace. It passed **100/100 cases**, preserved **100.0% Recall@5**, citation validity, claim faithfulness, refusal F1, and guardrail behavior, consumed **100 query read units**, and measured **346.1 ms p50 / 790.6 ms p95** end-to-end retrieval latency. No Pinecone credential or raw telemetry is stored in the result artifact.
+The improved agent also ran the identical 100 cases against the configured Pinecone namespace. It passed **100/100 cases**, preserved **100.0% Recall@5**, citation validity, claim faithfulness, refusal F1, and guardrail behavior, consumed **100 query read units**, and measured **436.2 ms p50 / 685.0 ms p95** end-to-end retrieval latency. No Pinecone credential or raw telemetry is stored in the result artifact.
 
 
 ## Baseline failure clusters

@@ -83,7 +83,7 @@ def run_local(dataset_path: Path, variant: str, backend: str, provider_environme
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the GPU Signal Atlas Week 4 evaluation")
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
-    parser.add_argument("--variant", choices=("baseline", "improved"), required=True)
+    parser.add_argument("--variant", choices=("baseline", "improved", "holdout"), required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--backend", choices=("local", "pinecone"), default="local")
     parser.add_argument("--provider-env-file", type=Path)

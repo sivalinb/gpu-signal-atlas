@@ -21,7 +21,7 @@ Neo4j is an implemented bonus evidence graph. The submission does not claim the 
 | Required field | GPU Signal Atlas decision | Status |
 |---|---|---|
 | One-line use case | Helps GPU platform engineers explain NVIDIA Xid/DCGM signals from a reviewed observability corpus in a public web application, targeting at least 90% citation validity, Recall@5 above 85%, and p95 retrieval below five seconds. | Complete |
-| Corpus | 17 reviewed English structure-aware records from NVIDIA Xid/DCGM/GPU Operator, Fluent Bit, OpenTelemetry, and labeled internal demonstration runbooks. | Complete; deliberately bounded |
+| Corpus | 27 reviewed English structure-aware records from NVIDIA Xid/DCGM/NVLink/NVSwitch/NCCL/GPU Operator, Fluent Bit, OpenTelemetry, and labeled internal demonstration runbooks. | Complete; deliberately bounded |
 | Ingestion + cleaning | Allow-listed HTTPS or local HTML input, removal of page chrome/scripts/forms, preservation of headings/tables/code/identifiers, source metadata, fingerprints, and a human review candidate. | Complete |
 | Ingestion + freshness | Seven-day official-source and 30-day internal-runbook review SLAs, content fingerprints, CI freshness gate, staging namespace, regression checks, and explicit promotion/rollback. | Complete |
 | Chunking + embedding | Identifier-centered structured records compared with fixed 90-token windows; deterministic 256d feature hashing for the reproducible Pinecone path plus a live 1024d `mistral-embed` ablation. | Complete |
@@ -35,7 +35,7 @@ Neo4j is an implemented bonus evidence graph. The submission does not claim the 
 | Hybrid retrieval | Pinecone dense and BM25 sparse candidates retain independent ranks, then use RRF and bounded reranking. | Excellent |
 | "I don't know" path | Unknown identifiers, unrelated questions, and six same-domain hard negatives refuse with zero diagnostic citations. | Excellent |
 | Cited generation | Deterministic output is default; optional Mistral strict-schema generation uses evidence-derived enums plus post-generation grounding validation. | Excellent |
-| Evaluation | 31 independent cases, 50 tests, retrieval/chunking ablations, 100% Recall@5, 0.931 MRR, 100% citation validity/grounding, and 100% refusal precision/recall on the bounded set. | Excellent for the reviewed corpus |
+| Evaluation | 100 owner-reviewed primary cases, a separate 16-case post-change holdout, automated tests, retrieval/chunking ablations, 100% Recall@5, 0.987 MRR, and complete citation/refusal metrics on the bounded primary set. Independent GPU-SME review remains pending. | Excellent for the reviewed corpus |
 | Google Doc | Overview, dataset, prompts/instructions, iterations, learnings, architecture, evaluation, limitations, setup, and requirement mapping. | Complete and updated |
 | Live demo | Public website demonstrates analysis, refusal, telemetry flow, performance intelligence, privacy boundaries, graph context, and voice interaction. | Complete |
 | Product communication | Homepage pitch, original GPU-to-evidence visual, interviewer script, instructor script, and 30-second elevator version explain the system before the technical walkthrough. | Complete |
@@ -49,7 +49,7 @@ Neo4j is an implemented bonus evidence graph. The submission does not claim the 
 - The checked-in precomputed index preserves credential-free evaluation and rollback evidence.
 - `mistral-embed` live ablation: 22 answerable cases, 1024 dimensions, Recall@5 100%, MRR 1.000, 1,863 tokens.
 - Live Mistral strict-schema Xid 79 generation passed the schema, evidence-enum, citation, and local grounding checks.
-- Neo4j synchronization created 17 Evidence records, 32 Signal identifiers, three BenchmarkRun records, and supporting technology/model/backend relationships.
+- Neo4j synchronization maps all reviewed Evidence records plus Signal identifiers, three public-reference BenchmarkRun records, and supporting technology/model/backend relationships.
 - The public graph endpoint returns a maximum of 40 read-only relationship paths and stores no raw telemetry.
 - Deepgram live validation completed both synthetic text-to-speech and speech-to-text; the website requires explicit microphone and playback actions.
 - The public integration endpoint reports every remaining provider configured and `secretsExposedToBrowser=false`.
@@ -94,7 +94,7 @@ The score is a reviewer-authored assessment because the handout specifies delive
 
 ### What still limits production claims
 
-1. The 17-record corpus and 31-case evaluation are excellent regression fixtures but too small for generalized GPU diagnostic accuracy.
+1. The 27-record corpus and bounded evaluation suites are strong regression fixtures but too small for generalized GPU diagnostic accuracy.
 2. The evaluation labels have not been independently blinded or graded by an NVIDIA/GPU domain expert.
 3. Demonstration telemetry is synthetic; broader model, driver, MIG, NVLink, and workload diversity should be tested with governed incident replays.
 4. The Mistral embedding result is an in-memory ablation; production Pinecone intentionally remains on the reproducible 256d representation until a controlled namespace migration is approved.

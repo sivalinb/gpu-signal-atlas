@@ -15,7 +15,9 @@ The canonical dataset is `evaluation/week4/golden-v2.jsonl`. It has 100 frozen c
 | Known failure | 15 | Normalization, parser variants, evidence ordering, status, and semantic-routing regressions |
 | Adversarial | 5 | Prompt injection, fabricated evidence, developer-role, and refusal-override attempts |
 
-`evaluation/week4/python/build_v2_dataset.py` deterministically combines v1 with 52 reviewed additions and enriches the labels with expected status, required extracted signals, severity, and labeler. `prepare_datasets.py` materializes each v2 scenario as a separate JSONL file and writes a catalog. Related product datasets include the 17-record reviewed NVIDIA/DCGM/Fluent Bit/OpenTelemetry evidence corpus and six attributable public benchmark records.
+`evaluation/week4/python/build_v2_dataset.py` deterministically combines v1 with 52 reviewed additions and enriches the labels with expected status, required extracted signals, severity, and labeler. `prepare_datasets.py` materializes each v2 scenario as a separate JSONL file and writes a catalog. Related product datasets include the 27-record reviewed NVIDIA/DCGM/NVLink/NVSwitch/NCCL/GPU Operator/Fluent Bit/OpenTelemetry evidence corpus and attributable public benchmark reference records.
+
+Run `npm run week4:holdout` to reproduce the separately fingerprinted 16-case post-change suite. Its first-run 15/16 result is intentionally preserved; do not tune against it and continue calling it a holdout.
 
 All evaluation inputs are synthetic or derived from curated public telemetry formats. Do not replace them with raw production logs unless they have passed organizational de-identification and retention review.
 

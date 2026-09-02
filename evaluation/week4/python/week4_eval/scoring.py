@@ -20,6 +20,16 @@ def _percentile(values: list[float], fraction: float) -> float:
     return ordered[index]
 
 
+def _wilson_interval(successes: int, total: int, z: float = 1.96) -> list[float]:
+    if total == 0:
+        return [0.0, 1.0]
+    proportion = successes / total
+    denominator = 1 + z * z / total
+    centre = proportion + z * z / (2 * total)
+    margin = z * math.sqrt((proportion * (1 - proportion) + z * z / (4 * total)) / total)
+    return [_round((centre - margin) / denominator), _round((centre + margin) / denominator)]
+
+
 def score_case(case: GoldenCase, output: dict[str, Any]) -> dict[str, Any]:
     retrieved = [str(item) for item in output.get("retrievedIds", [])]
     citations = [str(item) for item in output.get("citationIds", [])]
@@ -141,10 +151,14 @@ def aggregate_results(scored: list[dict[str, Any]]) -> dict[str, Any]:
     latencies = [item["latencyMs"] for item in scored]
     failure_reasons = Counter(reason for item in scored for reason in item["failureReasons"])
     scenario = defaultdict(lambda: {"cases": 0, "passed": 0})
+    category = defaultdict(lambda: {"cases": 0, "passed": 0})
     for item in scored:
         group = scenario[item["scenarioType"]]
         group["cases"] += 1
         group["passed"] += int(item["passed"])
+        category_group = category[item["category"]]
+        category_group["cases"] += 1
+        category_group["passed"] += int(item["passed"])
     scenario_scores = {
         key: {
             **value,
@@ -152,10 +166,19 @@ def aggregate_results(scored: list[dict[str, Any]]) -> dict[str, Any]:
         }
         for key, value in scenario.items()
     }
+    category_scores = {
+        key: {
+            **value,
+            "passRate": _round(value["passed"] / value["cases"] if value["cases"] else 1.0),
+        }
+        for key, value in sorted(category.items())
+    }
+    passed_count = sum(int(item["passed"]) for item in scored)
     return {
         "cases": count,
-        "passed": sum(int(item["passed"]) for item in scored),
-        "passRate": _round(sum(int(item["passed"]) for item in scored) / count if count else 1.0),
+        "passed": passed_count,
+        "passRate": _round(passed_count / count if count else 1.0),
+        "passRateWilson95": _wilson_interval(passed_count, count),
         "retrieval": {
             "recallAt5": _round(retrieval_hits / expected_retrievals if expected_retrievals else 1.0),
             "mrr": _round(statistics.fmean(item["scores"]["reciprocalRank"] for item in answerable) if answerable else 1.0),
@@ -184,6 +207,7 @@ def aggregate_results(scored: list[dict[str, Any]]) -> dict[str, Any]:
             "pineconeReadUnits": sum(item["pineconeReadUnits"] for item in scored),
         },
         "scenarioScores": scenario_scores,
+        "categoryScores": category_scores,
         "failureClusters": [
             {"reason": reason, "count": cluster_count}
             for reason, cluster_count in failure_reasons.most_common()

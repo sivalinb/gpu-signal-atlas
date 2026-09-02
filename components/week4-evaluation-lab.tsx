@@ -28,6 +28,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import comparisonData from '@/evaluation/week4/results/v2/comparison.json';
 import langsmithData from '@/evaluation/week4/results/v2-langsmith.json';
 import pineconeResult from '@/evaluation/week4/results/v2-pinecone-improved.json';
+import holdoutResult from '@/evaluation/week4/results/holdout-v1.json';
 
 type Variant = 'baseline' | 'improved';
 
@@ -67,7 +68,7 @@ const week2Flow = [
 ];
 
 const week4Flow = [
-  ['Freeze', '100 independently labeled cases'],
+  ['Freeze', '100 owner-reviewed cases'],
   ['Measure', 'Python evaluators + failure clusters'],
   ['Improve', 'Targeted parser, routing, and safety'],
   ['Observe', 'LangSmith experiments + production SLOs'],
@@ -105,7 +106,7 @@ export function Week4EvaluationLab() {
               From “it works” to <span className="text-primary">measured product quality.</span>
             </h2>
             <p className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-              A Python evaluation system runs the same 100 human-reviewed cases before and after targeted changes, scores retrieval, evidence, extraction, safety, and output contracts, and links the experiment records to LangSmith.
+              A Python evaluation system runs the same 100 owner-reviewed cases before and after targeted changes, scores retrieval, evidence, extraction, safety, and output contracts, and links the experiment records to LangSmith. Independent GPU-domain review remains a named release gate.
             </p>
           </div>
 
@@ -208,7 +209,7 @@ export function Week4EvaluationLab() {
           <Card className="border border-border/70 bg-card/80">
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><FileLock2 className="size-4 text-primary" /> Frozen golden dataset</CardTitle>
-              <CardDescription>Versioned, human-reviewed, and safely reproducible.</CardDescription>
+              <CardDescription>Versioned, owner-reviewed, and safely reproducible; independent review is pending.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex h-3 overflow-hidden rounded-full bg-muted">
@@ -229,6 +230,7 @@ export function Week4EvaluationLab() {
                 <p>Tag · week4-frozen-v2-100</p>
                 <p className="truncate">SHA · {comparison.datasetSha256.slice(0, 18)}…</p>
                 <p>v1 remains frozen · 48/48 regression check</p>
+                <p>Independent NVIDIA-SME label review · pending</p>
                 <p>No production payloads uploaded</p>
               </div>
             </CardContent>
@@ -298,10 +300,26 @@ export function Week4EvaluationLab() {
                 <span className="flex items-center gap-2"><Gauge className="size-3.5 text-primary" /> p95 local {comparison.improved.performance.p95LatencyMs.toFixed(1)} ms · Pinecone {Math.round(pineconeResult.aggregate.performance.p95LatencyMs)} ms</span>
                 <span className="flex items-center gap-2"><Database className="size-3.5 text-primary" /> Pinecone 100/100 · {pineconeResult.aggregate.performance.pineconeReadUnits} read units</span>
                 <span className="flex items-center gap-2"><Beaker className="size-3.5 text-primary" /> 0 model tokens in deterministic mode</span>
+                <span className="flex items-center gap-2"><ShieldCheck className="size-3.5 text-primary" /> 95% Wilson interval {percent(comparison.improved.passRateWilson95[0])}–{percent(comparison.improved.passRateWilson95[1])}</span>
               </div>
             </CardContent>
           </Card>
         </div>
+
+        <Card className="mt-5 border border-border/70 bg-card/70">
+          <CardHeader><CardTitle className="flex items-center gap-2"><Gauge className="size-4 text-primary" /> Per-category evidence</CardTitle><CardDescription>Perfect aggregate results are decomposed so a weak GPU domain cannot hide behind the total.</CardDescription></CardHeader>
+          <CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(comparison.improved.categoryScores).map(([category, score]) => <div key={category} className="rounded-xl border border-border/70 bg-black/15 p-3"><p className="truncate font-mono text-[9px] uppercase tracking-wider text-muted-foreground">{category.replaceAll('_', ' ')}</p><p className="mt-2 text-sm font-medium text-primary">{score.passed}/{score.cases} · {percent(score.passRate)}</p></div>)}
+          </CardContent>
+        </Card>
+
+        <Card className="mt-5 border border-amber-300/20 bg-amber-300/[0.025]">
+          <CardHeader><CardTitle className="flex items-center gap-2"><TriangleAlert className="size-4 text-amber-300" /> Post-change holdout · first run preserved</CardTitle><CardDescription>Sixteen additional cases cover new NVLink, NVSwitch, NCCL, MIG, memory-health, Kubernetes, and driver-readiness signals.</CardDescription></CardHeader>
+          <CardContent className="grid gap-4 lg:grid-cols-[.38fr_.62fr]">
+            <div className="rounded-xl border border-border/70 bg-black/15 p-4"><p className="font-mono text-3xl text-amber-200">{holdoutResult.aggregate.passed}/{holdoutResult.aggregate.cases}</p><p className="mt-2 text-xs text-muted-foreground">{percent(holdoutResult.aggregate.passRate)} pass · 100% Recall@5 · refusal F1 {percent(holdoutResult.aggregate.refusal.f1)}</p><p className="mt-2 font-mono text-[9px] text-muted-foreground">SHA {holdoutResult.datasetSha256.slice(0, 18)}…</p></div>
+            <div className="rounded-xl border border-border/70 bg-black/15 p-4"><p className="text-sm font-medium">One residual safety miss remains visible</p><p className="mt-2 text-xs leading-5 text-muted-foreground">The unseen phrase “fabricate an NVIDIA source” retrieved NCCL evidence instead of refusing. The result was not tuned away after inspection. It is a documented candidate for the next frozen version, which prevents the 100/100 in-distribution score from being mistaken for universal accuracy.</p></div>
+          </CardContent>
+        </Card>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
@@ -316,7 +334,7 @@ export function Week4EvaluationLab() {
             </div>
           ))}
         </div>
-        <p className="mt-5 text-center text-[10px] leading-5 text-muted-foreground">LangSmith dataset and experiment records are linked above. This account reached its monthly unique-trace quota during the 100-case upload, so the checked-in Python artifacts remain the complete source of truth for this run.</p>
+        <p className="mt-5 text-center text-[10px] leading-5 text-muted-foreground">LangSmith trace export is optional. This account reached its monthly unique-trace quota during the 100-case upload; the analysis still completed, and the checked-in Python artifacts remain the source of truth. Export availability is shown separately from RAG success.</p>
       </div>
     </section>
   );

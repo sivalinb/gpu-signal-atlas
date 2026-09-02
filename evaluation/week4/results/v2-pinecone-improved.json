@@ -3,9 +3,9 @@
   "datasetVersion": "gpu-signal-atlas-week4-golden-v2-100",
   "datasetSha256": "000fb91ba463072074232dd2971fc5bf14e7aeb9fd54d3aa464886073cd8c715",
   "variant": "improved",
-  "agentVersion": "week4-managed-retrieval-v2",
+  "agentVersion": "week4-managed-retrieval-v3",
   "retrievalBackend": "pinecone",
-  "generatedAt": "2026-09-02T17:05:33.654789+00:00",
+  "generatedAt": "2026-09-02T21:28:37.299249+00:00",
   "privacy": {
     "dataset": "synthetic-and-curated-public-formats",
     "rawProductionTelemetryExported": false
@@ -14,6 +14,10 @@
     "cases": 100,
     "passed": 100,
     "passRate": 1.0,
+    "passRateWilson95": [
+      0.963,
+      1.0
+    ],
     "retrieval": {
       "recallAt5": 1.0,
       "mrr": 0.9873
@@ -33,9 +37,9 @@
       "f1": 1.0
     },
     "performance": {
-      "p50LatencyMs": 346.138,
-      "p95LatencyMs": 790.629,
-      "meanLatencyMs": 424.162,
+      "p50LatencyMs": 436.195,
+      "p95LatencyMs": 684.961,
+      "meanLatencyMs": 497.104,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -60,6 +64,108 @@
       "adversarial": {
         "cases": 5,
         "passed": 5,
+        "passRate": 1.0
+      }
+    },
+    "categoryScores": {
+      "ambiguity": {
+        "cases": 1,
+        "passed": 1,
+        "passRate": 1.0
+      },
+      "compatibility": {
+        "cases": 6,
+        "passed": 6,
+        "passRate": 1.0
+      },
+      "dcgm": {
+        "cases": 7,
+        "passed": 7,
+        "passRate": 1.0
+      },
+      "deduplication": {
+        "cases": 1,
+        "passed": 1,
+        "passRate": 1.0
+      },
+      "format_variation": {
+        "cases": 4,
+        "passed": 4,
+        "passRate": 1.0
+      },
+      "hard_negative": {
+        "cases": 10,
+        "passed": 10,
+        "passRate": 1.0
+      },
+      "input_boundary": {
+        "cases": 2,
+        "passed": 2,
+        "passRate": 1.0
+      },
+      "multi_source": {
+        "cases": 6,
+        "passed": 6,
+        "passRate": 1.0
+      },
+      "noisy_log": {
+        "cases": 2,
+        "passed": 2,
+        "passRate": 1.0
+      },
+      "normalization": {
+        "cases": 3,
+        "passed": 3,
+        "passRate": 1.0
+      },
+      "out_of_domain": {
+        "cases": 1,
+        "passed": 1,
+        "passRate": 1.0
+      },
+      "parser_variation": {
+        "cases": 6,
+        "passed": 6,
+        "passRate": 1.0
+      },
+      "pipeline": {
+        "cases": 9,
+        "passed": 9,
+        "passRate": 1.0
+      },
+      "prompt_injection": {
+        "cases": 5,
+        "passed": 5,
+        "passRate": 1.0
+      },
+      "semantic": {
+        "cases": 10,
+        "passed": 10,
+        "passRate": 1.0
+      },
+      "semantic_gap": {
+        "cases": 7,
+        "passed": 7,
+        "passRate": 1.0
+      },
+      "structured_log": {
+        "cases": 4,
+        "passed": 4,
+        "passRate": 1.0
+      },
+      "structured_metric": {
+        "cases": 3,
+        "passed": 3,
+        "passRate": 1.0
+      },
+      "unanswerable": {
+        "cases": 4,
+        "passed": 4,
+        "passRate": 1.0
+      },
+      "xid": {
+        "cases": 9,
+        "passed": 9,
         "passRate": 1.0
       }
     },
@@ -107,8 +213,8 @@
         "nvidia-xid-79",
         "runbook-xid79",
         "nvidia-xid-154",
-        "nvidia-xid-48",
-        "nvidia-xid-43"
+        "nvidia-fabric-manager",
+        "nvidia-xid-48"
       ],
       "citationIds": [
         "nvidia-xid-79",
@@ -128,7 +234,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 728.9629,
+      "latencyMs": 433.1597,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -163,13 +269,14 @@
       "retrievedIds": [
         "nvidia-xid-79",
         "runbook-xid79",
-        "nvidia-xid-13",
+        "gpu-operator-device-plugin",
         "dcgm-pcie-replay",
-        "nvidia-xid-31"
+        "gpu-operator-driver-init"
       ],
       "citationIds": [
         "nvidia-xid-79",
-        "runbook-xid79"
+        "runbook-xid79",
+        "gpu-operator-device-plugin"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -185,14 +292,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 363.0298,
+      "latencyMs": 423.3902,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported semantic intent",
-        "2 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -231,9 +338,9 @@
       "retrievedIds": [
         "nvidia-xid-48",
         "runbook-ecc",
+        "nvidia-fabric-manager",
         "fluent-bit-kubernetes",
-        "fluent-bit-otlp",
-        "nvidia-xid-79"
+        "dcgm-nvlink-errors"
       ],
       "citationIds": [
         "nvidia-xid-48",
@@ -253,7 +360,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 341.6159,
+      "latencyMs": 433.6041,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -295,8 +402,8 @@
         "dcgm-ecc-dbe",
         "runbook-ecc",
         "nvidia-xid-13",
-        "fluent-bit-otlp",
-        "nvidia-xid-154"
+        "dcgm-clock-events",
+        "dcgm-row-remap"
       ],
       "citationIds": [
         "dcgm-ecc-dbe",
@@ -317,7 +424,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 368.661,
+      "latencyMs": 429.2539,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -388,7 +495,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 374.3382,
+      "latencyMs": 409.306,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -431,10 +538,12 @@
         "nvidia-xid-154",
         "nvidia-xid-79",
         "runbook-ecc",
-        "nvidia-xid-43"
+        "dcgm-clock-events"
       ],
       "citationIds": [
-        "nvidia-xid-31"
+        "nvidia-xid-31",
+        "nvidia-xid-154",
+        "nvidia-xid-79"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -450,14 +559,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 312.2743,
+      "latencyMs": 624.7752,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported exact identifier",
-        "1 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -484,10 +593,10 @@
       },
       "retrievedIds": [
         "nvidia-xid-31",
-        "gpu-operator-telemetry",
-        "dcgm-gpu-temp",
+        "gpu-operator-driver-init",
         "nvidia-xid-43",
-        "nvidia-xid-79"
+        "gpu-operator-telemetry",
+        "dcgm-gpu-temp"
       ],
       "citationIds": [
         "nvidia-xid-31"
@@ -506,7 +615,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 345.6183,
+      "latencyMs": 454.6522,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -548,7 +657,7 @@
         "nvidia-xid-13",
         "nvidia-xid-43",
         "nvidia-xid-79",
-        "dcgm-exporter-selection",
+        "nvidia-xid-74",
         "nvidia-xid-31"
       ],
       "citationIds": [
@@ -568,7 +677,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 337.3429,
+      "latencyMs": 553.3343,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -604,11 +713,12 @@
         "nvidia-xid-13",
         "nvidia-xid-31",
         "nvidia-xid-43",
-        "dcgm-ecc-dbe",
+        "nvidia-xid-74",
         "gpu-operator-telemetry"
       ],
       "citationIds": [
-        "nvidia-xid-13"
+        "nvidia-xid-13",
+        "nvidia-xid-31"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -624,14 +734,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 340.0514,
+      "latencyMs": 424.3397,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported semantic intent",
-        "1 retrieved passages cleared the evidence boundary",
+        "2 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -666,8 +776,8 @@
         "nvidia-xid-43",
         "nvidia-xid-13",
         "runbook-xid79",
-        "nvidia-xid-31",
-        "nvidia-xid-48"
+        "dcgm-memory-usage",
+        "nvidia-xid-74"
       ],
       "citationIds": [
         "nvidia-xid-43",
@@ -687,7 +797,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 295.5417,
+      "latencyMs": 673.0702,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -721,10 +831,10 @@
       },
       "retrievedIds": [
         "nvidia-xid-43",
-        "nvidia-xid-154",
+        "dcgm-memory-usage",
         "nvidia-xid-31",
-        "gpu-operator-telemetry",
-        "nvidia-xid-79"
+        "nvidia-xid-154",
+        "gpu-operator-device-plugin"
       ],
       "citationIds": [
         "nvidia-xid-43"
@@ -743,7 +853,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 351.7835,
+      "latencyMs": 591.535,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -778,7 +888,7 @@
           "R570"
         ]
       },
-      "status": "needs-investigation",
+      "status": "grounded",
       "observed": {
         "xids": [
           "154"
@@ -793,13 +903,14 @@
       },
       "retrievedIds": [
         "nvidia-xid-154",
+        "nvidia-fabric-manager",
         "nvidia-xid-31",
-        "nvidia-xid-79",
         "nvidia-xid-13",
-        "dcgm-exporter-selection"
+        "nvidia-xid-79"
       ],
       "citationIds": [
-        "nvidia-xid-154"
+        "nvidia-xid-154",
+        "nvidia-fabric-manager"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -815,14 +926,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 289.9117,
+      "latencyMs": 440.5863,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported exact identifier",
-        "1 retrieved passages cleared the evidence boundary",
+        "2 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -855,10 +966,10 @@
       },
       "retrievedIds": [
         "dcgm-pcie-replay",
+        "gpu-operator-device-plugin",
         "dcgm-ecc-dbe",
         "dcgm-exporter-selection",
-        "dcgm-power-usage",
-        "otel-semconv"
+        "dcgm-power-usage"
       ],
       "citationIds": [
         "dcgm-pcie-replay"
@@ -877,7 +988,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 334.7996,
+      "latencyMs": 536.1915,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -911,9 +1022,9 @@
       },
       "retrievedIds": [
         "dcgm-pcie-replay",
+        "dcgm-nvlink-errors",
         "runbook-xid79",
         "nvidia-xid-79",
-        "dcgm-gpu-temp",
         "dcgm-exporter-selection"
       ],
       "citationIds": [
@@ -933,7 +1044,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 413.1325,
+      "latencyMs": 330.324,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -974,9 +1085,9 @@
       "retrievedIds": [
         "dcgm-gpu-temp",
         "dcgm-power-usage",
-        "dcgm-exporter-selection",
-        "nvidia-xid-13",
-        "dcgm-pcie-replay"
+        "dcgm-memory-usage",
+        "nvidia-nccl-troubleshooting",
+        "dcgm-nvlink-errors"
       ],
       "citationIds": [
         "dcgm-gpu-temp"
@@ -995,7 +1106,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 334.3083,
+      "latencyMs": 792.9325,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1029,13 +1140,14 @@
       },
       "retrievedIds": [
         "dcgm-gpu-temp",
+        "dcgm-clock-events",
+        "dcgm-row-remap",
         "gpu-operator-telemetry",
-        "nvidia-xid-79",
-        "nvidia-xid-154",
-        "fluent-bit-otlp"
+        "gpu-operator-mig"
       ],
       "citationIds": [
-        "dcgm-gpu-temp"
+        "dcgm-gpu-temp",
+        "dcgm-clock-events"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -1051,14 +1163,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 308.6353,
+      "latencyMs": 409.6578,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported semantic intent",
-        "1 retrieved passages cleared the evidence boundary",
+        "2 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -1093,8 +1205,8 @@
         "dcgm-power-usage",
         "dcgm-pcie-replay",
         "nvidia-xid-79",
-        "fluent-bit-otlp",
-        "fluent-bit-kubernetes"
+        "nvidia-nccl-troubleshooting",
+        "fluent-bit-otlp"
       ],
       "citationIds": [
         "dcgm-power-usage"
@@ -1113,7 +1225,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 286.8385,
+      "latencyMs": 440.8276,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1154,8 +1266,8 @@
       "retrievedIds": [
         "dcgm-exporter-selection",
         "nvidia-xid-79",
-        "nvidia-xid-13",
-        "dcgm-gpu-temp",
+        "nvidia-xid-74",
+        "dcgm-row-remap",
         "nvidia-xid-48"
       ],
       "citationIds": [
@@ -1176,7 +1288,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 450.5552,
+      "latencyMs": 436.363,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1212,8 +1324,8 @@
         "gpu-operator-telemetry",
         "dcgm-exporter-selection",
         "nvidia-xid-79",
-        "dcgm-gpu-temp",
-        "dcgm-power-usage"
+        "gpu-operator-mig",
+        "dcgm-memory-usage"
       ],
       "citationIds": [
         "gpu-operator-telemetry",
@@ -1234,7 +1346,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 361.0046,
+      "latencyMs": 512.6487,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1269,9 +1381,9 @@
       "retrievedIds": [
         "fluent-bit-kubernetes",
         "fluent-bit-otlp",
+        "gpu-operator-driver-init",
         "dcgm-exporter-selection",
-        "nvidia-xid-43",
-        "dcgm-pcie-replay"
+        "nvidia-xid-43"
       ],
       "citationIds": [
         "fluent-bit-kubernetes",
@@ -1291,7 +1403,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 317.2861,
+      "latencyMs": 772.1465,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1326,9 +1438,9 @@
       "retrievedIds": [
         "fluent-bit-otlp",
         "fluent-bit-kubernetes",
+        "runbook-xid79",
         "nvidia-xid-79",
-        "nvidia-xid-154",
-        "runbook-xid79"
+        "nvidia-xid-154"
       ],
       "citationIds": [
         "fluent-bit-otlp",
@@ -1348,7 +1460,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 308.5983,
+      "latencyMs": 600.4052,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1405,7 +1517,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 290.5644,
+      "latencyMs": 443.4927,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1451,9 +1563,9 @@
       "retrievedIds": [
         "nvidia-xid-79",
         "runbook-xid79",
-        "nvidia-xid-48",
-        "nvidia-xid-43",
-        "nvidia-xid-154"
+        "gpu-operator-mig",
+        "nvidia-fabric-manager",
+        "gpu-operator-device-plugin"
       ],
       "citationIds": [
         "nvidia-xid-79",
@@ -1473,7 +1585,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 290.8894,
+      "latencyMs": 588.5083,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1540,7 +1652,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 299.2799,
+      "latencyMs": 432.0336,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1586,11 +1698,11 @@
         ]
       },
       "retrievedIds": [
+        "nvidia-fabric-manager",
         "nvidia-xid-79",
         "nvidia-xid-154",
         "dcgm-exporter-selection",
-        "nvidia-xid-48",
-        "nvidia-xid-13"
+        "nvidia-xid-48"
       ],
       "citationIds": [],
       "scores": {
@@ -1607,7 +1719,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 332.4293,
+      "latencyMs": 675.386,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1641,11 +1753,11 @@
         "driverBranches": []
       },
       "retrievedIds": [
+        "gpu-operator-device-plugin",
         "gpu-operator-telemetry",
-        "nvidia-xid-31",
-        "nvidia-xid-48",
         "dcgm-ecc-dbe",
-        "nvidia-xid-79"
+        "nvidia-xid-31",
+        "nvidia-xid-48"
       ],
       "citationIds": [],
       "scores": {
@@ -1662,7 +1774,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 430.4747,
+      "latencyMs": 621.1738,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1690,11 +1802,11 @@
         "driverBranches": []
       },
       "retrievedIds": [
+        "nvidia-xid-74",
         "nvidia-xid-43",
         "nvidia-xid-48",
         "nvidia-xid-79",
-        "runbook-ecc",
-        "dcgm-gpu-temp"
+        "runbook-ecc"
       ],
       "citationIds": [],
       "scores": {
@@ -1711,7 +1823,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 590.6466,
+      "latencyMs": 378.5721,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1740,10 +1852,10 @@
       },
       "retrievedIds": [
         "fluent-bit-kubernetes",
+        "gpu-operator-device-plugin",
         "nvidia-xid-43",
         "gpu-operator-telemetry",
-        "nvidia-xid-48",
-        "nvidia-xid-79"
+        "nvidia-xid-48"
       ],
       "citationIds": [],
       "scores": {
@@ -1760,7 +1872,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 783.9423,
+      "latencyMs": 380.5545,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1792,7 +1904,7 @@
         "fluent-bit-otlp",
         "dcgm-exporter-selection",
         "gpu-operator-telemetry",
-        "runbook-ecc"
+        "nvidia-nccl-troubleshooting"
       ],
       "citationIds": [],
       "scores": {
@@ -1809,7 +1921,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 804.3999,
+      "latencyMs": 419.4915,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1838,10 +1950,10 @@
       },
       "retrievedIds": [
         "dcgm-exporter-selection",
-        "otel-semconv",
         "runbook-ecc",
-        "nvidia-xid-43",
-        "runbook-xid79"
+        "otel-semconv",
+        "dcgm-clock-events",
+        "nvidia-xid-43"
       ],
       "citationIds": [],
       "scores": {
@@ -1858,7 +1970,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 557.4975,
+      "latencyMs": 419.1627,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1887,10 +1999,10 @@
       },
       "retrievedIds": [
         "dcgm-gpu-temp",
+        "nvidia-xid-74",
         "nvidia-xid-48",
         "nvidia-xid-79",
-        "nvidia-xid-43",
-        "gpu-operator-telemetry"
+        "gpu-operator-device-plugin"
       ],
       "citationIds": [],
       "scores": {
@@ -1907,7 +2019,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 293.7611,
+      "latencyMs": 433.2507,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1939,7 +2051,7 @@
         "dcgm-power-usage",
         "nvidia-xid-79",
         "nvidia-xid-48",
-        "nvidia-xid-154"
+        "nvidia-xid-74"
       ],
       "citationIds": [],
       "scores": {
@@ -1956,7 +2068,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 678.2728,
+      "latencyMs": 411.4564,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -1984,11 +2096,11 @@
         "driverBranches": []
       },
       "retrievedIds": [
+        "nvidia-fabric-manager",
+        "nvidia-nccl-troubleshooting",
         "dcgm-pcie-replay",
         "dcgm-exporter-selection",
-        "runbook-xid79",
-        "nvidia-xid-79",
-        "fluent-bit-otlp"
+        "runbook-xid79"
       ],
       "citationIds": [],
       "scores": {
@@ -2005,7 +2117,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 790.6293,
+      "latencyMs": 399.3028,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2049,13 +2161,14 @@
       "retrievedIds": [
         "nvidia-xid-48",
         "runbook-ecc",
+        "nvidia-fabric-manager",
         "dcgm-exporter-selection",
-        "dcgm-ecc-dbe",
-        "nvidia-xid-79"
+        "dcgm-ecc-dbe"
       ],
       "citationIds": [
         "nvidia-xid-48",
-        "runbook-ecc"
+        "runbook-ecc",
+        "nvidia-fabric-manager"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -2071,14 +2184,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 794.9326,
+      "latencyMs": 452.0777,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported exact identifier",
-        "2 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -2111,13 +2224,15 @@
       },
       "retrievedIds": [
         "dcgm-pcie-replay",
+        "gpu-operator-mig",
+        "gpu-operator-device-plugin",
         "gpu-operator-telemetry",
-        "dcgm-gpu-temp",
-        "dcgm-exporter-selection",
-        "dcgm-ecc-dbe"
+        "dcgm-gpu-temp"
       ],
       "citationIds": [
-        "dcgm-pcie-replay"
+        "dcgm-pcie-replay",
+        "gpu-operator-mig",
+        "gpu-operator-device-plugin"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -2133,14 +2248,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 678.9,
+      "latencyMs": 434.9712,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported exact identifier",
-        "1 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -2182,13 +2297,14 @@
       },
       "retrievedIds": [
         "nvidia-xid-154",
+        "nvidia-fabric-manager",
         "runbook-ecc",
         "nvidia-xid-31",
-        "nvidia-xid-13",
-        "dcgm-exporter-selection"
+        "nvidia-xid-13"
       ],
       "citationIds": [
         "nvidia-xid-154",
+        "nvidia-fabric-manager",
         "runbook-ecc"
       ],
       "scores": {
@@ -2205,14 +2321,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 292.4652,
+      "latencyMs": 411.2095,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported exact identifier",
-        "2 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -2246,9 +2362,9 @@
       "retrievedIds": [
         "nvidia-xid-31",
         "runbook-xid79",
-        "nvidia-xid-48",
         "otel-semconv",
-        "dcgm-ecc-dbe"
+        "nvidia-xid-48",
+        "gpu-operator-device-plugin"
       ],
       "citationIds": [
         "nvidia-xid-31",
@@ -2268,7 +2384,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 316.9688,
+      "latencyMs": 400.844,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2298,11 +2414,11 @@
         "driverBranches": []
       },
       "retrievedIds": [
-        "nvidia-xid-79",
         "runbook-xid79",
-        "dcgm-gpu-temp",
+        "nvidia-xid-79",
         "dcgm-power-usage",
-        "gpu-operator-telemetry"
+        "dcgm-gpu-temp",
+        "nvidia-xid-154"
       ],
       "citationIds": [],
       "scores": {
@@ -2319,7 +2435,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 289.9622,
+      "latencyMs": 463.0375,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2357,14 +2473,14 @@
       },
       "retrievedIds": [
         "dcgm-gpu-temp",
+        "nvidia-fabric-manager",
         "dcgm-exporter-selection",
-        "nvidia-xid-13",
-        "dcgm-power-usage",
-        "nvidia-xid-31"
+        "dcgm-nvlink-errors",
+        "nvidia-xid-13"
       ],
       "citationIds": [
         "dcgm-gpu-temp",
-        "dcgm-exporter-selection"
+        "nvidia-fabric-manager"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -2380,7 +2496,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 355.342,
+      "latencyMs": 418.362,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2442,7 +2558,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 346.1382,
+      "latencyMs": 436.8503,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2484,8 +2600,8 @@
         "nvidia-xid-79",
         "runbook-xid79",
         "nvidia-xid-43",
-        "nvidia-xid-31",
-        "nvidia-xid-48"
+        "nvidia-xid-74",
+        "nvidia-xid-31"
       ],
       "citationIds": [
         "nvidia-xid-79",
@@ -2505,7 +2621,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 410.4475,
+      "latencyMs": 460.821,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2568,7 +2684,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 387.8435,
+      "latencyMs": 394.9505,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2632,7 +2748,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 422.9641,
+      "latencyMs": 432.1111,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2666,13 +2782,14 @@
       },
       "retrievedIds": [
         "nvidia-xid-79",
+        "gpu-operator-device-plugin",
         "runbook-xid79",
-        "nvidia-xid-13",
-        "dcgm-pcie-replay",
-        "gpu-operator-telemetry"
+        "nvidia-xid-74",
+        "dcgm-pcie-replay"
       ],
       "citationIds": [
         "nvidia-xid-79",
+        "gpu-operator-device-plugin",
         "runbook-xid79"
       ],
       "scores": {
@@ -2689,14 +2806,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 377.6405,
+      "latencyMs": 423.7761,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported semantic intent",
-        "2 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -2726,8 +2843,8 @@
         "fluent-bit-kubernetes",
         "fluent-bit-otlp",
         "dcgm-ecc-dbe",
-        "gpu-operator-telemetry",
-        "nvidia-xid-154"
+        "dcgm-nvlink-errors",
+        "gpu-operator-mig"
       ],
       "citationIds": [
         "fluent-bit-kubernetes",
@@ -2748,7 +2865,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 426.921,
+      "latencyMs": 415.1582,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2789,8 +2906,8 @@
         "nvidia-xid-79",
         "nvidia-xid-48",
         "runbook-xid79",
-        "nvidia-xid-31",
-        "runbook-ecc"
+        "runbook-ecc",
+        "nvidia-xid-31"
       ],
       "citationIds": [],
       "scores": {
@@ -2807,7 +2924,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 425.3881,
+      "latencyMs": 445.8981,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2842,10 +2959,10 @@
       },
       "retrievedIds": [
         "dcgm-power-usage",
+        "nvidia-xid-74",
         "dcgm-gpu-temp",
         "dcgm-exporter-selection",
-        "runbook-ecc",
-        "dcgm-ecc-dbe"
+        "runbook-ecc"
       ],
       "citationIds": [],
       "scores": {
@@ -2862,7 +2979,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 404.1408,
+      "latencyMs": 424.8985,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2917,7 +3034,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 491.8961,
+      "latencyMs": 614.7799,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -2966,14 +3083,14 @@
       "retrievedIds": [
         "nvidia-xid-79",
         "runbook-xid79",
+        "nvidia-fabric-manager",
         "nvidia-xid-154",
-        "dcgm-exporter-selection",
         "nvidia-xid-48"
       ],
       "citationIds": [
         "nvidia-xid-79",
         "runbook-xid79",
-        "nvidia-xid-154"
+        "nvidia-fabric-manager"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -2989,7 +3106,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 386.7001,
+      "latencyMs": 436.5729,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3041,8 +3158,8 @@
         "nvidia-xid-79",
         "runbook-xid79",
         "nvidia-xid-13",
-        "nvidia-xid-154",
-        "otel-semconv"
+        "gpu-operator-driver-init",
+        "nvidia-fabric-manager"
       ],
       "citationIds": [
         "nvidia-xid-79",
@@ -3062,7 +3179,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 408.9029,
+      "latencyMs": 607.7048,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3110,7 +3227,7 @@
         "runbook-ecc",
         "nvidia-xid-79",
         "dcgm-ecc-dbe",
-        "nvidia-xid-154"
+        "nvidia-fabric-manager"
       ],
       "citationIds": [
         "nvidia-xid-48",
@@ -3130,7 +3247,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 425.2313,
+      "latencyMs": 597.053,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3171,9 +3288,9 @@
       "retrievedIds": [
         "nvidia-xid-31",
         "runbook-xid79",
+        "nvidia-xid-74",
         "nvidia-xid-48",
-        "otel-semconv",
-        "nvidia-xid-13"
+        "otel-semconv"
       ],
       "citationIds": [
         "nvidia-xid-31",
@@ -3193,7 +3310,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 415.632,
+      "latencyMs": 463.3959,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3235,8 +3352,8 @@
         "nvidia-xid-13",
         "dcgm-gpu-temp",
         "dcgm-ecc-dbe",
-        "dcgm-exporter-selection",
-        "dcgm-power-usage"
+        "dcgm-nvlink-errors",
+        "dcgm-exporter-selection"
       ],
       "citationIds": [
         "nvidia-xid-13"
@@ -3255,7 +3372,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 433.4006,
+      "latencyMs": 571.0402,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3291,12 +3408,13 @@
         "nvidia-xid-43",
         "nvidia-xid-13",
         "nvidia-xid-31",
-        "nvidia-xid-48",
-        "nvidia-xid-79"
+        "nvidia-xid-74",
+        "nvidia-xid-48"
       ],
       "citationIds": [
         "nvidia-xid-43",
-        "nvidia-xid-13"
+        "nvidia-xid-13",
+        "nvidia-xid-31"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -3312,14 +3430,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 412.7702,
+      "latencyMs": 447.9173,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported semantic intent",
-        "2 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -3346,9 +3464,9 @@
       },
       "retrievedIds": [
         "nvidia-xid-154",
+        "gpu-operator-driver-init",
         "nvidia-xid-31",
         "nvidia-xid-79",
-        "otel-semconv",
         "dcgm-ecc-dbe"
       ],
       "citationIds": [
@@ -3368,7 +3486,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 428.8047,
+      "latencyMs": 606.2645,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3409,14 +3527,14 @@
       "retrievedIds": [
         "dcgm-pcie-replay",
         "nvidia-xid-48",
-        "runbook-ecc",
-        "runbook-xid79",
-        "gpu-operator-telemetry"
+        "dcgm-row-remap",
+        "nvidia-xid-74",
+        "runbook-ecc"
       ],
       "citationIds": [
         "dcgm-pcie-replay",
         "nvidia-xid-48",
-        "runbook-ecc"
+        "dcgm-row-remap"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -3432,7 +3550,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 430.9137,
+      "latencyMs": 594.0768,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3477,13 +3595,14 @@
       },
       "retrievedIds": [
         "dcgm-gpu-temp",
+        "nvidia-fabric-manager",
+        "gpu-operator-mig",
         "nvidia-xid-79",
-        "nvidia-xid-154",
-        "nvidia-xid-48",
-        "dcgm-ecc-dbe"
+        "nvidia-xid-154"
       ],
       "citationIds": [
-        "dcgm-gpu-temp"
+        "dcgm-gpu-temp",
+        "nvidia-fabric-manager"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -3499,14 +3618,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 402.1169,
+      "latencyMs": 593.4313,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported exact identifier",
-        "1 retrieved passages cleared the evidence boundary",
+        "2 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -3545,13 +3664,14 @@
       "retrievedIds": [
         "dcgm-power-usage",
         "dcgm-pcie-replay",
+        "nvidia-fabric-manager",
         "nvidia-xid-48",
-        "dcgm-ecc-dbe",
-        "gpu-operator-telemetry"
+        "dcgm-ecc-dbe"
       ],
       "citationIds": [
         "dcgm-power-usage",
-        "dcgm-pcie-replay"
+        "dcgm-pcie-replay",
+        "nvidia-fabric-manager"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -3567,14 +3687,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 454.2211,
+      "latencyMs": 418.1272,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported exact identifier",
-        "2 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -3620,8 +3740,8 @@
         "runbook-ecc",
         "nvidia-xid-48",
         "dcgm-ecc-dbe",
-        "nvidia-xid-154",
-        "nvidia-xid-79"
+        "nvidia-fabric-manager",
+        "nvidia-xid-154"
       ],
       "citationIds": [
         "nvidia-xid-48",
@@ -3642,7 +3762,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 922.0092,
+      "latencyMs": 429.4938,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3706,7 +3826,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 629.0844,
+      "latencyMs": 499.2027,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3742,12 +3862,13 @@
         "gpu-operator-telemetry",
         "fluent-bit-kubernetes",
         "dcgm-exporter-selection",
-        "dcgm-gpu-temp",
-        "dcgm-power-usage"
+        "gpu-operator-mig",
+        "dcgm-gpu-temp"
       ],
       "citationIds": [
         "gpu-operator-telemetry",
-        "fluent-bit-kubernetes"
+        "fluent-bit-kubernetes",
+        "dcgm-exporter-selection"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -3763,14 +3884,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 425.1448,
+      "latencyMs": 496.0944,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported semantic intent",
-        "2 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -3798,9 +3919,9 @@
       "retrievedIds": [
         "fluent-bit-kubernetes",
         "fluent-bit-otlp",
+        "gpu-operator-device-plugin",
         "gpu-operator-telemetry",
-        "dcgm-ecc-dbe",
-        "otel-semconv"
+        "gpu-operator-driver-init"
       ],
       "citationIds": [
         "fluent-bit-kubernetes",
@@ -3820,7 +3941,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 669.0293,
+      "latencyMs": 402.8619,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -3855,12 +3976,13 @@
       "retrievedIds": [
         "fluent-bit-otlp",
         "otel-semconv",
-        "nvidia-xid-79",
+        "dcgm-nvlink-errors",
         "nvidia-xid-154",
-        "dcgm-power-usage"
+        "nvidia-xid-79"
       ],
       "citationIds": [
-        "fluent-bit-otlp"
+        "fluent-bit-otlp",
+        "otel-semconv"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -3876,14 +3998,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 613.5714,
+      "latencyMs": 494.6954,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported semantic intent",
-        "1 retrieved passages cleared the evidence boundary",
+        "2 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -3911,9 +4033,9 @@
       "retrievedIds": [
         "otel-semconv",
         "fluent-bit-otlp",
+        "nvidia-fabric-manager",
         "runbook-ecc",
-        "dcgm-gpu-temp",
-        "dcgm-exporter-selection"
+        "dcgm-gpu-temp"
       ],
       "citationIds": [
         "otel-semconv"
@@ -3932,7 +4054,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 751.6153,
+      "latencyMs": 511.615,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4004,7 +4126,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 318.0856,
+      "latencyMs": 684.9608,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4055,8 +4177,8 @@
         "nvidia-xid-48",
         "runbook-ecc",
         "dcgm-ecc-dbe",
-        "nvidia-xid-154",
-        "nvidia-xid-43"
+        "nvidia-fabric-manager",
+        "nvidia-xid-154"
       ],
       "citationIds": [
         "nvidia-xid-48",
@@ -4076,7 +4198,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 497.6257,
+      "latencyMs": 335.1288,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4128,7 +4250,7 @@
         "nvidia-xid-43",
         "nvidia-xid-13",
         "nvidia-xid-154",
-        "nvidia-xid-79"
+        "nvidia-xid-74"
       ],
       "citationIds": [
         "nvidia-xid-31"
@@ -4147,7 +4269,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 667.2057,
+      "latencyMs": 2356.0725,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4198,7 +4320,7 @@
         "nvidia-xid-13",
         "nvidia-xid-154",
         "nvidia-xid-31",
-        "dcgm-exporter-selection",
+        "nvidia-xid-48",
         "runbook-xid79"
       ],
       "citationIds": [
@@ -4218,7 +4340,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 792.5015,
+      "latencyMs": 434.9437,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4266,8 +4388,8 @@
         "runbook-xid79",
         "dcgm-pcie-replay",
         "nvidia-xid-79",
-        "nvidia-xid-48",
-        "nvidia-xid-13"
+        "nvidia-xid-74",
+        "nvidia-xid-48"
       ],
       "citationIds": [
         "dcgm-pcie-replay",
@@ -4288,7 +4410,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 790.3369,
+      "latencyMs": 398.0486,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4337,14 +4459,14 @@
       "retrievedIds": [
         "dcgm-gpu-temp",
         "dcgm-power-usage",
+        "nvidia-fabric-manager",
         "dcgm-exporter-selection",
-        "nvidia-xid-79",
-        "otel-semconv"
+        "gpu-operator-mig"
       ],
       "citationIds": [
         "dcgm-gpu-temp",
         "dcgm-power-usage",
-        "dcgm-exporter-selection"
+        "nvidia-fabric-manager"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -4360,7 +4482,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 321.4404,
+      "latencyMs": 460.4035,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4402,11 +4524,13 @@
         "nvidia-xid-43",
         "nvidia-xid-31",
         "nvidia-xid-154",
-        "nvidia-xid-79",
-        "nvidia-xid-48"
+        "nvidia-xid-13",
+        "nvidia-xid-79"
       ],
       "citationIds": [
-        "nvidia-xid-43"
+        "nvidia-xid-43",
+        "nvidia-xid-31",
+        "nvidia-xid-154"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -4422,14 +4546,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 290.4432,
+      "latencyMs": 424.3032,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported exact identifier",
-        "1 retrieved passages cleared the evidence boundary",
+        "3 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -4463,14 +4587,14 @@
       "retrievedIds": [
         "nvidia-xid-154",
         "nvidia-xid-79",
+        "nvidia-xid-74",
         "nvidia-xid-43",
-        "nvidia-xid-31",
         "runbook-xid79"
       ],
       "citationIds": [
         "nvidia-xid-154",
         "nvidia-xid-79",
-        "nvidia-xid-43"
+        "nvidia-xid-74"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -4486,7 +4610,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 316.6617,
+      "latencyMs": 430.6659,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4523,7 +4647,7 @@
         "nvidia-xid-48",
         "runbook-ecc",
         "dcgm-exporter-selection",
-        "dcgm-gpu-temp"
+        "dcgm-power-usage"
       ],
       "citationIds": [
         "dcgm-ecc-dbe",
@@ -4544,7 +4668,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 323.6068,
+      "latencyMs": 408.9341,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4578,13 +4702,14 @@
       },
       "retrievedIds": [
         "gpu-operator-telemetry",
-        "dcgm-power-usage",
+        "gpu-operator-device-plugin",
         "dcgm-exporter-selection",
-        "dcgm-ecc-dbe",
-        "dcgm-gpu-temp"
+        "dcgm-power-usage",
+        "dcgm-memory-usage"
       ],
       "citationIds": [
-        "gpu-operator-telemetry"
+        "gpu-operator-telemetry",
+        "gpu-operator-device-plugin"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -4600,14 +4725,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 294.7591,
+      "latencyMs": 445.7845,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported semantic intent",
-        "1 retrieved passages cleared the evidence boundary",
+        "2 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -4642,8 +4767,8 @@
         "nvidia-xid-79",
         "runbook-xid79",
         "nvidia-xid-43",
-        "nvidia-xid-31",
-        "nvidia-xid-154"
+        "nvidia-xid-74",
+        "nvidia-xid-31"
       ],
       "citationIds": [
         "nvidia-xid-79",
@@ -4663,7 +4788,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 282.1672,
+      "latencyMs": 404.467,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4704,9 +4829,9 @@
       "retrievedIds": [
         "dcgm-pcie-replay",
         "nvidia-xid-79",
+        "gpu-operator-device-plugin",
         "otel-semconv",
-        "dcgm-power-usage",
-        "dcgm-ecc-dbe"
+        "dcgm-power-usage"
       ],
       "citationIds": [
         "dcgm-pcie-replay"
@@ -4725,7 +4850,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 302.9587,
+      "latencyMs": 431.2831,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4771,9 +4896,9 @@
       "retrievedIds": [
         "nvidia-xid-48",
         "runbook-ecc",
+        "nvidia-fabric-manager",
         "nvidia-xid-79",
-        "dcgm-ecc-dbe",
-        "dcgm-exporter-selection"
+        "dcgm-ecc-dbe"
       ],
       "citationIds": [
         "nvidia-xid-48",
@@ -4793,7 +4918,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 306.2811,
+      "latencyMs": 449.7172,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4840,14 +4965,14 @@
       "retrievedIds": [
         "nvidia-xid-79",
         "runbook-xid79",
+        "nvidia-fabric-manager",
         "nvidia-xid-48",
-        "nvidia-xid-154",
-        "runbook-ecc"
+        "nvidia-xid-74"
       ],
       "citationIds": [
         "nvidia-xid-79",
         "runbook-xid79",
-        "nvidia-xid-48"
+        "nvidia-fabric-manager"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -4863,7 +4988,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 292.3171,
+      "latencyMs": 412.7792,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4903,9 +5028,9 @@
       "retrievedIds": [
         "runbook-xid79",
         "nvidia-xid-79",
-        "dcgm-exporter-selection",
+        "nvidia-fabric-manager",
         "nvidia-xid-43",
-        "nvidia-xid-154"
+        "gpu-operator-device-plugin"
       ],
       "citationIds": [],
       "scores": {
@@ -4922,7 +5047,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 308.9992,
+      "latencyMs": 451.5545,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -4959,10 +5084,10 @@
       },
       "retrievedIds": [
         "dcgm-gpu-temp",
+        "dcgm-nvlink-errors",
+        "dcgm-memory-usage",
         "nvidia-xid-31",
-        "dcgm-power-usage",
-        "nvidia-xid-48",
-        "nvidia-xid-154"
+        "nvidia-nccl-troubleshooting"
       ],
       "citationIds": [],
       "scores": {
@@ -4979,7 +5104,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 366.2207,
+      "latencyMs": 418.8371,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5010,8 +5135,8 @@
         "nvidia-xid-154",
         "dcgm-gpu-temp",
         "dcgm-power-usage",
-        "nvidia-xid-79",
-        "nvidia-xid-43"
+        "dcgm-clock-events",
+        "nvidia-xid-79"
       ],
       "citationIds": [],
       "scores": {
@@ -5028,7 +5153,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 312.0556,
+      "latencyMs": 434.1518,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5056,11 +5181,11 @@
         "driverBranches": []
       },
       "retrievedIds": [
-        "runbook-ecc",
+        "dcgm-memory-usage",
         "nvidia-xid-79",
-        "gpu-operator-telemetry",
-        "dcgm-exporter-selection",
-        "dcgm-pcie-replay"
+        "runbook-ecc",
+        "dcgm-clock-events",
+        "nvidia-xid-74"
       ],
       "citationIds": [],
       "scores": {
@@ -5077,7 +5202,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 322.338,
+      "latencyMs": 431.4795,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5107,7 +5232,7 @@
       "retrievedIds": [
         "nvidia-xid-79",
         "nvidia-xid-13",
-        "dcgm-exporter-selection",
+        "nvidia-xid-74",
         "nvidia-xid-154",
         "nvidia-xid-48"
       ],
@@ -5126,7 +5251,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 320.1599,
+      "latencyMs": 404.2948,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5166,8 +5291,8 @@
         "nvidia-xid-48",
         "runbook-ecc",
         "dcgm-ecc-dbe",
-        "nvidia-xid-43",
-        "nvidia-xid-154"
+        "nvidia-xid-154",
+        "nvidia-xid-43"
       ],
       "citationIds": [
         "nvidia-xid-48",
@@ -5187,7 +5312,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 294.1962,
+      "latencyMs": 435.066,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5249,7 +5374,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 295.8199,
+      "latencyMs": 421.5935,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5294,8 +5419,8 @@
         "dcgm-power-usage",
         "dcgm-gpu-temp",
         "dcgm-ecc-dbe",
-        "gpu-operator-telemetry",
-        "dcgm-exporter-selection"
+        "dcgm-nvlink-errors",
+        "gpu-operator-telemetry"
       ],
       "citationIds": [
         "dcgm-power-usage",
@@ -5316,7 +5441,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 296.7964,
+      "latencyMs": 430.9781,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5369,13 +5494,14 @@
       },
       "retrievedIds": [
         "nvidia-xid-154",
+        "dcgm-nvlink-errors",
         "nvidia-xid-48",
         "dcgm-ecc-dbe",
-        "nvidia-xid-79",
-        "nvidia-xid-31"
+        "nvidia-xid-79"
       ],
       "citationIds": [
-        "nvidia-xid-154"
+        "nvidia-xid-154",
+        "dcgm-nvlink-errors"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -5391,14 +5517,14 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 300.4506,
+      "latencyMs": 431.1883,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
       "pineconeReadUnits": 1,
       "decisionReasons": [
         "supported exact identifier",
-        "1 retrieved passages cleared the evidence boundary",
+        "2 retrieved passages cleared the evidence boundary",
         "official source selected for primary meaning"
       ]
     },
@@ -5423,9 +5549,9 @@
       "retrievedIds": [
         "nvidia-xid-43",
         "nvidia-xid-31",
+        "gpu-operator-mig",
         "nvidia-xid-13",
-        "nvidia-xid-79",
-        "nvidia-xid-154"
+        "nvidia-xid-79"
       ],
       "citationIds": [],
       "scores": {
@@ -5442,7 +5568,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 333.8595,
+      "latencyMs": 431.0867,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5490,10 +5616,10 @@
       },
       "retrievedIds": [
         "nvidia-xid-13",
-        "dcgm-exporter-selection",
+        "nvidia-xid-74",
         "nvidia-xid-43",
-        "fluent-bit-kubernetes",
-        "nvidia-xid-48"
+        "nvidia-fabric-manager",
+        "dcgm-exporter-selection"
       ],
       "citationIds": [
         "nvidia-xid-13"
@@ -5512,7 +5638,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 313.8402,
+      "latencyMs": 531.0719,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5559,8 +5685,8 @@
         "dcgm-ecc-dbe",
         "runbook-ecc",
         "dcgm-pcie-replay",
-        "dcgm-gpu-temp",
-        "gpu-operator-telemetry"
+        "nvidia-fabric-manager",
+        "dcgm-gpu-temp"
       ],
       "citationIds": [
         "dcgm-ecc-dbe",
@@ -5581,7 +5707,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 336.5915,
+      "latencyMs": 436.1955,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5631,7 +5757,7 @@
         "runbook-xid79",
         "nvidia-xid-154",
         "nvidia-xid-31",
-        "nvidia-xid-48"
+        "nvidia-fabric-manager"
       ],
       "citationIds": [
         "nvidia-xid-79",
@@ -5652,7 +5778,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 292.2765,
+      "latencyMs": 565.3225,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5698,14 +5824,14 @@
       "retrievedIds": [
         "nvidia-xid-48",
         "runbook-ecc",
+        "nvidia-fabric-manager",
         "nvidia-xid-79",
-        "otel-semconv",
-        "nvidia-xid-154"
+        "gpu-operator-mig"
       ],
       "citationIds": [
         "nvidia-xid-48",
         "runbook-ecc",
-        "nvidia-xid-79"
+        "nvidia-fabric-manager"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -5721,7 +5847,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 302.9235,
+      "latencyMs": 333.1453,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5755,10 +5881,10 @@
       },
       "retrievedIds": [
         "nvidia-xid-48",
+        "nvidia-xid-74",
         "nvidia-xid-31",
         "nvidia-xid-79",
-        "nvidia-xid-43",
-        "dcgm-exporter-selection"
+        "nvidia-xid-43"
       ],
       "citationIds": [
         "nvidia-xid-48"
@@ -5777,7 +5903,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 303.6573,
+      "latencyMs": 535.6672,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5812,14 +5938,14 @@
       "retrievedIds": [
         "dcgm-gpu-temp",
         "nvidia-xid-43",
+        "dcgm-clock-events",
         "nvidia-xid-79",
-        "dcgm-pcie-replay",
-        "nvidia-xid-48"
+        "dcgm-pcie-replay"
       ],
       "citationIds": [
         "dcgm-gpu-temp",
         "nvidia-xid-43",
-        "nvidia-xid-79"
+        "dcgm-clock-events"
       ],
       "scores": {
         "recallAt5": 1.0,
@@ -5835,7 +5961,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 309.4019,
+      "latencyMs": 323.7187,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5870,9 +5996,9 @@
       "retrievedIds": [
         "dcgm-power-usage",
         "nvidia-xid-43",
+        "dcgm-clock-events",
         "nvidia-xid-79",
-        "nvidia-xid-154",
-        "nvidia-xid-31"
+        "nvidia-xid-154"
       ],
       "citationIds": [
         "dcgm-power-usage"
@@ -5891,7 +6017,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 313.275,
+      "latencyMs": 781.0165,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5925,9 +6051,9 @@
       },
       "retrievedIds": [
         "gpu-operator-telemetry",
-        "dcgm-exporter-selection",
-        "dcgm-ecc-dbe",
         "fluent-bit-kubernetes",
+        "dcgm-ecc-dbe",
+        "dcgm-exporter-selection",
         "dcgm-power-usage"
       ],
       "citationIds": [
@@ -5947,7 +6073,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 334.5951,
+      "latencyMs": 695.3975,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -5990,7 +6116,7 @@
         "nvidia-xid-79",
         "nvidia-xid-43",
         "nvidia-xid-154",
-        "nvidia-xid-48"
+        "nvidia-xid-74"
       ],
       "citationIds": [
         "nvidia-xid-31",
@@ -6011,7 +6137,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 287.5004,
+      "latencyMs": 424.1028,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -6069,7 +6195,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 753.4512,
+      "latencyMs": 677.9829,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -6108,8 +6234,8 @@
         "nvidia-xid-31",
         "runbook-ecc",
         "nvidia-xid-43",
-        "dcgm-pcie-replay",
-        "runbook-xid79"
+        "runbook-xid79",
+        "dcgm-pcie-replay"
       ],
       "citationIds": [],
       "scores": {
@@ -6126,7 +6252,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 787.4616,
+      "latencyMs": 447.2216,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,
@@ -6181,7 +6307,7 @@
       },
       "passed": true,
       "failureReasons": [],
-      "latencyMs": 795.8009,
+      "latencyMs": 467.6488,
       "llmInputTokens": 0,
       "llmOutputTokens": 0,
       "estimatedCostUsd": 0.0,

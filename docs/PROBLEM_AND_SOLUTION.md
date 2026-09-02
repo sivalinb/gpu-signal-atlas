@@ -74,7 +74,7 @@ An unknown Xid or DCGM field causes a hard refusal. The response asks for a comp
 | Cite evidence | Direct official/internal source links |
 | Refuse unsupported requests | Unknown-identifier and domain-threshold checks |
 | Explain retrieval | Browser trace displays top rank and sparse/vector positions |
-| Evaluate quality | 31 independent labeled cases, including six same-domain hard negatives |
+| Evaluate quality | 100 owner-reviewed primary cases plus a separate 16-case post-change holdout; independent GPU-SME review remains pending |
 | Protect credentials | Pinecone key is server-only; no client-side secret or model key |
 
 ## Non-functional requirements
@@ -117,6 +117,6 @@ An unknown Xid or DCGM field causes a hard refusal. The response asks for a comp
 4. Place generation behind a strict JSON schema and citation validator.
 5. Add authenticated access and approved internal runbooks.
 6. Connect read-only telemetry backends after data-governance review.
-7. Expand the evaluation set with independently labeled, de-identified incidents.
+7. Add independently labeled, de-identified incidents; the current 100-case primary set and 16-case holdout are owner-reviewed.
 
 The local build intentionally stops before those production concerns so Week 2 learning remains centered on retrieval, grounding, and evaluation.

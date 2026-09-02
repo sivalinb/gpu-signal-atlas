@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   benchmarkProvenance,
+  benchmarkCampaignContract,
   buildDecisionReport,
   compareRuns,
   defaultSlo,
@@ -17,6 +18,13 @@ test('public benchmark records retain complete provenance and positive metrics',
   assert.equal(benchmarkProvenance.evidenceClass, 'public-measurement');
   assert.equal(publicBenchmarkRuns.length, 3);
   assert.ok(publicBenchmarkRuns.every((run) => run.ttftP99Ms > 0 && run.requestsPerSecond > 0));
+});
+
+test('benchmark campaign contract exposes missing reproducibility evidence', () => {
+  assert.equal(benchmarkCampaignContract.status, 'public-reference-incomplete');
+  assert.ok(benchmarkCampaignContract.requiredBeforePromotion.some((item) => item.includes('GPU SKU')));
+  assert.ok(benchmarkCampaignContract.requiredBeforePromotion.some((item) => item.includes('confidence interval')));
+  assert.match(benchmarkCampaignContract.exactCommandTemplate, /genai-perf profile/);
 });
 
 test('SLO evaluation is deterministic and exposes every decision', () => {

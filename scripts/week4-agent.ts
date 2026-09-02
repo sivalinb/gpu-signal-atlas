@@ -5,7 +5,7 @@ import { getPineconeConfig, retrieveFromPinecone } from '../core/pinecone.ts';
 interface AgentRequest {
   caseId: string;
   query: string;
-  variant: 'baseline' | 'improved';
+  variant: 'baseline' | 'improved' | 'holdout';
   backend?: 'local' | 'pinecone';
 }
 

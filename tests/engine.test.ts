@@ -83,6 +83,29 @@ test('hybrid retrieval ranks an exact DCGM field first', () => {
   assert.equal(retrieve('DCGM_FI_DEV_GPU_TEMP=91')[0].document.id, 'dcgm-gpu-temp');
 });
 
+test('expanded GPU corpus covers fabric, memory health, NCCL, MIG, and scheduling', () => {
+  const cases = [
+    ['NVRM Xid 74 NVLink error', 'nvidia-xid-74'],
+    ['DCGM_FI_DEV_ROW_REMAP_FAILED=1', 'dcgm-row-remap'],
+    ['NCCL all-reduce collective timeout on rank 3', 'nvidia-nccl-troubleshooting'],
+    ['nvidia-nvswitch3 SXid 28006 link 46', 'nvidia-fabric-manager'],
+    ['nvidia.com/mig.config.state failed', 'gpu-operator-mig'],
+    ['GPU pod Pending with nvidia.com/gpu requested', 'gpu-operator-device-plugin'],
+  ] as const;
+  for (const [query, expected] of cases) {
+    const analysis = analyzeTelemetry(query);
+    assert.notEqual(analysis.status, 'refused', query);
+    assert.equal(analysis.citations[0]?.id, expected, query);
+  }
+});
+
+test('citations explain what was selected without inventing confidence', () => {
+  const analysis = analyzeTelemetry('NVRM Xid 79 GPU has fallen off the bus');
+  assert.match(analysis.citations[0].excerpt, /PCIe connection/);
+  assert.match(analysis.citations[0].selectionReason, /Primary evidence/);
+  assert.doesNotMatch(analysis.citations[0].selectionReason, /confidence/i);
+});
+
 test('grounded analysis includes only retriever-backed citations', () => {
   const analysis = analyzeTelemetry('Xid 48 with DCGM_FI_DEV_ECC_DBE_VOL_TOTAL=2 on A100');
   const retrieved = new Set(analysis.retrieval.map((result) => result.document.id));
@@ -140,7 +163,7 @@ test('corpus IDs and URLs are valid and unique', () => {
   assert.equal(new Set(corpus.map((document) => document.id)).size, corpus.length);
   assert.ok(corpus.every((document) => document.sourceUrl.startsWith('https://')));
   assert.ok(corpus.every((document) => document.provenance.curatedContentHash.startsWith('fnv1a:')));
-  assert.ok(corpus.every((document) => document.provenance.retrievedAt === '2026-08-29'));
+  assert.ok(corpus.every((document) => document.provenance.retrievedAt === '2026-09-02'));
 });
 
 test('retrieval result is bounded to five documents', () => {

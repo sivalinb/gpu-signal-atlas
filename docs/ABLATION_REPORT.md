@@ -6,10 +6,10 @@ Generated with `npm run ablate -- --write` against the checked-in 31-case expect
 
 | Variant | Corpus records | Recall@5 | MRR |
 |---|---:|---:|---:|
-| BM25 only | 17 | 100.0% | 0.931 |
-| Vector only | 17 | 91.7% | 0.753 |
-| Hybrid RRF | 17 | 95.8% | 0.889 |
-| Hybrid + contextual rerank | 17 | 100.0% | 0.931 |
+| BM25 only | 27 | 100.0% | 0.931 |
+| Vector only | 27 | 83.3% | 0.692 |
+| Hybrid RRF | 27 | 95.8% | 0.826 |
+| Hybrid + contextual rerank | 27 | 100.0% | 0.951 |
 
 The comparison separates exact sparse matching, feature-hash vector similarity, reciprocal-rank fusion, and the final contextual boosts. Scores measure retrieval only; refusal and generation remain covered by the main evaluation.
 
@@ -17,8 +17,8 @@ The comparison separates exact sparse matching, feature-hash vector similarity, 
 
 | Variant | Corpus records | Recall@5 | MRR |
 |---|---:|---:|---:|
-| Fixed 90-token source windows | 19 | 91.7% | 0.896 |
-| Structure-aware identifier records | 17 | 100.0% | 0.931 |
+| Fixed 90-token source windows | 30 | 91.7% | 0.896 |
+| Structure-aware identifier records | 27 | 100.0% | 0.951 |
 
 The fixed baseline concatenates records by source page, splits them into 90-token windows with 15-token overlap, and therefore permits multiple identifiers to share a chunk. The selected corpus keeps one Xid or metric concept per reviewed record with attached authority, evidence, and limitations.
 
