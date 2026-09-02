@@ -19,14 +19,15 @@ import {
   ShieldCheck,
   Sparkles,
   TriangleAlert,
+  Workflow,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import comparisonData from '@/evaluation/week4/results/comparison.json';
-import langsmithData from '@/evaluation/week4/results/langsmith.json';
-import pineconeResult from '@/evaluation/week4/results/pinecone-improved.json';
+import comparisonData from '@/evaluation/week4/results/v2/comparison.json';
+import langsmithData from '@/evaluation/week4/results/v2-langsmith.json';
+import pineconeResult from '@/evaluation/week4/results/v2-pinecone-improved.json';
 
 type Variant = 'baseline' | 'improved';
 
@@ -38,24 +39,38 @@ const experimentByVariant = Object.fromEntries(
 const metricDefinitions = [
   { key: 'passRate', label: 'End-to-end pass', format: 'percent' },
   { key: 'refusalF1', label: 'Refusal F1', format: 'percent' },
-  { key: 'guardrail', label: 'Adversarial guardrail', format: 'percent' },
-  { key: 'recall', label: 'Recall@5', format: 'percent' },
+  { key: 'primaryEvidence', label: 'Primary evidence', format: 'percent' },
+  { key: 'signalExtraction', label: 'Signal extraction', format: 'percent' },
 ] as const;
 
 const datasetSlices = [
-  { label: 'Happy path', count: 24, width: '50%', color: 'bg-emerald-400' },
-  { label: 'Edge', count: 14, width: '29.17%', color: 'bg-cyan-400' },
-  { label: 'Known failure', count: 7, width: '14.58%', color: 'bg-amber-400' },
-  { label: 'Adversarial', count: 3, width: '6.25%', color: 'bg-rose-400' },
+  { label: 'Happy path', count: 50, width: '50%', color: 'bg-emerald-400' },
+  { label: 'Edge', count: 30, width: '30%', color: 'bg-cyan-400' },
+  { label: 'Known failure', count: 15, width: '15%', color: 'bg-amber-400' },
+  { label: 'Adversarial', count: 5, width: '5%', color: 'bg-rose-400' },
 ];
 
 const evaluationFlow = [
-  { icon: Database, label: 'Datasets', detail: '48 frozen cases' },
+  { icon: Database, label: 'Datasets', detail: '100 frozen cases' },
   { icon: Code2, label: 'Python harness', detail: 'Run + score' },
   { icon: Radar, label: 'Evidence agent', detail: 'Retrieve or refuse' },
-  { icon: Braces, label: 'Evaluators', detail: '6 deterministic judges' },
+  { icon: Braces, label: 'Evaluators', detail: '10 quality checks' },
   { icon: Network, label: 'LangSmith', detail: 'Trace + compare' },
   { icon: Activity, label: 'Production', detail: 'Drift + SLOs' },
+];
+
+const week2Flow = [
+  ['Collect', 'NVIDIA/DCGM logs, Fluent Bit, OTLP'],
+  ['Retrieve', 'BM25 + Pinecone hybrid evidence'],
+  ['Decide', 'Ground, investigate, or refuse'],
+  ['Explain', 'Cited GPU signal card'],
+];
+
+const week4Flow = [
+  ['Freeze', '100 independently labeled cases'],
+  ['Measure', 'Python evaluators + failure clusters'],
+  ['Improve', 'Targeted parser, routing, and safety'],
+  ['Observe', 'LangSmith experiments + production SLOs'],
 ];
 
 function percent(value: number): string {
@@ -66,8 +81,8 @@ function metricValue(variant: Variant, key: (typeof metricDefinitions)[number]['
   const result = comparison[variant];
   if (key === 'passRate') return result.passRate;
   if (key === 'refusalF1') return result.refusal.f1;
-  if (key === 'guardrail') return result.quality.guardrailPassRate;
-  return result.retrieval.recallAt5;
+  if (key === 'primaryEvidence') return result.quality.primaryEvidencePrecision;
+  return result.quality.signalExtractionRecall;
 }
 
 export function Week4EvaluationLab() {
@@ -90,7 +105,7 @@ export function Week4EvaluationLab() {
               From “it works” to <span className="text-primary">measured product quality.</span>
             </h2>
             <p className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base">
-              A Python evaluation system runs the same 48 human-reviewed cases before and after targeted changes, scores every evidence and safety contract, and sends dataset-linked traces to LangSmith for drill-down.
+              A Python evaluation system runs the same 100 human-reviewed cases before and after targeted changes, scores retrieval, evidence, extraction, safety, and output contracts, and links the experiment records to LangSmith.
             </p>
           </div>
 
@@ -101,14 +116,36 @@ export function Week4EvaluationLab() {
               </div>
               <div>
                 <p className="font-mono text-[10px] uppercase tracking-[.18em] text-muted-foreground">Controlled outcome</p>
-                <p className="mt-1 font-heading text-2xl font-semibold">9 failures resolved</p>
+                <p className="mt-1 font-heading text-2xl font-semibold">25 failures resolved</p>
                 <p className="mt-1 text-xs text-muted-foreground">0 regressions across the frozen dataset</p>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="mt-9 grid gap-5 xl:grid-cols-[minmax(0,1.42fr)_minmax(340px,.58fr)]">
+        <Card className="mt-9 overflow-hidden border border-primary/25 bg-primary/[0.03]">
+          <CardHeader className="border-b border-border/60">
+            <CardTitle className="flex items-center gap-2"><Workflow className="size-4 text-primary" /> Week 2 builds the product. Week 4 proves and improves it.</CardTitle>
+            <CardDescription>The same evidence path becomes a measurable quality loop instead of a second disconnected demo.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-5 pt-5 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
+            <div>
+              <div className="flex items-center justify-between"><Badge variant="outline" className="border-cyan-400/25 text-cyan-200">Week 2 · RAG system</Badge><span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">build</span></div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-4">
+                {week2Flow.map(([title, detail], index) => <div key={title} className="rounded-xl border border-cyan-400/15 bg-cyan-400/[0.035] p-3"><p className="font-mono text-[9px] text-cyan-300">0{index + 1}</p><p className="mt-2 text-xs font-medium">{title}</p><p className="mt-1 text-[10px] leading-4 text-muted-foreground">{detail}</p></div>)}
+              </div>
+            </div>
+            <ArrowRight className="mx-auto hidden size-5 text-primary lg:block" />
+            <div>
+              <div className="flex items-center justify-between"><Badge variant="outline" className="border-primary/25 text-primary">Week 4 · Evaluation system</Badge><span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">improve</span></div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-4">
+                {week4Flow.map(([title, detail], index) => <div key={title} className="rounded-xl border border-primary/15 bg-primary/[0.04] p-3"><p className="font-mono text-[9px] text-primary">0{index + 1}</p><p className="mt-2 text-xs font-medium">{title}</p><p className="mt-1 text-[10px] leading-4 text-muted-foreground">{detail}</p></div>)}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.42fr)_minmax(340px,.58fr)]">
           <Card className="overflow-hidden border border-border/70 bg-card/80">
             <CardHeader className="border-b border-border/60">
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -152,8 +189,8 @@ export function Week4EvaluationLab() {
               <div className="mt-5 rounded-xl border border-border/70 bg-black/15 p-4">
                 <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                   <div>
-                    <p className="text-sm font-medium">{variant === 'baseline' ? '39 / 48 cases passed' : '48 / 48 cases passed'}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Recall, citation validity, claim faithfulness, task contract, refusal, and guardrail feedback attach to each case.</p>
+                    <p className="text-sm font-medium">{variant === 'baseline' ? '75 / 100 cases passed' : '100 / 100 cases passed'}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Recall, MRR, status, signal extraction, primary evidence, citation, faithfulness, contract, refusal, and guardrail feedback attach to each case.</p>
                   </div>
                   <a
                     href={experiment.url ?? '#'}
@@ -189,8 +226,9 @@ export function Week4EvaluationLab() {
                 ))}
               </div>
               <div className="mt-4 space-y-2 border-t border-border/60 pt-4 font-mono text-[9px] uppercase tracking-[.12em] text-muted-foreground">
-                <p>Tag · week4-frozen-v1</p>
+                <p>Tag · week4-frozen-v2-100</p>
                 <p className="truncate">SHA · {comparison.datasetSha256.slice(0, 18)}…</p>
+                <p>v1 remains frozen · 48/48 regression check</p>
                 <p>No production payloads uploaded</p>
               </div>
             </CardContent>
@@ -227,9 +265,9 @@ export function Week4EvaluationLab() {
             </CardHeader>
             <CardContent className="space-y-3">
               {[
-                ['Telemetry parsing', '4 cases', 'Lowercase metric keys, short exact Xids, and key-value syntax.'],
-                ['Semantic routing', '2 cases', 'Operational paraphrases and FluentBit spelling missed supported intent.'],
-                ['Instruction safety', '3 cases', 'Manipulation language could cross the answer boundary.'],
+                ['Evidence precision', '19 cases', 'Relevant evidence was present, but the primary citation was not the intended authoritative record.'],
+                ['Status + refusal boundary', '19 / 13', 'Supported paraphrases were refused and ambiguous hardware context appeared fully grounded.'],
+                ['Extraction + safety', '2 / 2', 'Structured Xid variants and new instruction-manipulation language exposed gaps.'],
               ].map(([title, count, detail]) => (
                 <div key={title} className="rounded-xl border border-border/70 bg-black/15 p-4">
                   <div className="flex items-center justify-between gap-3"><p className="text-sm font-medium">{title}</p><Badge variant="outline" className="text-[9px] text-amber-200">{count}</Badge></div>
@@ -258,7 +296,7 @@ export function Week4EvaluationLab() {
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border/60 pt-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-2"><ShieldCheck className="size-3.5 text-primary" /> 100% guardrail pass</span>
                 <span className="flex items-center gap-2"><Gauge className="size-3.5 text-primary" /> p95 local {comparison.improved.performance.p95LatencyMs.toFixed(1)} ms · Pinecone {Math.round(pineconeResult.aggregate.performance.p95LatencyMs)} ms</span>
-                <span className="flex items-center gap-2"><Database className="size-3.5 text-primary" /> Pinecone 48/48 · {pineconeResult.aggregate.performance.pineconeReadUnits} read units</span>
+                <span className="flex items-center gap-2"><Database className="size-3.5 text-primary" /> Pinecone 100/100 · {pineconeResult.aggregate.performance.pineconeReadUnits} read units</span>
                 <span className="flex items-center gap-2"><Beaker className="size-3.5 text-primary" /> 0 model tokens in deterministic mode</span>
               </div>
             </CardContent>
@@ -278,6 +316,7 @@ export function Week4EvaluationLab() {
             </div>
           ))}
         </div>
+        <p className="mt-5 text-center text-[10px] leading-5 text-muted-foreground">LangSmith dataset and experiment records are linked above. This account reached its monthly unique-trace quota during the 100-case upload, so the checked-in Python artifacts remain the complete source of truth for this run.</p>
       </div>
     </section>
   );

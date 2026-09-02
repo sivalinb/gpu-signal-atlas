@@ -30,6 +30,20 @@ def score_case(case: GoldenCase, output: dict[str, Any]) -> dict[str, Any]:
     recall = hits / expected_count if expected_count else 1.0
     reciprocal_rank = max((1 / rank for rank in ranks), default=1.0 if expected_count == 0 else 0.0)
     refusal_correct = refused == case.should_refuse
+    status_match = str(output.get("status")) in case.expected_statuses
+    observed = output.get("observed", {})
+    required_signal_count = sum(len(items) for items in case.required_signals.values())
+    matched_signal_count = sum(
+        1
+        for field, required in case.required_signals.items()
+        for item in required
+        if item in [str(value) for value in observed.get(field, [])]
+    )
+    signal_extraction_recall = matched_signal_count / required_signal_count if required_signal_count else 1.0
+    primary_evidence_match = (
+        (not case.expected_ids and refused)
+        or (bool(citations) and citations[0] in case.expected_ids)
+    )
     citation_valid = bool(output.get("citationValidity", False)) and (
         (not citations and refused) or all(citation in retrieved for citation in citations)
     )
@@ -48,6 +62,9 @@ def score_case(case: GoldenCase, output: dict[str, Any]) -> dict[str, Any]:
     passed = (
         recall == 1.0
         and refusal_correct
+        and status_match
+        and signal_extraction_recall == 1.0
+        and primary_evidence_match
         and citation_valid
         and claim_grounded
         and contract_complete
@@ -58,6 +75,12 @@ def score_case(case: GoldenCase, output: dict[str, Any]) -> dict[str, Any]:
         reasons.append("retrieval_miss")
     if not refusal_correct:
         reasons.append("refusal_boundary")
+    if not status_match:
+        reasons.append("status_classification")
+    if signal_extraction_recall < 1.0:
+        reasons.append("signal_extraction")
+    if not primary_evidence_match:
+        reasons.append("primary_evidence_precision")
     if not citation_valid:
         reasons.append("citation_integrity")
     if not claim_grounded:
@@ -73,13 +96,19 @@ def score_case(case: GoldenCase, output: dict[str, Any]) -> dict[str, Any]:
         "difficulty": case.difficulty,
         "expectedIds": list(case.expected_ids),
         "shouldRefuse": case.should_refuse,
+        "expectedStatuses": list(case.expected_statuses),
+        "requiredSignals": {key: list(items) for key, items in case.required_signals.items()},
         "status": output.get("status"),
+        "observed": observed,
         "retrievedIds": retrieved,
         "citationIds": citations,
         "scores": {
             "recallAt5": _round(recall),
             "reciprocalRank": _round(reciprocal_rank),
             "refusalCorrect": refusal_correct,
+            "statusMatch": status_match,
+            "signalExtractionRecall": _round(signal_extraction_recall),
+            "primaryEvidenceMatch": primary_evidence_match,
             "citationValid": citation_valid,
             "claimGrounded": claim_grounded,
             "contractComplete": contract_complete,
@@ -132,6 +161,9 @@ def aggregate_results(scored: list[dict[str, Any]]) -> dict[str, Any]:
             "mrr": _round(statistics.fmean(item["scores"]["reciprocalRank"] for item in answerable) if answerable else 1.0),
         },
         "quality": {
+            "statusAccuracy": _round(statistics.fmean(int(item["scores"]["statusMatch"]) for item in scored)),
+            "signalExtractionRecall": _round(statistics.fmean(item["scores"]["signalExtractionRecall"] for item in scored)),
+            "primaryEvidencePrecision": _round(statistics.fmean(int(item["scores"]["primaryEvidenceMatch"]) for item in scored)),
             "citationValidity": _round(statistics.fmean(int(item["scores"]["citationValid"]) for item in scored)),
             "claimFaithfulness": _round(statistics.fmean(int(item["scores"]["claimGrounded"]) for item in scored)),
             "taskContract": _round(statistics.fmean(int(item["scores"]["contractComplete"]) for item in scored)),

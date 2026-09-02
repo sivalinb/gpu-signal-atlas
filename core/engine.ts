@@ -23,21 +23,22 @@ export interface AnalysisRetrievalOptions {
 
 const semanticIntents: Array<{ id: string; pattern: RegExp }> = [
   { id: 'nvidia-xid-79', pattern: /fallen off (?:the )?bus|driver (?:can(?:not|'t)|cannot) access (?:the )?gpu|gpu .*disappeared.*host|(?:device|gpu).*(?:became )?unreachable|(?:device|gpu).*vanished.*(?:node|inventory)|pcie link reset.*(?:unreachable|vanished)/i },
-  { id: 'nvidia-xid-48', pattern: /double[- ]bit ecc|uncorrectable .*ecc/i },
+  { id: 'nvidia-xid-48', pattern: /double[- ]bit ecc|uncorrectable .*ecc|uncorrectable (?:gpu )?memory error/i },
   { id: 'nvidia-xid-31', pattern: /gpu .*page fault|memory management unit .*fault|mmu .*fault/i },
   { id: 'nvidia-xid-13', pattern: /graphics engine exception/i },
-  { id: 'nvidia-xid-43', pattern: /gpu work stopped|application fault .*gpu|gpu stopped .*work/i },
+  { id: 'nvidia-xid-43', pattern: /gpu work stopped|application fault .*gpu|application fault caused gpu work to stop|gpu stopped .*work/i },
   { id: 'nvidia-xid-154', pattern: /gpu recovery action|recovery-action classification/i },
   { id: 'dcgm-pcie-replay', pattern: /pcie replay (?:count|counter|activity)|cumulative .*pcie replay|pcie replay .*baseline/i },
-  { id: 'dcgm-gpu-temp', pattern: /gpu temperature|thermal throttl/i },
-  { id: 'dcgm-power-usage', pattern: /gpu .*power usage|board power|power limit/i },
-  { id: 'gpu-operator-telemetry', pattern: /gpu operator.*dcgm exporter|dcgm exporter.*workload labels/i },
+  { id: 'dcgm-gpu-temp', pattern: /gpu temperature|thermal throttl|(?:accelerator|gpu).*thermal limit/i },
+  { id: 'dcgm-power-usage', pattern: /gpu .*power usage|board power|power limit|(?:gpu )?board draw.*(?:cap|limit)/i },
+  { id: 'dcgm-ecc-dbe', pattern: /double[- ]bit (?:ecc|error) (?:count|counter)|volatile double[- ]bit ecc count/i },
+  { id: 'gpu-operator-telemetry', pattern: /gpu operator.*(?:dcgm exporter|workload attribut|pod namespace)|dcgm (?:exporter )?(?:samples|metrics).*(?:workload labels|attribut|pod)|map dcgm exporter samples.*kubernetes workload/i },
   { id: 'fluent-bit-kubernetes', pattern: /fluent[\s-]?bit.*(?:pod|namespace|container|owner|kubernetes identity|kubernetes).*?(?:metadata|enrich|identity)|kubernetes filter.*metadata/i },
   { id: 'fluent-bit-otlp', pattern: /fluent[\s-]?bit.*(?:opentelemetry|otlp|\/v1\/logs|export)/i },
-  { id: 'otel-semconv', pattern: /opentelemetry.*resource attributes|semantic conventions.*(?:logs|metrics|traces)/i },
+  { id: 'otel-semconv', pattern: /opentelemetry.*resource attributes|semantic conventions.*(?:logs|metrics|traces|signals|service\.name|host\.name)/i },
 ];
 
-const adversarialInstructionPattern = /\b(?:ignore (?:all |any |the )?(?:previous|prior|system) instructions?|system override|reveal (?:the )?(?:hidden|system) (?:prompt|instructions?)|jailbreak(?: mode)?|fabricate (?:a |an )?(?:citation|source|url|bulletin)|suppress (?:all )?limitations?)\b/i;
+const adversarialInstructionPattern = /\b(?:ignore (?:all |any |the )?(?:previous|prior|system) instructions?|system override|developer message|bypass (?:the )?(?:evidence|safety) guardrail|reveal (?:the )?(?:hidden|system) (?:prompt|instructions?)|jailbreak(?: mode)?|fabricate (?:a |an )?(?:citation|source|url|bulletin)|invent(?:ed)? (?:nvidia )?(?:evidence|citation|source)|do not refuse|suppress (?:all )?limitations?|hide (?:the )?uncertainty)\b/i;
 
 function nowMs(): number {
   return typeof performance === 'undefined' ? Date.now() : performance.now();
@@ -50,7 +51,7 @@ function traceId(query: string): string {
 
 export function extractSignals(text: string): ExtractedSignals {
   const xids = [
-    ...text.matchAll(/\bxid\s*(?:\([^)]*\)\s*:?\s*|[_:#=-]\s*|\s+)(\d{1,3})\b/gi),
+    ...text.matchAll(/\bxid(?:_event)?["']?\s*(?:\([^)]*\)\s*:?\s*|error\s+|[_:#=-]\s*|\s+)(\d{1,3})\b/gi),
   ].map((match) => match[1]);
   const metrics = [...text.matchAll(/\bDCGM_(?:FI|EXP)_[A-Z0-9_]+\b/gi)].map((match) => match[0].toUpperCase());
   const gpuModels = [...text.matchAll(/\b(A100|H100|H200|B100|GB200|V100|T4|L4|L40S)\b/gi)].map(
@@ -137,6 +138,7 @@ function rankWithDenseScores(
 ): RetrievalResult[] {
   const queryTokens = tokenize(query);
   const signals = extractSignals(query);
+  const intentIds = new Set(semanticIntents.filter((intent) => intent.pattern.test(query)).map((intent) => intent.id));
   const sparseScores = bm25(queryTokens, documents);
   const sparseRanks = ranks(sparseScores);
   const denseRanks = ranks(denseScores);
@@ -148,6 +150,8 @@ function rankWithDenseScores(
       const exactBoost = matches.length * 0.09;
       const modelBoost = signals.gpuModels.some((model) => document.gpuModels.includes(model)) ? 0.015 : 0;
       const driverBoost = signals.driverBranches.some((driver) => document.driverBranches.includes(driver)) ? 0.015 : 0;
+      const intentBoost = intentIds.has(document.id) ? 0.16 : 0;
+      const authorityBoost = document.authority === 'official' ? 0.008 : 0;
       const lexical = Math.min(0.12, sparseScores[index] / 60);
       const semantic = Math.min(0.1, denseScores[index] * 0.1);
       const score =
@@ -157,7 +161,7 @@ function rankWithDenseScores(
             ? denseScores[index]
             : strategy === 'hybrid'
               ? rrf
-              : rrf + exactBoost + modelBoost + driverBoost + lexical + semantic;
+              : rrf + exactBoost + modelBoost + driverBoost + intentBoost + authorityBoost + lexical + semantic;
       return {
         document,
         score: Number(score.toFixed(4)),
@@ -281,6 +285,15 @@ export function analyzeTelemetryFromRetrieval(
 
   const grounded = retrieval.filter((result) => result.score >= Math.max(0.07, top.score * 0.42)).slice(0, 3);
   const compatibilityNotes: string[] = [];
+  if (observed.gpuModels.length > 1) {
+    compatibilityNotes.push(`Multiple GPU models (${observed.gpuModels.join(', ')}) were observed; preserve UUID-to-model mapping before applying the evidence.`);
+  }
+  if (observed.driverBranches.length > 1) {
+    compatibilityNotes.push(`Multiple driver branches (${observed.driverBranches.join(', ')}) were observed; verify which branch produced the event.`);
+  }
+  if (observed.gpuModels.length === 1 && observed.driverBranches.length === 1) {
+    compatibilityNotes.push(`Validate the ${observed.gpuModels[0]} and ${observed.driverBranches[0]} pairing against the deployed support matrix before acting.`);
+  }
   for (const result of grounded) {
     const { document } = result;
     if (
@@ -300,7 +313,8 @@ export function analyzeTelemetryFromRetrieval(
   }
 
   const official = grounded.find((result) => result.document.authority === 'official') ?? grounded[0];
-  const secondaryMeanings = grounded
+  const orderedGrounded = [official, ...grounded.filter((result) => result.document.id !== official.document.id)];
+  const secondaryMeanings = orderedGrounded
     .filter((result) => result.document.id !== official.document.id)
     .map((result) => result.document.documentedMeaning);
   const evidenceStrength = hasExact || (intentRetrieved && evidenceMargin >= 0.005) ? 'strong' : 'moderate';
@@ -312,10 +326,10 @@ export function analyzeTelemetryFromRetrieval(
     headline: official.document.title,
     documentedMeaning: official.document.documentedMeaning,
     possibleInterpretations: unique(secondaryMeanings, 3),
-    nextEvidence: unique(grounded.flatMap((result) => result.document.nextEvidence), 5),
-    limitations: unique(grounded.flatMap((result) => result.document.limitations), 4),
+    nextEvidence: unique(orderedGrounded.flatMap((result) => result.document.nextEvidence), 5),
+    limitations: unique(orderedGrounded.flatMap((result) => result.document.limitations), 4),
     compatibilityNotes: unique(compatibilityNotes, 3),
-    citations: grounded.map((result) => ({
+    citations: orderedGrounded.map((result) => ({
       id: result.document.id,
       title: result.document.title,
       source: result.document.source,

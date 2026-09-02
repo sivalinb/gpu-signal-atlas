@@ -44,6 +44,7 @@ process.stdout.write(JSON.stringify({
   variant: request.variant,
   status: analysis.status,
   evidenceStrength: analysis.evidenceStrength,
+  observed: analysis.observed,
   retrievedIds,
   citationIds,
   citationValidity: citationIds.every((id) => retrievedIds.includes(id) && corpus.some((document) => document.id === id)),

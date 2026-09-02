@@ -15,9 +15,9 @@ REPO_ROOT = SCRIPT_DIR.parents[2]
 sys.path.insert(0, str(SCRIPT_DIR))
 
 from week4_eval import (  # noqa: E402
-    DATASET_VERSION,
     aggregate_results,
     dataset_fingerprint,
+    dataset_version_for,
     load_cases,
     score_case,
 )
@@ -65,7 +65,7 @@ def run_local(dataset_path: Path, variant: str, backend: str, provider_environme
         print(f"[{index:02d}/{len(cases)}] {state} {case.id}")
     return {
         "schemaVersion": 1,
-        "datasetVersion": DATASET_VERSION,
+        "datasetVersion": dataset_version_for(dataset_path),
         "datasetSha256": dataset_fingerprint(dataset_path),
         "variant": variant,
         "agentVersion": os.environ.get("GPU_ATLAS_AGENT_VERSION", variant),

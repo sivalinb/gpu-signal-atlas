@@ -82,8 +82,8 @@ async function requestIntegrationStatus(signal?: AbortSignal): Promise<Integrati
 }
 
 const evaluationMetrics = [
-  ['Recall@5', '100%', '48 labeled cases'],
-  ['MRR', '0.957', 'rank quality'],
+  ['Recall@5', '100%', '100 labeled cases'],
+  ['MRR', '0.951', '31-case rank quality'],
   ['Citations', '100%', 'retriever-backed'],
   ['Refusals', '100%', 'precision & recall'],
 ];
@@ -92,7 +92,7 @@ const retrievalAblation = [
   ['BM25 only', '100.0%', '0.931', '100%'],
   ['Vector only', '91.7%', '0.753', '91.7%'],
   ['Hybrid RRF', '95.8%', '0.889', '95.8%'],
-  ['Hybrid + rerank', '100.0%', '0.931', '100%'],
+  ['Hybrid + rerank', '100.0%', '0.951', '100%'],
 ];
 
 const flow = [

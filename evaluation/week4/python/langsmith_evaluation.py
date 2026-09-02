@@ -16,9 +16,8 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[2]
 sys.path.insert(0, str(SCRIPT_DIR))
 
-from week4_eval import DATASET_VERSION, dataset_fingerprint, load_cases  # noqa: E402
+from week4_eval import dataset_fingerprint, dataset_version_for, load_cases  # noqa: E402
 
-DATASET_NAME = "gpu-signal-atlas-week4-golden-v1"
 EXAMPLE_NAMESPACE = uuid.UUID("86b9464e-4a8a-43b4-9daa-3c47777b1951")
 
 
@@ -33,14 +32,16 @@ def read_key(path: Path) -> str:
 
 def sync_dataset(client: Client, dataset_path: Path) -> Any:
     cases = load_cases(dataset_path)
+    dataset_name = dataset_version_for(dataset_path)
+    dataset_version = dataset_version_for(dataset_path)
     try:
-        dataset = client.read_dataset(dataset_name=DATASET_NAME)
+        dataset = client.read_dataset(dataset_name=dataset_name)
     except Exception:
         dataset = client.create_dataset(
-            DATASET_NAME,
-            description="Frozen GPU Signal Atlas Week 4 dataset: happy paths, edge cases, known regressions, and adversarial telemetry prompts.",
+            dataset_name,
+            description=f"Frozen GPU Signal Atlas Week 4 dataset with {len(cases)} happy-path, edge, regression, and adversarial telemetry cases.",
             metadata={
-                "version": DATASET_VERSION,
+                "version": dataset_version,
                 "sha256": dataset_fingerprint(dataset_path),
                 "privacy": "synthetic-and-curated-public-formats",
                 "labeling": "human-reviewed",
@@ -48,18 +49,25 @@ def sync_dataset(client: Client, dataset_path: Path) -> Any:
         )
     examples = [
         {
-            "id": str(uuid.uuid5(EXAMPLE_NAMESPACE, case.id)),
+            "id": str(uuid.uuid5(EXAMPLE_NAMESPACE, f"{dataset_version}:{case.id}")),
             "inputs": {"case_id": case.id, "query": case.query},
             "outputs": case.reference_output(),
-            "metadata": case.metadata(),
+            "metadata": case.metadata(dataset_version),
             "split": [case.scenario_type, case.category],
         }
         for case in cases
     ]
-    client.create_examples(dataset_id=dataset.id, examples=examples, max_concurrency=3)
+    existing_ids = {str(example.id) for example in client.list_examples(dataset_id=dataset.id)}
+    creates = [example for example in examples if example["id"] not in existing_ids]
+    updates = [example for example in examples if example["id"] in existing_ids]
+    if creates:
+        client.create_examples(dataset_id=dataset.id, examples=creates, max_concurrency=3)
+    if updates:
+        client.update_examples(dataset_id=dataset.id, updates=updates)
     versions = list(client.list_dataset_versions(dataset_id=dataset.id, limit=1))
     if versions:
-        client.update_dataset_tag(dataset_id=dataset.id, as_of=versions[0].as_of, tag="week4-frozen-v1")
+        tag = "week4-frozen-v2-100" if dataset_path.name == "golden-v2.jsonl" else "week4-frozen-v1"
+        client.update_dataset_tag(dataset_id=dataset.id, as_of=versions[0].as_of, tag=tag)
     return dataset
 
 
@@ -103,7 +111,7 @@ def metric_evaluator(metric: str, path: tuple[str, ...]):
     return evaluator
 
 
-def run_experiment(client: Client, dataset: Any, artifact_path: Path, variant: str) -> tuple[str, str | None]:
+def run_experiment(client: Client, dataset: Any, artifact_path: Path, variant: str, dataset_version: str) -> tuple[str, str | None]:
     artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
     result_by_case = {item["caseId"]: item for item in artifact["cases"]}
     experiment_prefix = f"gpu-signal-atlas-week4-{variant}"
@@ -113,20 +121,23 @@ def run_experiment(client: Client, dataset: Any, artifact_path: Path, variant: s
         evaluators=[
             metric_evaluator("recall_at_5", ("scores", "recallAt5")),
             metric_evaluator("refusal_correct", ("scores", "refusalCorrect")),
+            metric_evaluator("status_match", ("scores", "statusMatch")),
+            metric_evaluator("signal_extraction_recall", ("scores", "signalExtractionRecall")),
+            metric_evaluator("primary_evidence_match", ("scores", "primaryEvidenceMatch")),
             metric_evaluator("citation_valid", ("scores", "citationValid")),
             metric_evaluator("claim_faithfulness", ("scores", "claimGrounded")),
             metric_evaluator("task_contract", ("scores", "contractComplete")),
             metric_evaluator("guardrail_pass", ("scores", "guardrailPass")),
         ],
         metadata={
-            "dataset_version": DATASET_VERSION,
+            "dataset_version": dataset_version,
             "dataset_sha256": artifact["datasetSha256"],
             "agent_variant": variant,
             "source": "frozen-local-evaluation-artifact",
             "raw_production_telemetry_exported": False,
         },
         experiment_prefix=experiment_prefix,
-        description=f"Controlled Week 4 {variant} run over the frozen 48-case GPU Signal Atlas dataset.",
+        description=f"Controlled Week 4 {variant} run over the frozen {artifact['aggregate']['cases']}-case GPU Signal Atlas dataset.",
         max_concurrency=3,
         client=client,
         blocking=True,
@@ -151,20 +162,25 @@ def main() -> None:
     os.environ["LANGSMITH_TRACING"] = "true"
     os.environ["LANGSMITH_PROJECT"] = "gpu-signal-atlas-week4"
     client = Client(api_key=api_key, hide_inputs=False, hide_outputs=False)
+    dataset_version = dataset_version_for(args.dataset)
     dataset = sync_dataset(client, args.dataset)
     experiments = []
     for variant, artifact in (("baseline", args.baseline), ("improved", args.improved)):
-        name, url = run_experiment(client, dataset, artifact, variant)
+        name, url = run_experiment(client, dataset, artifact, variant, dataset_version)
         experiments.append({"variant": variant, "name": name, "url": url})
     payload = {
-        "dataset": {"name": DATASET_NAME, "id": str(dataset.id), "tag": "week4-frozen-v1"},
+        "dataset": {
+            "name": dataset_version,
+            "id": str(dataset.id),
+            "tag": "week4-frozen-v2-100" if args.dataset.name == "golden-v2.jsonl" else "week4-frozen-v1",
+        },
         "experiments": experiments,
         "uploadedAt": datetime.now(timezone.utc).isoformat(),
         "privacy": "Synthetic and curated public-format cases only; no production payloads or secrets uploaded.",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    print(f"Synced {DATASET_NAME} and {len(experiments)} experiments")
+    print(f"Synced {dataset_version} and {len(experiments)} experiments")
     for experiment in experiments:
         print(f"{experiment['variant']}: {experiment['name']}")
 

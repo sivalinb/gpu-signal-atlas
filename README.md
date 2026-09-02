@@ -109,26 +109,29 @@ Start at the product homepage for the Observe → Retrieve → Explain → Decid
 
 Open **Performance** in the main navigation for the solution-architecture workflow. Compare the bundled public NVIDIA benchmark runs, inspect SLO decisions, visualize how benchmark and telemetry systems align, review a safe MIG/diagnostics workflow, edit a headroom/cost scenario, and export the evidence report. Public measurements and derived scenarios are labeled separately throughout the interface.
 
-Open **Eval lab** for the Week 4 product-quality view. Toggle the frozen baseline and improved LangSmith experiments, inspect the 24/14/7/3 dataset distribution, follow the Python evaluation pipeline, and map each failure cluster to the targeted code change and measured result.
+Open **Eval lab** for the Week 2 → Week 4 product-quality view. See how the RAG request path becomes a frozen evaluation loop, toggle the baseline and improved experiments, inspect the 50/30/15/5 dataset distribution, and map each failure cluster to a targeted code change and measured result.
 
 Open **Metrics** for the self-observing runtime view. It polls a sanitized server summary every 15 seconds and shows live Pinecone index statistics, application-observed query read units and latency, the latest RAG stage timing, provider request health, RAG outcomes, and the bounded OpenTelemetry safety buffer. The charts are explicitly labeled as current-runtime and non-durable; they do not imitate provider billing or historical control-plane metrics.
 
 ## Week 4 controlled evaluation snapshot
 
-The frozen `gpu-signal-atlas-week4-golden-v1` dataset contains 48 human-reviewed expectations: 24 happy paths, 14 edge cases, 7 known-failure regressions, and 3 adversarial prompts. The identical dataset was run before and after three targeted changes. All nine baseline failures were resolved with zero regressions.
+The canonical `gpu-signal-atlas-week4-golden-v2-100` dataset contains 100 human-reviewed expectations: 50 happy paths, 30 edge cases, 15 known-failure regressions, and 5 adversarial prompts. The identical fingerprinted dataset was run before and after five targeted changes. All 25 baseline failures were resolved with zero regressions. The original 48-case v1 dataset remains unchanged and still passes 48/48 as a backward-compatibility gate.
 
 | Metric | Baseline | Improved |
 |---|---:|---:|
-| End-to-end pass rate | 81.2% | 100.0% |
-| Recall@5 | 100.0% | 100.0% |
-| Mean reciprocal rank | 0.957 | 0.957 |
+| End-to-end pass rate | 75.0% | 100.0% |
+| Recall@5 | 97.7% | 100.0% |
+| Mean reciprocal rank | 0.937 | 0.987 |
+| Status accuracy | 81.0% | 100.0% |
+| Signal extraction recall | 98.5% | 100.0% |
+| Primary evidence precision | 81.0% | 100.0% |
 | Citation validity | 100.0% | 100.0% |
 | Claim faithfulness | 100.0% | 100.0% |
-| Refusal F1 | 69.0% | 100.0% |
-| Adversarial guardrail | 93.8% | 100.0% |
+| Refusal F1 | 74.5% | 100.0% |
+| Adversarial guardrail | 98.0% | 100.0% |
 | Regressions | — | 0 |
 
-The additional managed-index run passed 48/48 cases with 100% Recall@5, used 48 Pinecone read units, and measured 987.6 ms p95 end-to-end retrieval latency. These results validate the checked-in deterministic corpus and frozen queries. They are regression evidence, not generalized GPU-diagnostic accuracy. Full Week 4 methodology is in [`docs/WEEK4_EVALUATION_REPORT.md`](docs/WEEK4_EVALUATION_REPORT.md); the original 31-case retrieval benchmark remains in [`docs/EVALUATION_REPORT.md`](docs/EVALUATION_REPORT.md).
+The additional managed-index run passed 100/100 cases with 100% Recall@5, used 100 Pinecone read units, and measured 790.6 ms p95 end-to-end retrieval latency. These results validate the checked-in deterministic corpus and frozen queries. They are regression evidence, not generalized GPU-diagnostic accuracy. Full v2 methodology is in [`docs/WEEK4_V2_EVALUATION_REPORT.md`](docs/WEEK4_V2_EVALUATION_REPORT.md); the v1 report and original 31-case retrieval benchmark remain available for history.
 
 ## Repository map
 
@@ -154,7 +157,7 @@ core/
   samples.ts                 browser replay inputs
   types.ts                   public data contracts
 evaluation/cases.ts          independent query expectations
-evaluation/week4/            frozen 48-case dataset, scenario slices, results, CSV/XLSX, and Python harness
+evaluation/week4/            immutable v1 plus canonical 100-case v2 datasets, results, CSV/XLSX, and Python harness
 tests/engine.test.ts         unit, retrieval, safety, and regression tests
 scripts/analyze.ts           command-line analysis
 scripts/evaluate.ts          reproducible evaluation runner

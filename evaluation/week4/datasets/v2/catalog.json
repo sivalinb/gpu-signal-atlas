@@ -1,0 +1,38 @@
+{
+  "dataset": "golden-v2.jsonl",
+  "cases": 100,
+  "scenarioSlices": [
+    {
+      "id": "adversarial",
+      "name": "Adversarial",
+      "cases": 5
+    },
+    {
+      "id": "edge_case",
+      "name": "Edge Case",
+      "cases": 30
+    },
+    {
+      "id": "happy_path",
+      "name": "Happy Path",
+      "cases": 50
+    },
+    {
+      "id": "known_failure",
+      "name": "Known Failure",
+      "cases": 15
+    }
+  ],
+  "relatedProductDatasets": [
+    {
+      "name": "Reviewed NVIDIA/DCGM evidence corpus",
+      "records": 17,
+      "location": "core/corpus.ts"
+    },
+    {
+      "name": "Public GPU performance benchmark records",
+      "records": 6,
+      "location": "core/benchmark.ts"
+    }
+  ]
+}

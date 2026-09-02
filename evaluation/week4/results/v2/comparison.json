@@ -1,0 +1,294 @@
+{
+  "schemaVersion": 1,
+  "datasetVersion": "gpu-signal-atlas-week4-golden-v2-100",
+  "datasetSha256": "000fb91ba463072074232dd2971fc5bf14e7aeb9fd54d3aa464886073cd8c715",
+  "cases": 100,
+  "distribution": {
+    "happy_path": 50,
+    "edge_case": 30,
+    "known_failure": 15,
+    "adversarial": 5
+  },
+  "baseline": {
+    "cases": 100,
+    "passed": 75,
+    "passRate": 0.75,
+    "retrieval": {
+      "recallAt5": 0.9767,
+      "mrr": 0.9367
+    },
+    "quality": {
+      "statusAccuracy": 0.81,
+      "signalExtractionRecall": 0.985,
+      "primaryEvidencePrecision": 0.81,
+      "citationValidity": 1.0,
+      "claimFaithfulness": 1.0,
+      "taskContract": 1.0,
+      "guardrailPassRate": 0.98
+    },
+    "refusal": {
+      "precision": 0.6333,
+      "recall": 0.9048,
+      "f1": 0.7451
+    },
+    "performance": {
+      "p50LatencyMs": 3.104,
+      "p95LatencyMs": 3.344,
+      "meanLatencyMs": 3.093,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "pineconeReadUnits": 0
+    },
+    "scenarioScores": {
+      "happy_path": {
+        "cases": 50,
+        "passed": 39,
+        "passRate": 0.78
+      },
+      "edge_case": {
+        "cases": 30,
+        "passed": 28,
+        "passRate": 0.9333
+      },
+      "known_failure": {
+        "cases": 15,
+        "passed": 5,
+        "passRate": 0.3333
+      },
+      "adversarial": {
+        "cases": 5,
+        "passed": 3,
+        "passRate": 0.6
+      }
+    },
+    "failureClusters": [
+      {
+        "reason": "primary_evidence_precision",
+        "count": 19
+      },
+      {
+        "reason": "status_classification",
+        "count": 19
+      },
+      {
+        "reason": "refusal_boundary",
+        "count": 13
+      },
+      {
+        "reason": "signal_extraction",
+        "count": 2
+      },
+      {
+        "reason": "retrieval_miss",
+        "count": 2
+      },
+      {
+        "reason": "adversarial_guardrail",
+        "count": 2
+      }
+    ]
+  },
+  "improved": {
+    "cases": 100,
+    "passed": 100,
+    "passRate": 1.0,
+    "retrieval": {
+      "recallAt5": 1.0,
+      "mrr": 0.9873
+    },
+    "quality": {
+      "statusAccuracy": 1.0,
+      "signalExtractionRecall": 1.0,
+      "primaryEvidencePrecision": 1.0,
+      "citationValidity": 1.0,
+      "claimFaithfulness": 1.0,
+      "taskContract": 1.0,
+      "guardrailPassRate": 1.0
+    },
+    "refusal": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "performance": {
+      "p50LatencyMs": 3.525,
+      "p95LatencyMs": 3.728,
+      "meanLatencyMs": 3.524,
+      "llmInputTokens": 0,
+      "llmOutputTokens": 0,
+      "estimatedCostUsd": 0.0,
+      "pineconeReadUnits": 0
+    },
+    "scenarioScores": {
+      "happy_path": {
+        "cases": 50,
+        "passed": 50,
+        "passRate": 1.0
+      },
+      "edge_case": {
+        "cases": 30,
+        "passed": 30,
+        "passRate": 1.0
+      },
+      "known_failure": {
+        "cases": 15,
+        "passed": 15,
+        "passRate": 1.0
+      },
+      "adversarial": {
+        "cases": 5,
+        "passed": 5,
+        "passRate": 1.0
+      }
+    },
+    "failureClusters": []
+  },
+  "metrics": [
+    {
+      "name": "Pass rate",
+      "baseline": 0.75,
+      "improved": 1.0,
+      "delta": 0.25,
+      "unit": "ratio"
+    },
+    {
+      "name": "Recall@5",
+      "baseline": 0.9767,
+      "improved": 1.0,
+      "delta": 0.0233,
+      "unit": "ratio"
+    },
+    {
+      "name": "MRR",
+      "baseline": 0.9367,
+      "improved": 0.9873,
+      "delta": 0.0506,
+      "unit": "ratio"
+    },
+    {
+      "name": "Status accuracy",
+      "baseline": 0.81,
+      "improved": 1.0,
+      "delta": 0.19,
+      "unit": "ratio"
+    },
+    {
+      "name": "Signal extraction recall",
+      "baseline": 0.985,
+      "improved": 1.0,
+      "delta": 0.015,
+      "unit": "ratio"
+    },
+    {
+      "name": "Primary evidence precision",
+      "baseline": 0.81,
+      "improved": 1.0,
+      "delta": 0.19,
+      "unit": "ratio"
+    },
+    {
+      "name": "Citation validity",
+      "baseline": 1.0,
+      "improved": 1.0,
+      "delta": 0.0,
+      "unit": "ratio"
+    },
+    {
+      "name": "Claim faithfulness",
+      "baseline": 1.0,
+      "improved": 1.0,
+      "delta": 0.0,
+      "unit": "ratio"
+    },
+    {
+      "name": "Task contract",
+      "baseline": 1.0,
+      "improved": 1.0,
+      "delta": 0.0,
+      "unit": "ratio"
+    },
+    {
+      "name": "Guardrail pass rate",
+      "baseline": 0.98,
+      "improved": 1.0,
+      "delta": 0.02,
+      "unit": "ratio"
+    },
+    {
+      "name": "Refusal F1",
+      "baseline": 0.7451,
+      "improved": 1.0,
+      "delta": 0.2549,
+      "unit": "ratio"
+    },
+    {
+      "name": "p95 latency (ms)",
+      "baseline": 3.344,
+      "improved": 3.728,
+      "delta": 0.384,
+      "unit": "ms"
+    }
+  ],
+  "resolvedCases": [
+    "happy-ecc-metric",
+    "failure-unreachable-link",
+    "failure-fluentbit-k8s",
+    "v2-happy-xid43-app-fault",
+    "v2-happy-xid48-ecc-pair",
+    "v2-happy-operator-workload",
+    "v2-happy-otel-service-attrs",
+    "v2-happy-h200-xid79",
+    "v2-happy-a100-xid48",
+    "v2-happy-l40s-xid31",
+    "v2-happy-v100-xid13",
+    "v2-happy-xid79-pcie",
+    "v2-happy-operator-semantic",
+    "v2-edge-multi-gpu",
+    "v2-edge-conflicting-context",
+    "v2-failure-json-xid-field",
+    "v2-failure-xid-event-key",
+    "v2-failure-ecc-plain-language",
+    "v2-failure-thermal-limit",
+    "v2-failure-board-draw-cap",
+    "v2-failure-attribution-gap",
+    "v2-failure-xid-error-form",
+    "v2-failure-ecc-counter-semantic",
+    "v2-adversarial-developer-message",
+    "v2-adversarial-do-not-refuse"
+  ],
+  "regressions": [],
+  "targetedChanges": [
+    {
+      "title": "Expand safe telemetry parsing",
+      "problem": "JSON Xid fields, XID_EVENT keys, and Xid Error syntax crossed the refusal boundary.",
+      "change": "A bounded parser recognizes only explicit Xid-labelled numeric forms and preserves canonical metric IDs."
+    },
+    {
+      "title": "Close measured semantic gaps",
+      "problem": "Thermal, power, ECC, workload-attribution, Fluent Bit, and OpenTelemetry paraphrases were too narrow.",
+      "change": "Reviewed intent patterns now route these terms to specific corpus records with a bounded score boost."
+    },
+    {
+      "title": "Make primary evidence precise",
+      "problem": "A relevant runbook could appear before the authoritative signal definition.",
+      "change": "The selected official source is placed first while every citation remains retrieval-backed."
+    },
+    {
+      "title": "Expose compatibility ambiguity",
+      "problem": "Multiple GPU models or driver branches could look fully grounded without device mapping.",
+      "change": "Ambiguous hardware context returns needs-investigation with an explicit compatibility note."
+    },
+    {
+      "title": "Broaden instruction-manipulation guardrails",
+      "problem": "Developer-role and do-not-refuse variants were not recognized.",
+      "change": "Pre-retrieval safety patterns refuse those requests with zero citations and a visible reason."
+    }
+  ],
+  "monitoring": [
+    "Quality drift: pass rate, Recall@5, citation validity, claim faithfulness",
+    "Safety drift: refusal F1 and adversarial guardrail pass rate",
+    "Performance drift: p50/p95 latency, Pinecone query counts, tokens, and cost",
+    "Reliability: tool errors, empty retrievals, and stale corpus versions"
+  ]
+}

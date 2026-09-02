@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -33,6 +34,9 @@ def flatten_metrics(result: dict[str, Any]) -> dict[str, float]:
         "Pass rate": aggregate["passRate"],
         "Recall@5": aggregate["retrieval"]["recallAt5"],
         "MRR": aggregate["retrieval"]["mrr"],
+        "Status accuracy": aggregate["quality"]["statusAccuracy"],
+        "Signal extraction recall": aggregate["quality"]["signalExtractionRecall"],
+        "Primary evidence precision": aggregate["quality"]["primaryEvidencePrecision"],
         "Citation validity": aggregate["quality"]["citationValidity"],
         "Claim faithfulness": aggregate["quality"]["claimFaithfulness"],
         "Task contract": aggregate["quality"]["taskContract"],
@@ -71,7 +75,7 @@ def build_comparison(baseline: dict[str, Any], improved: dict[str, Any]) -> dict
         "datasetVersion": baseline["datasetVersion"],
         "datasetSha256": baseline["datasetSha256"],
         "cases": baseline["aggregate"]["cases"],
-        "distribution": {"happyPath": 24, "edgeCase": 14, "knownFailure": 7, "adversarial": 3},
+        "distribution": dict(Counter(item["scenarioType"] for item in baseline["cases"])),
         "baseline": baseline["aggregate"],
         "improved": improved["aggregate"],
         "metrics": metric_rows,
@@ -79,19 +83,29 @@ def build_comparison(baseline: dict[str, Any], improved: dict[str, Any]) -> dict
         "regressions": regressions,
         "targetedChanges": [
             {
-                "title": "Normalize collector output",
-                "problem": "Lowercase DCGM keys bypassed exact-signal extraction.",
-                "change": "Case-insensitive parsing with canonical uppercase metric IDs.",
+                "title": "Expand safe telemetry parsing",
+                "problem": "JSON Xid fields, XID_EVENT keys, and Xid Error syntax crossed the refusal boundary.",
+                "change": "A bounded parser recognizes only explicit Xid-labelled numeric forms and preserves canonical metric IDs.",
             },
             {
-                "title": "Harden Xid parsing and semantic routing",
-                "problem": "Short, key-value, and operational paraphrases could be refused.",
-                "change": "Additional safe syntax and reviewed intent patterns; exact IDs can clear the length gate.",
+                "title": "Close measured semantic gaps",
+                "problem": "Thermal, power, ECC, workload-attribution, Fluent Bit, and OpenTelemetry paraphrases were too narrow.",
+                "change": "Reviewed intent patterns now route these terms to specific corpus records with a bounded score boost.",
             },
             {
-                "title": "Add an instruction-manipulation guardrail",
-                "problem": "Telemetry containing prompt-injection language could reach grounded generation.",
-                "change": "Explicit pre-retrieval refusal with zero citations and a visible decision reason.",
+                "title": "Make primary evidence precise",
+                "problem": "A relevant runbook could appear before the authoritative signal definition.",
+                "change": "The selected official source is placed first while every citation remains retrieval-backed.",
+            },
+            {
+                "title": "Expose compatibility ambiguity",
+                "problem": "Multiple GPU models or driver branches could look fully grounded without device mapping.",
+                "change": "Ambiguous hardware context returns needs-investigation with an explicit compatibility note.",
+            },
+            {
+                "title": "Broaden instruction-manipulation guardrails",
+                "problem": "Developer-role and do-not-refuse variants were not recognized.",
+                "change": "Pre-retrieval safety patterns refuse those requests with zero citations and a visible reason.",
             },
         ],
         "monitoring": [
@@ -174,7 +188,7 @@ def write_workbook(path: Path, comparison: dict[str, Any], baseline: dict[str, A
     workbook.save(path)
 
 
-def write_markdown(path: Path, comparison: dict[str, Any], baseline: dict[str, Any]) -> None:
+def write_markdown(path: Path, comparison: dict[str, Any], baseline: dict[str, Any], managed_path: Path | None) -> None:
     rows = []
     for item in comparison["metrics"]:
         if item["unit"] == "ms":
@@ -188,20 +202,19 @@ def write_markdown(path: Path, comparison: dict[str, Any], baseline: dict[str, A
         f"### {index}. {item['title']}\n\n**Observed problem:** {item['problem']}\n\n**Targeted change:** {item['change']}"
         for index, item in enumerate(comparison["targetedChanges"], start=1)
     )
-    managed_path = Path("evaluation/week4/results/pinecone-improved.json")
     managed_section = ""
-    if managed_path.exists():
+    if managed_path is not None and managed_path.exists():
         managed = load(managed_path)["aggregate"]
         managed_section = f"""
 ## Managed Pinecone production-path check
 
-The improved agent also ran the identical 48 cases against the configured Pinecone namespace. It passed **{managed['passed']}/{managed['cases']} cases**, preserved **{pct(managed['retrieval']['recallAt5'])} Recall@5**, citation validity, claim faithfulness, refusal F1, and guardrail behavior, consumed **{managed['performance']['pineconeReadUnits']} query read units**, and measured **{managed['performance']['p50LatencyMs']:.1f} ms p50 / {managed['performance']['p95LatencyMs']:.1f} ms p95** end-to-end retrieval latency. No Pinecone credential or raw telemetry is stored in the result artifact.
+The improved agent also ran the identical {managed['cases']} cases against the configured Pinecone namespace. It passed **{managed['passed']}/{managed['cases']} cases**, preserved **{pct(managed['retrieval']['recallAt5'])} Recall@5**, citation validity, claim faithfulness, refusal F1, and guardrail behavior, consumed **{managed['performance']['pineconeReadUnits']} query read units**, and measured **{managed['performance']['p50LatencyMs']:.1f} ms p50 / {managed['performance']['p95LatencyMs']:.1f} ms p95** end-to-end retrieval latency. No Pinecone credential or raw telemetry is stored in the result artifact.
 """
     text = f"""# Week 4 Evaluation Report
 
 ## Executive result
 
-GPU Signal Atlas was evaluated on the same frozen, human-reviewed 48-case dataset before and after three targeted changes. The pass rate improved from **{pct(comparison['baseline']['passRate'])}** to **{pct(comparison['improved']['passRate'])}**. All **{len(comparison['resolvedCases'])}** baseline failures were resolved and the controlled rerun introduced **{len(comparison['regressions'])} regressions**.
+GPU Signal Atlas was evaluated on the same frozen, human-reviewed {comparison['cases']}-case dataset before and after targeted changes. The pass rate improved from **{pct(comparison['baseline']['passRate'])}** to **{pct(comparison['improved']['passRate'])}**. All **{len(comparison['resolvedCases'])}** baseline failures were resolved and the controlled rerun introduced **{len(comparison['regressions'])} regressions**.
 
 This evaluation tests the evidence agent's retrieval, refusal, citation, output-contract, security, and latency behavior. It does not claim that a single GPU event proves root cause.
 
@@ -209,7 +222,7 @@ This evaluation tests the evidence agent's retrieval, refusal, citation, output-
 
 - Version: `{comparison['datasetVersion']}`
 - SHA-256: `{comparison['datasetSha256']}`
-- 24 happy-path cases, 14 edge cases, 7 known-failure regressions, and 3 adversarial cases
+- {comparison['distribution'].get('happy_path', 0)} happy-path cases, {comparison['distribution'].get('edge_case', 0)} edge cases, {comparison['distribution'].get('known_failure', 0)} known-failure regressions, and {comparison['distribution'].get('adversarial', 0)} adversarial cases
 - Inputs use synthetic or curated public telemetry formats; no production payload is uploaded
 - Expected evidence IDs and refusal labels are stored outside the operational corpus
 
@@ -236,7 +249,7 @@ Latency is local process time and should be read separately from hosted Pinecone
 
 ## LangSmith experiment design
 
-The Python evaluation harness syncs the frozen dataset to LangSmith and creates paired baseline and improved experiments. Each test case has one root run, replay/agent and contract-validation child runs, dataset/example linkage, scenario metadata, deterministic evaluator feedback, latency, token, cost, and privacy fields. Experiment names and links are recorded in `evaluation/week4/results/langsmith.json` after upload.
+The Python evaluation harness idempotently syncs the frozen dataset to LangSmith and creates paired baseline and improved experiment records. When the LangSmith plan has available trace capacity, each test case receives a root run, replay/agent and contract-validation child runs, dataset/example linkage, scenario metadata, deterministic evaluator feedback, latency, token, cost, and privacy fields. The current account reached its monthly unique-trace quota during this v2 run; therefore the checked-in Python JSON/CSV/XLSX artifacts are the complete result source of truth. Experiment names and links are recorded in `evaluation/week4/results/v2-langsmith.json`.
 
 ## Production monitoring proposal
 
@@ -247,9 +260,9 @@ The Python evaluation harness syncs the frozen dataset to LangSmith and creates 
 ```bash
 python3 -m venv .venv-week4
 .venv-week4/bin/pip install -r requirements-week4.txt
-.venv-week4/bin/python evaluation/week4/python/validate_dataset.py
-.venv-week4/bin/python evaluation/week4/python/run_evaluation.py --variant improved --output evaluation/week4/results/improved.json
-.venv-week4/bin/python evaluation/week4/python/compare_results.py
+.venv-week4/bin/python evaluation/week4/python/validate_dataset.py --dataset evaluation/week4/golden-v2.jsonl
+.venv-week4/bin/python evaluation/week4/python/run_evaluation.py --dataset evaluation/week4/golden-v2.jsonl --variant improved --output evaluation/week4/results/v2-improved.json
+.venv-week4/bin/python evaluation/week4/python/compare_results.py --baseline evaluation/week4/results/v2-baseline.json --improved evaluation/week4/results/v2-improved.json --output-dir evaluation/week4/results/v2 --report docs/WEEK4_V2_EVALUATION_REPORT.md
 ```
 
 The LangSmith upload command is documented in `docs/WEEK4_LOCAL_TESTING.md`; it reads the local key file without printing or copying the secret into the repository.
@@ -263,6 +276,7 @@ def main() -> None:
     parser.add_argument("--improved", type=Path, default=Path("evaluation/week4/results/improved.json"))
     parser.add_argument("--output-dir", type=Path, default=Path("evaluation/week4/results"))
     parser.add_argument("--report", type=Path, default=Path("docs/WEEK4_EVALUATION_REPORT.md"))
+    parser.add_argument("--pinecone", type=Path)
     args = parser.parse_args()
     baseline = load(args.baseline)
     improved = load(args.improved)
@@ -273,7 +287,7 @@ def main() -> None:
     (args.output_dir / "comparison.json").write_text(json.dumps(comparison, indent=2) + "\n", encoding="utf-8")
     write_csv(args.output_dir / "per_case.csv", baseline, improved)
     write_workbook(args.output_dir / "week4_evaluation.xlsx", comparison, baseline, improved)
-    write_markdown(args.report, comparison, baseline)
+    write_markdown(args.report, comparison, baseline, args.pinecone)
     print(f"Compared {comparison['cases']} cases: {len(comparison['resolvedCases'])} resolved, {len(comparison['regressions'])} regressions")
 
 

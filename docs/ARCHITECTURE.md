@@ -29,7 +29,7 @@ flowchart TB
 
 The deployed application keeps input and rendering in the browser but performs retrieval through a same-origin server route. That route is the only component allowed to use the Pinecone credential. The credential-free command-line path and checked-in vector index remain available for deterministic regression testing and ablations.
 
-The Week 4 evaluation plane is intentionally separate from the production request path. A Python harness validates a frozen 48-case JSONL dataset, invokes the TypeScript evidence agent as the system under test, applies deterministic evaluators, clusters failures, writes JSON/CSV/XLSX/report artifacts, and uploads dataset-linked baseline and improved experiments to LangSmith. Pinecone remains the hosted retrieval plane; LangSmith is the experiment and trace plane, not a vector database.
+The Week 4 evaluation plane is intentionally separate from the production request path. A Python harness validates the canonical frozen 100-case JSONL dataset, invokes the TypeScript evidence agent as the system under test, applies deterministic evaluators, clusters failures, writes JSON/CSV/XLSX/report artifacts, and registers dataset-linked baseline and improved experiments in LangSmith. The immutable 48-case v1 remains a regression gate. Pinecone is the hosted retrieval plane; LangSmith is the experiment and trace plane, not a vector database.
 
 ## Implemented telemetry-to-browser path
 
