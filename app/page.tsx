@@ -858,7 +858,6 @@ function ProductHomepage() {
             <div className="mt-7 flex flex-wrap gap-3">
               <a href="#analyze" className={buttonVariants({ size: 'lg', className: 'bg-primary text-primary-foreground hover:bg-primary/90' })}><Sparkles className="size-4" /> Try a live signal</a>
               <a href="#walkthrough" className={buttonVariants({ size: 'lg', variant: 'outline' })}><Play className="size-4" /> Watch the system flow</a>
-              <a href="#interview-tour" className={buttonVariants({ size: 'lg', variant: 'ghost' })}><Gauge className="size-4" /> 5-minute interview tour</a>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
               {['Exact identifier preservation', 'Retriever-backed citations', 'Tested refusal path'].map((item) => (
@@ -915,17 +914,6 @@ function ProductHomepage() {
               <div><p className="text-sm font-medium">{title}</p><p className="mt-1 text-xs leading-5 text-muted-foreground">{detail}</p></div>
             </div>
           ))}
-        </div>
-        <div id="interview-tour" className="mt-6 rounded-2xl border border-primary/20 bg-primary/[0.035] p-5">
-          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><p className="font-mono text-[9px] uppercase tracking-[.18em] text-primary">NVIDIA interview mode · five minutes</p><p className="mt-2 text-sm text-slate-300">Follow one bounded story from incident signal to performance and release evidence.</p></div><Badge variant="outline" className="self-start border-primary/25 text-primary">4 proof points</Badge></div>
-          <div className="mt-4 grid gap-2 sm:grid-cols-4">
-            {[
-              ['01 · Diagnose', '#analyze', 'Run Xid 79 and inspect cited evidence.'],
-              ['02 · Explain', '#walkthrough', 'Show ingestion, hybrid retrieval, and refusal.'],
-              ['03 · Benchmark', '#performance-lab', 'Open the campaign contract and SLO gate.'],
-              ['04 · Prove', '#week4-evaluation', 'Close on 100 cases, confidence interval, and limits.'],
-            ].map(([title, href, detail]) => <a key={title} href={href} className="rounded-xl border border-border/70 bg-black/15 p-3 transition hover:border-primary/30 hover:bg-primary/5"><p className="text-xs font-medium text-primary">{title}</p><p className="mt-2 text-[11px] leading-5 text-muted-foreground">{detail}</p></a>)}
-          </div>
         </div>
       </div>
     </section>

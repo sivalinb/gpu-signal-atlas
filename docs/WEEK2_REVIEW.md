@@ -6,9 +6,9 @@
 
 GPU Signal Atlas implements every technical layer named in the Week 2 handout: a specific corpus, ingestion and cleaning, freshness controls, chunking, embeddings, vector storage, hybrid retrieval, reranking, cited generation, refusal, and evaluation. The public application and repository substantially exceed the baseline project.
 
-The final submission is not yet complete because the handout separately requires a live video of five minutes or less. The script and demo surface are ready, but the recording and its public link remain an external deliverable.
+The final submission is not yet complete because the handout separately requires a live video of five minutes or less. The recording and its public link remain an external deliverable.
 
-The new product homepage, original GPU-to-evidence illustration, and audience-specific pitch scripts improve reviewer comprehension and recording readiness. They do not increase the technical score because the communication/documentation category was already at its maximum and the missing video remains a separate submission gate.
+The product homepage, original GPU-to-evidence illustration, and concise product explanation improve reviewer comprehension. They do not increase the technical score because the communication/documentation category was already at its maximum and the missing video remains a separate submission gate.
 
 ## Scope choice
 
@@ -38,10 +38,10 @@ Neo4j is an implemented bonus evidence graph. The submission does not claim the 
 | Evaluation | 100 owner-reviewed primary cases, a separate 16-case post-change holdout, automated tests, retrieval/chunking ablations, 100% Recall@5, 0.987 MRR, and complete citation/refusal metrics on the bounded primary set. Independent GPU-SME review remains pending. | Excellent for the reviewed corpus |
 | Google Doc | Overview, dataset, prompts/instructions, iterations, learnings, architecture, evaluation, limitations, setup, and requirement mapping. | Complete and updated |
 | Live demo | Public website demonstrates analysis, refusal, telemetry flow, performance intelligence, privacy boundaries, graph context, and voice interaction. | Complete |
-| Product communication | Homepage pitch, original GPU-to-evidence visual, interviewer script, instructor script, and 30-second elevator version explain the system before the technical walkthrough. | Complete |
+| Product communication | Homepage explanation and original GPU-to-evidence visual explain the system before the technical walkthrough. | Complete |
 | AI coding-tool explanation | Repository and document explain Codex's role and the validation gates used to accept changes. | Complete |
 | Project assets | Public GitHub repository contains code, tests, configs, evaluation, and documentation. | Complete |
-| Video, five minutes or less | Recording-ready script exists; final recording/public link does not yet exist. | **Pending** |
+| Video, five minutes or less | Final recording/public link does not yet exist. | **Pending** |
 
 ## Verified implementation evidence
 
@@ -74,9 +74,9 @@ The score is a reviewer-authored assessment because the handout specifies delive
 
 | Required Week 2 deliverable | Current status | Evidence |
 |---|---|---|
-| Project documentation | Complete | Public Google Doc includes overview, dataset, prompts/instructions, iterations, learnings, architecture, evaluation, limitations, pitch scripts, and requirement mapping. |
+| Project documentation | Complete | Public Google Doc includes overview, dataset, prompts/instructions, iterations, learnings, architecture, evaluation, limitations, and requirement mapping. |
 | Project assets | Complete | Public GitHub contains application source, tests, evaluation, workflow/configuration assets, and documentation. |
-| Video demo, five minutes or less | Pending | A timed 4:55 script and recording-ready public product are complete; the recording and public video link still must be supplied. |
+| Video demo, five minutes or less | Pending | The public product is complete; the recording and public video link still must be supplied. |
 
 **Deliverable completion: 2 of 3 submitted artifacts complete; 1 recording artifact pending.** This status is deliberately separate from the 98/100 technical-quality assessment.
 
@@ -103,4 +103,4 @@ The score is a reviewer-authored assessment because the handout specifies delive
 
 ## Final recommendation
 
-Submit the project after recording the five-minute video. Open with the homepage visual and 30-second pitch, then spend most of the time on Xid 79, hybrid retrieval, the refusal example, the visual end-to-end flow, and the evaluation evidence. Treat the Mistral/Neo4j/Deepgram additions as concise product differentiation; do not let them obscure the core Week 2 RAG decisions.
+Submit the project after recording the required video. Keep Xid 79, hybrid retrieval, the refusal example, the visual end-to-end flow, and the evaluation evidence central. Treat the Mistral/Neo4j/Deepgram additions as concise product differentiation; do not let them obscure the core Week 2 RAG decisions.

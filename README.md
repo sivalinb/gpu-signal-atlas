@@ -218,13 +218,11 @@ docs/                        design, visual, evaluation, testing, and submission
 - [`docs/PROVIDER_OBSERVABILITY.md`](docs/PROVIDER_OBSERVABILITY.md) — live metrics, chart semantics, data boundaries, and production extension
 - [`docs/MULTIMODAL_EVIDENCE_FABRIC.md`](docs/MULTIMODAL_EVIDENCE_FABRIC.md) — Mistral, Neo4j, and Deepgram flows, controls, and extension design
 - [`docs/PERFORMANCE_INTELLIGENCE.md`](docs/PERFORMANCE_INTELLIGENCE.md) — public benchmark data, technology mapping, SLOs, correlation, MIG, capacity, APIs, and production extension
-- [`docs/NVIDIA_INTERVIEW_DEMO.md`](docs/NVIDIA_INTERVIEW_DEMO.md) — focused solution-architecture interview walkthrough and follow-up answers
 - [`docs/LOCAL_TESTING.md`](docs/LOCAL_TESTING.md) — local setup and end-to-end verification
 - [`docs/RUNBOOKS.md`](docs/RUNBOOKS.md) — demonstration evidence-collection runbooks
-- [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) — five-minute video walkthrough
 - [`docs/PROJECT_DOCUMENTATION.md`](docs/PROJECT_DOCUMENTATION.md) — submission-ready project narrative
 - [`docs/WEEK2_REVIEW.md`](docs/WEEK2_REVIEW.md) — expert requirement mapping and 98/100 technical scorecard
-- [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) — public links, recording sequence, and final handoff checks
+- [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) — public links, technical verification, and final handoff checks
 
 ## License
 

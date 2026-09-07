@@ -188,10 +188,9 @@ The performance workbench adds five solution-architecture views: public benchmar
 - Dataset, prompts, iterations, and learnings
 - Fluent Bit/OpenTelemetry replay assets
 - Local setup and verification guide
-- Five-minute demo script
 - Public Google Doc with Week 2 requirement mapping and expert assessment
 - Interactive start-to-finish visual pipeline walkthrough
-- Original product-homepage illustration and simple interviewer/instructor pitch scripts
+- Original product-homepage illustration and concise product explanation
 - Implemented Fluent Bit/OpenTelemetry → safe gateway → SSE inbox → explicit RAG analysis flow
 - Persistent vector-index build and verification scripts
 - Implemented ingestion and freshness workflow
@@ -204,4 +203,4 @@ The performance workbench adds five solution-architecture views: public benchmar
 - Public website: `https://gpu-signal-atlas.siva-babu.chatgpt.site`
 - Public repository: `https://github.com/sivalinb/gpu-signal-atlas`
 - Public Google Doc: `https://docs.google.com/document/d/1bksyAMQVZFTTbXAq5TY1KnvXqq1rBO-trVjV1gjTezI/edit`
-- Video: record the updated sequence in `docs/DEMO_SCRIPT.md`, keep it below five minutes, confirm the link is public, and submit all three assets through the Week 2 form.
+- Video: keep the final recording below five minutes, confirm the link is public, and submit all three assets through the Week 2 form.

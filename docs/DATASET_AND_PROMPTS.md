@@ -139,7 +139,7 @@ These prompts summarize the design work used to create the project:
 5. Refuse unknown identifiers instead of retrieving a semantically adjacent GPU error.
 6. Label synthetic telemetry and internal runbooks honestly.
 7. Build independent evaluation labels and measure Recall@5, MRR, citation validity, refusal quality, and latency.
-8. Provide a working website, CI, observability replay, visual guide, local testing guide, and five-minute demo script.
+8. Provide a working website, CI, observability replay, visual guide, local testing guide, and submission-ready project documentation.
 
 ## Major iterations
 
